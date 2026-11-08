@@ -47,6 +47,96 @@ function rollTalent(rng) {
   return 'peak';
 }
 
+/**
+ * 天生标签（r35 补，设计/01 §1）：命格 fate + 天赋 talents[]。
+ *
+ * `talents.json` 里 `fates` 是命格（一人一个），`talents` 是天生禀赋（一人 0–2 个）。
+ * 命格改起点/上限，天赋是布尔型加成；两者都不进乘法（需求/01 §5）。
+ */
+function fateList() {
+  try {
+    const cfg = require('../repository/config');
+    const t = cfg.get('talents') || {};
+    return (t.fates || []).map((f) => f.id);
+  } catch (e) { return []; }
+}
+
+function talentList() {
+  try {
+    const cfg = require('../repository/config');
+    const t = cfg.get('talents') || {};
+    return (t.talents || []).map((x) => x.id);
+  } catch (e) { return []; }
+}
+
+function rollFate(rng) {
+  const list = fateList();
+  if (!list.length) return '';
+  return list[Math.min(list.length - 1, Math.floor(rng() * list.length))];
+}
+
+/** 天赋：40% 一个都没有，45% 一个，15% 两个（占位权重，数值待重推） */
+function rollTalents(rng) {
+  const list = talentList();
+  if (!list.length) return [];
+  const r = rng();
+  const n = r < 0.40 ? 0 : r < 0.85 ? 1 : 2;
+  const out = [];
+  for (let i = 0; i < n; i += 1) {
+    const pick = list[Math.floor(rng() * list.length)];
+    if (pick && out.indexOf(pick) < 0) out.push(pick);
+  }
+  return out;
+}
+
+/** 属性上限（需求/01 §2.1，r35）：单项 100、总量 200 */
+function attrCaps() {
+  try {
+    const cfg = require('../repository/config');
+    const C = (cfg.get('rules') || {}).ATTR_CAP || {};
+    return { single: Number(C.single) || 100, hard: Number(C.hard) || 200 };
+  } catch (e) {
+    return { single: 100, hard: 200 };
+  }
+}
+
+/**
+ * 命格 + 天赋带来的修饰器（r35）。
+ *
+ * `talents.json` 每条都带一个 `mods[]`（`{target, op, value}`），
+ * 这里把它们包成标准修饰器（`duration: permanent`、`source` 指向命格/天赋 id），
+ * 于是**面板、判定、事件读取时全都自动生效**，不需要在业务代码里特判。
+ */
+function birthMods(fateId, talentIds) {
+  const out = [];
+  let cfg = {};
+  try {
+    cfg = require('../repository/config').get('talents') || {};
+  } catch (e) { return out; }
+
+  const push = (src, list) => {
+    for (const m of (list || [])) {
+      if (!m || !m.target) continue;
+      out.push({
+        target: m.target,
+        op: m.op || 'add',
+        value: m.value,
+        duration: { kind: 'permanent' },
+        source: src,
+        stack: 'unique'
+      });
+    }
+  };
+
+  for (const f of (cfg.fates || [])) {
+    if (f.id === fateId) push('fate.' + f.id, f.mods);
+  }
+  for (const t of (cfg.talents || [])) {
+    if (talentIds.indexOf(t.id) >= 0) push('talent.' + t.id, t.mods);
+  }
+  return out;
+}
+
 function artIds() {
   /* 循环引用不碰：这里只读一次种子名字，读不到就用内置兜底 */
   try {
@@ -68,6 +158,11 @@ function initial(name, opts) {
   const arts = {};
   for (const id of ids) arts[id] = { lvl: 0, exp: 0, talent: 'none', learned: false };
 
+  /* 天生标签：命格（一人一个）+ 天赋（0–2 个），并把它们的修饰器带上（r35） */
+  const fate = rollFate(rng);
+  const talents = rollTalents(rng);
+  const innateMods = birthMods(fate, talents);
+
   const flags = {};
   if (talent !== 'none') {
     /* 有天赋 = 小时候被家里送去做过学徒；没有就得靠「拜师学艺」事件 */
@@ -83,11 +178,16 @@ function initial(name, opts) {
     lifespan: 72,
     zone: 'city',
     luck: roll.luck,
+    /* 天生标签（r35，设计/01 §1） */
+    fate,
+    talents,
     attr: {
       aptitude: { base: roll.aptitude },
       insight: { base: roll.insight },
       heart: { base: roll.heart }
     },
+    /* 属性上限：单项封顶 + 总量封顶（需求/01 §2.1） */
+    attrCaps: attrCaps(),
     reputation: { base: 8 },
     path: {
       body: pathState(),
@@ -102,7 +202,7 @@ function initial(name, opts) {
     merit: { war: 0, craft: 0, office: 0 },
     education: { stage: 'meng', graduated: false },
     items: {},
-    mods: [],
+    mods: innateMods,
     pending: [],
     flags,
     war: { phase: 'peace' },

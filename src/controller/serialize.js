@@ -44,4 +44,55 @@ function cropWorld(world) {
   return rest;
 }
 
-module.exports = { cropEvent, cropEvents, cropWorld };
+/**
+ * 角色卡的裁剪（r35，设计/40 §1.1）。
+ *
+ * **隐藏属性 / 寿命 / 观己 → 只有 sysadmin 能看。**
+ * 玩家只看到：名字、年龄、四道的**品名与能不能点**、囊中、纪事。
+ * 看不到：资质/悟性/心性/气运的数值、寿元、修为条的具体数、内部计数。
+ *
+ * 注意：这不是"前端藏 DOM"——**这些字段根本不会出现在发给浏览器的 JSON 里**。
+ */
+const VIEWER_MAP = { sysadmin: 'sysadmin', user: 'user', guest: 'user' };
+
+function cropState(state, viewer) {
+  if (!state) return state;
+  const v = VIEWER_MAP[String(viewer || 'guest')] || 'user';
+  if (v === 'sysadmin') return state;
+
+  const out = { ...state };
+
+  /* ① 隐藏属性：只留"有没有"，不留数值 */
+  delete out.attr;
+
+  /* ② 寿命：玩家只知道"还活着"，不知道能活到几岁 */
+  delete out.lifespan;
+
+  /* ③ 气运 */
+  delete out.luck;
+
+  /* ④ 先天标签的**具体内容**也不给（命格名会剧透出身） */
+  delete out.fate;
+  delete out.talents;
+
+  /* ⑤ 四道的修为条数值：只给"满没满"与下一个品名 */
+  if (out.path && typeof out.path === 'object') {
+    const p = {};
+    for (const [dao, row] of Object.entries(out.path)) {
+      if (!row || typeof row !== 'object') { p[dao] = row; continue; }
+      const r = { ...row };
+      delete r.bar;
+      delete r.barMax;
+      /* ready 是布尔，留着——它是"修为满了没有"，不是数值 */
+      p[dao] = r;
+    }
+    out.path = p;
+  }
+
+  /* ⑥ 内部计数 */
+  delete out.monthsUsed;
+
+  return out;
+}
+
+module.exports = { cropEvent, cropEvents, cropWorld, cropState, VIEWER_MAP };

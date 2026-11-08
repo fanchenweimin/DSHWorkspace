@@ -10,7 +10,7 @@ const arts = require('../model/rules/arts');
 const realm = require('../model/rules/realm');
 const running = require('../model/state/running');
 const session = require('../middleware/session');
-const { cropEvents, cropEvent } = require('./serialize');
+const { cropEvents, cropEvent, cropState } = require('./serialize');
 const { evalWhen } = require('../model/rules/dsl');
 
 const STAGE = {
@@ -166,7 +166,8 @@ function payload(req, gid, state, extra) {
   const viewer = session.viewerOf(req);
   const table = handSys.table(state);
   return {
-    state: publicState(state),
+    /* r35：角色卡也要按 viewer 裁——隐藏属性 / 寿命只给 sysadmin（设计/40 §1.1） */
+    state: cropState(publicState(state), viewer),
     main: table.main ? cropEvent(mainFor(state), viewer) : null,
     breaks: table.breaks,
     train: table.train,

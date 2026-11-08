@@ -58,8 +58,16 @@ function roundBars(state) {
   }
 }
 
-/** 满一年：长一岁、清手牌、清月、修饰器到期、修为取整、写年份分隔 */
+/**
+ * 满一年。**年初链的顺序写死**（设计/00 I7、需求/01 §6、需求/20 §10.1）：
+ *
+ *   ① 寿元  ② 气运漂移  ③ 心性衰减  ④ 心魔  ⑤ 城池层（未接）  ⑥ 跨年动作（暂缓）  ⑦ 掷事件
+ *
+ * 顺序不能换：先衰减再掷心魔，与先掷再衰减，是两个人不同的死法。
+ */
 function rollYear(state) {
+  const rules = config.get('rules');
+
   state.clock.year += 1;
   state.clock.age += 1;
   state.monthsUsed = 0;
@@ -68,25 +76,52 @@ function rollYear(state) {
   state.turn.breakthroughUsed = false;
   state.turn.mainId = null;      /* 新的一年重抽主卡（设计/20 §9） */
   state.turn.mainDone = false;   /* 新的一年才又有"一件大事" */
+  state.turn.heartBlocked = false;  /* 心魔活下来的"当年不可再发起心关"解除 */
   mods.expire(state);
   roundBars(state);
 
   /* 坊市的货架当年有效：跨年就收摊（需求/20 §7：1 月/次） */
   if (state.flags && state.flags.market) delete state.flags.market.open;
 
-  /* 寿元跟着境界走（设计/20 §9 step1_lifespan）：进了品就活得久些 */
-  const rules = config.get('rules');
+  /* ── ① 寿元（设计/20 §9 step1_lifespan） ───────────────── */
   state.lifespan = realm.lifespanOf(state, rules);
-
-  /* 战事日期到了就把 war.phase 推上去（设计/21 §2：到点必来，不看概率） */
-  calendar.sync(state);
-
-  state.log.push(`— 大曜历${cnYear(state.clock.year)}年 · ${state.clock.age} 岁 —`);
-
   if (state.clock.age > state.lifespan) {
     state.dead = true;
     state.log.push(`你活到了 ${state.clock.age} 岁。这一年冬天，你没能再睁眼。`);
+    state.log.push(`— 大曜历${cnYear(state.clock.year)}年 · ${state.clock.age} 岁 —`);
+    return;
   }
+
+  /* ── ② 气运漂移（需求/01 §4：每年向 50 回归 ±1） ─────────── */
+  const luck = num(state.luck != null ? state.luck : 50);
+  if (luck !== 50) {
+    state.luck = luck + (luck > 50 ? -1 : 1);
+  }
+
+  /* ── ③ 心性衰减（需求/01 §3.2：定时任务，只到 60 为止） ─────── */
+  const decay = realm.heartDecay(state, rules);
+  if (decay > 0) {
+    state.log.push(`日子又磨去一点。心性 −${decay}（现 ${Math.round(num(mods.get(state, 'attr.heart.eff')))}）。`);
+  }
+
+  /* ── ④ 心魔（需求/01 §3.5：心性 0–39 每年掷一次） ──────────── */
+  const demon = realm.rollDemon(state, rules, Math.random);
+  if (demon) {
+    if (demon.survived) {
+      state.log.push(`这一年你心里有什么东西碎了。你熬过来了，但什么都没剩下。（心性 ${Math.round(demon.heart)} → ${Math.round(demon.after)}，修为清零）`);
+    } else {
+      state.log.push(`你没能从那一夜里走出来。心性 ${Math.round(demon.heart)}，心魔在你心里生了根。`);
+      state.log.push(`— 大曜历${cnYear(state.clock.year)}年 · ${state.clock.age} 岁 —`);
+      return;
+    }
+  }
+
+  /* ── ⑤ 城池层（未接）、⑥ 跨年动作（r35 暂缓） ─────────────── */
+
+  /* ── ⑦ 战事日历（设计/21 §2：到点必来，不看概率） ──────────── */
+  calendar.sync(state);
+
+  state.log.push(`— 大曜历${cnYear(state.clock.year)}年 · ${state.clock.age} 岁 —`);
 }
 
 /**

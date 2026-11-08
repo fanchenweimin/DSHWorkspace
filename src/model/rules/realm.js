@@ -281,19 +281,33 @@ function judgeBreak(state, params, ctx) {
   /* r32：**每年只能破一次境界，但"入门"不算**（感气入门、体魄入门这种）。
      入门问的是"能不能开始"，不是"能不能再进一步"，所以不占当年的名额。 */
   const isEntry = num(path.level) === 0 && tier === 1;
-  if (!force && !isEntry && state.turn && state.turn.breakthroughUsed) {
+
+  /* r35：修心的门是**一次性**的，且心性 < 90 → **必然失败**（需求/11 §6.1–§6.2）。
+     这一检查要放在 force 之前：连"事件直接把门推开"也不行——心性不够就是进不去。 */
+  if (dao === 'heart') {
+    const H = rules.HEART || {};
+    const need = num(H.heartBreakNeed != null ? H.heartBreakNeed : 90);
+    const heartV = num(mods.get(state, 'attr.heart.eff'));
+    if (heartV < need) {
+      return { ok: false, why: 'heart_low', p: 0, need, heart: heartV };
+    }
+  }
+
+  /* r35：`force` 也吃"一年一次"。
+     r34 之前 force 绕过这条，导致 15 条 evt.gate.* 可以同年连破两个瓶颈。
+     需求/20 §10.2 写的是"全局一次，不分道、不分品"，没有例外。 */
+  if (!isEntry && state.turn && state.turn.breakthroughUsed) {
     return { ok: false, why: 'one_per_year' };
   }
   /* r27 / r28：这里**不检查修为条**。
      ① 入门关（第 1 品）根本没有修为条，只看瓶颈；
-     ② 品内突破的"修为得先练满"是**资格**问题，放在业务层 `turn.breakAct()`
+     ② 品内突破的"修为得先修满"是**资格**问题，放在业务层 `turn.breakAct()`
         里拦（那边能给出"还差多少"的人话），不塞进纯判定。 */
-
-  state.turn = state.turn || {};
-  if (!isEntry) state.turn.breakthroughUsed = true;
 
   /* 事件瓶颈：事件办成了就直接进品，不再掷第二次骰（r30） */
   if (force) {
+    state.turn = state.turn || {};
+    if (!isEntry) state.turn.breakthroughUsed = true;
     commitTier(state, dao, tier, rules);
     return { ok: true, why: 'event', q: 0, forced: true };
   }
@@ -302,10 +316,16 @@ function judgeBreak(state, params, ctx) {
   path.wall = path.wall || {};
   if (path.wall[tier] === undefined) path.wall[tier] = rng() < q;   // 一品只掷一次（§4.1）
 
+  /* r35：**没墙（q=0 掷空）不占年度名额**（设计/11 §4 + §10）。
+     r34 之前这行在掷 q 之前，运气好的人也要被罚一年。 */
   if (!path.wall[tier]) {
     commitTier(state, dao, tier, rules);
     return { ok: true, why: 'no_wall', q };
   }
+
+  /* 到这里才算"真的开始冲关"：占掉今年的名额 */
+  state.turn = state.turn || {};
+  if (!isEntry) state.turn.breakthroughUsed = true;
 
   /**
    * 入门关（第 1 品）和品内突破不是一回事：
@@ -325,30 +345,146 @@ function judgeBreak(state, params, ctx) {
     ? Math.max(successBase(state, dao, tier, rules), num(S.openBase != null ? S.openBase : 0.25))
     : successBase(state, dao, tier, rules);
 
+  /* 灌顶（r35）：一次性，把这一次判定抬到"基本保送"（需求/11 §7.4）。 */
+  const enlight = num(path.enlighten);
+
   const p = Math.min(
-    0.95,
+    num(S.pCap != null ? S.pCap : 0.95),
     base
       + (entry ? 0 : studyBonus(state, dao, tier, rules))
-      + num(path.fail)
+      + Math.min(num(S.failCap != null ? S.failCap : 0.1), num(path.fail))
       + pillBonus(state, rules)
       + luckAdj(state)
+      + enlight
   );
   const roll = rng();
   if (roll < p) {
+    path.enlighten = 0;                       /* 灌顶用掉就没了 */
     commitTier(state, dao, tier, rules);
-    return { ok: true, why: 'roll', q, p, roll };
+    return { ok: true, why: 'roll', q, p, roll, enlight };
   }
 
+  path.enlighten = 0;                          /* 灌顶失败也算用掉 */
   path.fail = Math.min(
-    num(S.failCap != null ? S.failCap : 0.03),
+    num(S.failCap != null ? S.failCap : 0.1),
     num(path.fail) + 0.01 + rng() * 0.02
   );
   return { ok: false, why: 'roll', q, p, roll };
+}
+
+/* ── 心性：定时衰减 / 心魔 / 心关失败（需求/01 §3，r35） ────── */
+
+/**
+ * ① 自然衰减（定时任务）。
+ *
+ * 规则（`需求/01` §3.2）：
+ *   - **入了修心就不衰减**（不惑 = 世事再也磨不动你）
+ *   - **心性 ≤ 60 就停**——定时任务永远压不到 40，单靠熬时间遇不到心魔
+ *   - 在册（蒙/府/太）−1；离校 −2
+ *
+ * @returns {number} 实际扣掉的量（0 表示没执行）
+ */
+function heartDecay(state, rules) {
+  const H = (rules || {}).HEART || {};
+  const floor = num(H.decayFloor != null ? H.decayFloor : 60);
+  const heartPath = state.path && state.path.heart;
+  const heart = num(mods.get(state, 'attr.heart.eff'));
+
+  /* 已入修心：自然衰减归零 */
+  if (heartPath && num(heartPath.level) >= 1) return 0;
+  /* 已到地板：定时任务停止 */
+  if (heart <= floor) return 0;
+
+  const inSchool = !!(state.education && !state.education.graduated);
+  const step = num(inSchool
+    ? (H.decayInSchool != null ? H.decayInSchool : 1)
+    : (H.decayOutSchool != null ? H.decayOutSchool : 2));
+
+  const next = Math.max(floor, heart - step);
+  const lost = heart - next;
+  if (lost > 0) mods.write(state, 'attr.heart.eff', next);
+  return lost;
+}
+
+/**
+ * 心魔的存活率（**与心性成正比**，r35）。
+ *   p(活) = 0.1 × 心性 / 39     39 → 0.100、20 → 0.051、0 → 0
+ */
+function demonSurvive(heart, rules) {
+  const H = (rules || {}).HEART || {};
+  const at = num(H.demonSurviveAt != null ? H.demonSurviveAt : 39);
+  const max = num(H.demonSurviveMax != null ? H.demonSurviveMax : 0.1);
+  if (at <= 0) return 0;
+  return clamp((max * num(heart)) / at, 0, 1);
+}
+
+/** 心魔只找入道者（锻体 ≥ 3 或 炼气 ≥ 2）。凡人只得"心疾"，不掷骰。 */
+function canHaveDemon(state, rules) {
+  const H = (rules || {}).HEART || {};
+  const needBody = num(H.demonRequiresBody != null ? H.demonRequiresBody : 3);
+  const needQi = num(H.demonRequiresQi != null ? H.demonRequiresQi : 2);
+  const body = num(((state.path || {}).body || {}).level);
+  const qi = num(((state.path || {}).qi || {}).level);
+  return body >= needBody || qi >= needQi;
+}
+
+/**
+ * ② 心魔判定（年初 step4）。返回 null 表示没触发。
+ *
+ * 触发：心性 0–39，每年掷一次。
+ * 存活：心性 −5、**当前品修为条清零**、当年不能再发起心关。
+ * 死亡：`state.dead = true`。
+ */
+function rollDemon(state, rules, rng) {
+  const H = (rules || {}).HEART || {};
+  const line = num(H.demonLine != null ? H.demonLine : 40);
+  const heart = num(mods.get(state, 'attr.heart.eff'));
+
+  if (heart >= line) return null;
+  if (!canHaveDemon(state, rules)) return null;
+
+  const p = demonSurvive(heart, rules);
+  const roll = (rng || Math.random)();
+
+  if (roll < p) {
+    const loss = num(H.demonHpLoss != null ? H.demonHpLoss : 5);
+    const after = Math.max(0, heart - loss);
+    mods.write(state, 'attr.heart.eff', after);
+    /* 当前品的修为条清零（所有道，因为"这一关"是他整个人的关卡） */
+    for (const dao of DAOS) {
+      const p2 = state.path[dao];
+      if (p2 && num(p2.level) >= 1) p2.bar = 0;
+    }
+    state.turn = state.turn || {};
+    state.turn.heartBlocked = true;      /* 当年不能再发起心关 */
+    return { kind: 'demon', survived: true, heart, after, p, roll };
+  }
+  state.dead = true;
+  return { kind: 'demon', survived: false, heart, p, roll };
+}
+
+/**
+ * ③ 心关失败（需求/01 §3.4）：修为 −10×基数、30% 心性 −1。
+ * 与 ① 分开记——入修心后 ① 停了，③ 不停。
+ */
+function heartClashFail(state, rules, rng) {
+  const H = (rules || {}).HEART || {};
+  const chance = num(H.heartClashFailPenalty != null ? H.heartClashFailPenalty : 0.3);
+  const loss = num(H.heartClashFailLoss != null ? H.heartClashFailLoss : 1);
+  const heart = num(mods.get(state, 'attr.heart.eff'));
+  const roll = (rng || Math.random)();
+  if (roll < chance) {
+    const after = Math.max(0, heart - loss);
+    mods.write(state, 'attr.heart.eff', after);
+    return { ok: true, lost: loss, from: heart, to: after, roll, chance };
+  }
+  return { ok: true, lost: 0, roll, chance };
 }
 
 module.exports = {
   RANK, DAOS, GONGFA, attrOf, gongfaOf, barMax, baseRate, monthGain, spiritCoef,
   appearRate, successBase, studyBonus, pillBonus, luckAdj,
   bottleneckOf, commitTier, spill, breakWall, judgeBreak, lifespanOf,
-  monthsToFull, canTrain
+  monthsToFull, canTrain,
+  heartDecay, demonSurvive, canHaveDemon, rollDemon, heartClashFail
 };

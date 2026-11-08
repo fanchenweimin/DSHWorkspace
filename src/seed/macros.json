@@ -1,52 +1,144 @@
 {
   "macro.break.attempt": {
-    "params": ["dao", "tier"],
+    "params": [
+      "dao",
+      "tier"
+    ],
     "desc": "冲关：判定 → 成败分支。公式锁在 rules/，这里只编排",
     "do": [
-      { "judge": { "kind": "break", "dao": "$arg.dao", "tier": "$arg.tier" } },
+      {
+        "judge": {
+          "kind": "break",
+          "dao": "$arg.dao",
+          "tier": "$arg.tier"
+        }
+      },
       {
         "if": {
-          "when": [ { "eq": ["$last.ok", true] } ],
-          "then": [ { "call": { "macro": "macro.break.success", "args": { "dao": "$arg.dao", "tier": "$arg.tier" } } } ],
-          "else": [ { "call": { "macro": "macro.break.fail", "args": { "dao": "$arg.dao" } } } ]
+          "when": [
+            {
+              "eq": [
+                "$last.ok",
+                true
+              ]
+            }
+          ],
+          "then": [
+            {
+              "call": {
+                "macro": "macro.break.success",
+                "args": {
+                  "dao": "$arg.dao",
+                  "tier": "$arg.tier"
+                }
+              }
+            }
+          ],
+          "else": [
+            {
+              "call": {
+                "macro": "macro.break.fail",
+                "args": {
+                  "dao": "$arg.dao"
+                }
+              }
+            }
+          ]
         }
       }
     ]
   },
   "macro.break.success": {
-    "params": ["dao", "tier"],
+    "params": [
+      "dao",
+      "tier"
+    ],
     "desc": "破境成功：层级由 realm.commitTier 写（唯一写入点），这里只写文案与标记",
     "do": [
-      { "log": "关隘开了一线，你听见自己骨节里有什么东西松开了。" },
-      { "flag": { "id": "flag.last_break.dao", "value": "$arg.dao" } },
-      { "flag": { "id": "flag.last_break.tier", "value": "$arg.tier" } }
+      {
+        "log": "关隘开了一线，你听见自己骨节里有什么东西松开了。"
+      },
+      {
+        "flag": {
+          "id": "flag.last_break.dao",
+          "value": "$arg.dao"
+        }
+      },
+      {
+        "flag": {
+          "id": "flag.last_break.tier",
+          "value": "$arg.tier"
+        }
+      }
     ]
   },
   "macro.break.fail": {
-    "params": ["dao"],
+    "params": [
+      "dao"
+    ],
     "desc": "破境失败：不扣修为、不降层级，只记一次失败（I4）",
     "do": [
-      { "log": "你退了回来。修为一点没少，只是这一年过去了。" }
+      {
+        "log": "你退了回来。修为一点没少，只是这一年过去了。"
+      }
     ]
   },
   "macro.study.session": {
-    "params": ["dao", "tier"],
+    "params": [
+      "dao",
+      "tier"
+    ],
     "desc": "求学 / 求指导一次：+0.03，同一个瓶颈只能叠一次（用 flag 记）",
     "do": [
-      { "add": ["path.$arg.dao.study.$arg.tier", 0.03] },
-      { "flag": { "id": "flag.study.$arg.dao.$arg.tier", "value": true } }
+      {
+        "add": [
+          "path.$arg.dao.study.$arg.tier",
+          0.03
+        ]
+      },
+      {
+        "flag": {
+          "id": "flag.study.$arg.dao.$arg.tier",
+          "value": true
+        }
+      }
     ]
   },
   "macro.spirit.knock": {
     "params": [],
     "desc": "叩养灵之门：判定 → 成败分支。判定器读 SUCCESS.event.spirit",
     "do": [
-      { "judge": { "kind": "break", "dao": "spirit", "tier": 1 } },
+      {
+        "judge": {
+          "kind": "break",
+          "dao": "spirit",
+          "tier": 1
+        }
+      },
       {
         "if": {
-          "when": [ { "eq": ["$last.ok", true] } ],
-          "then": [ { "call": { "macro": "macro.spirit.success" } } ],
-          "else": [ { "call": { "macro": "macro.spirit.fail" } } ]
+          "when": [
+            {
+              "eq": [
+                "$last.ok",
+                true
+              ]
+            }
+          ],
+          "then": [
+            {
+              "call": {
+                "macro": "macro.spirit.success"
+              }
+            }
+          ],
+          "else": [
+            {
+              "call": {
+                "macro": "macro.spirit.fail"
+              }
+            }
+          ]
         }
       }
     ]
@@ -55,58 +147,237 @@
     "params": [],
     "desc": "入门（见众生）：只写标记；level 由 commit 写（I25）",
     "do": [
-      { "log": "你忽然听见了。屋外的、城外的、土里埋着的，都在响。" },
-      { "flag": { "id": "flag.spirit.entered", "value": true } }
+      {
+        "log": "你忽然听见了。屋外的、城外的、土里埋着的，都在响。"
+      },
+      {
+        "flag": {
+          "id": "flag.spirit.entered",
+          "value": true
+        }
+      }
     ]
   },
   "macro.spirit.fail": {
     "params": [],
     "desc": "叩门未开：不扣灵力、不降层级（I4）",
     "do": [
-      { "log": "门在那儿。你摸到了，就是推不开。" }
+      {
+        "log": "门在那儿。你摸到了，就是推不开。"
+      }
     ]
   },
   "macro.art.session": {
-    "params": ["art"],
+    "params": [
+      "art"
+    ],
     "desc": "做一月百艺：钱与声望由 systems/arts 算，这里不写数值（避免两套公式）",
     "do": [
-      { "log": "你在作坊里待了一个月。" }
+      {
+        "log": "你在作坊里待了一个月。"
+      }
     ]
   },
   "macro.war.defend": {
-    "params": ["city", "months"],
+    "params": [
+      "city",
+      "months"
+    ],
     "desc": "守城：按月消耗，城防 + 守方战力结算",
     "do": [
-      { "add": ["merit.war", 12] },
-      { "log": "城墙上的火把一夜没灭。" }
+      {
+        "add": [
+          "merit.war",
+          12
+        ]
+      },
+      {
+        "log": "城墙上的火把一夜没灭。"
+      }
     ]
   },
   "macro.war.flee": {
-    "params": ["city"],
+    "params": [
+      "city"
+    ],
     "desc": "弃城而走：不掉命，扣名声与战功",
     "do": [
-      { "add": ["merit.war", -30] },
-      { "add": ["reputation.eff", -10] },
-      { "log": "你走了。回头时，城还在烧。" }
+      {
+        "add": [
+          "merit.war",
+          -30
+        ]
+      },
+      {
+        "add": [
+          "reputation.eff",
+          -10
+        ]
+      },
+      {
+        "log": "你走了。回头时，城还在烧。"
+      }
     ]
   },
   "macro.war.cityFall": {
-    "params": ["city"],
+    "params": [
+      "city"
+    ],
     "desc": "城破：改四个系统（人口 / 灵脉 / 席位 / 事实标记），不扣修为",
     "do": [
-      { "flag": { "id": "flag.city_lost.$arg.city", "value": true } },
-      { "log": "城破了。它不扣你的修为，它扣你修炼的输入。" }
+      {
+        "flag": {
+          "id": "flag.city_lost.$arg.city",
+          "value": true
+        }
+      },
+      {
+        "log": "城破了。它不扣你的修为，它扣你修炼的输入。"
+      }
     ]
   },
   "macro.merit.exchange": {
-    "params": ["target"],
+    "params": [
+      "target"
+    ],
     "desc": "贡献兑换：只能换身份·席位·配额（I21）",
     "do": [
       {
         "if": {
-          "when": [ { "gte": ["merit.war", 100] } ],
-          "then": [ { "sub": ["merit.war", 100] }, { "log": "你换到了一次城卫的名额。" } ],
-          "else": [ { "log": "差得太远。" } ]
+          "when": [
+            {
+              "gte": [
+                "merit.war",
+                100
+              ]
+            }
+          ],
+          "then": [
+            {
+              "sub": [
+                "merit.war",
+                100
+              ]
+            },
+            {
+              "log": "你换到了一次城卫的名额。"
+            }
+          ],
+          "else": [
+            {
+              "log": "差得太远。"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "macro.heart.clash.fail": {
+    "params": [],
+    "desc": "心关失败（需求/01 §3.4、需求/11 §6.3）：扣修为，并 30% 概率扣 1 点心性。",
+    "do": [
+      {
+        "if": {
+          "when": [
+            {
+              "gte": [
+                "path.heart.bar",
+                10
+              ]
+            }
+          ],
+          "then": [
+            {
+              "sub": [
+                "path.heart.bar",
+                10
+              ]
+            }
+          ],
+          "else": [
+            {
+              "set": [
+                "path.heart.bar",
+                0
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "judge": {
+          "kind": "attr",
+          "a": "attr.heart.eff",
+          "b": "attr.heart.eff",
+          "scale": 0.3
+        }
+      },
+      {
+        "if": {
+          "when": [
+            {
+              "eq": [
+                "$last.ok",
+                false
+              ]
+            }
+          ],
+          "then": [
+            {
+              "add": [
+                "attr.heart.eff",
+                -1
+              ]
+            },
+            {
+              "log": "（心性 −1）"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "macro.spell.chance.grant": {
+    "params": [
+      "spell"
+    ],
+    "desc": "奇遇得术法（需求/12 §0.1.2）：直接把这门术法记为已学（入门），不再走学堂/坊市。",
+    "do": [
+      {
+        "if": {
+          "when": [
+            {
+              "notFlag": "flag.spell.known.$arg.spell"
+            }
+          ],
+          "then": [
+            {
+              "set": [
+                "spells.$arg.spell.lvl",
+                0
+              ]
+            },
+            {
+              "set": [
+                "spells.$arg.spell.exp",
+                0
+              ]
+            },
+            {
+              "flag": {
+                "id": "flag.spell.known.$arg.spell",
+                "value": true
+              }
+            },
+            {
+              "log": "这门术法你记下了。只是入门，还放不出来。"
+            }
+          ],
+          "else": [
+            {
+              "log": "这门你早就学过了。"
+            }
+          ]
         }
       }
     ]

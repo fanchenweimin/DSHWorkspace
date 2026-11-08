@@ -165,7 +165,7 @@ source  template  args  window  fromCalendar  order  duty  maxMonths
 
 ## 配置（sysadmin）
 
-- 配置的**磁盘原值**在 `src/seed/*.json`（16 份，就是数据层）。
+- 配置的**磁盘原值**在 `src/seed/*.json`（**17 份**，就是数据层）。
 - 在 `/admin.html` 里保存，写的是 **sqlite 覆盖层**（`config_overrides` 表），**不动磁盘文件**。
 - 运行时读的是 `repository/config.js` 的 `get()`：**覆盖层优先，否则磁盘**。
   所以「保存 → 刷新页面」就生效，不用重启。
@@ -179,7 +179,7 @@ source  template  args  window  fromCalendar  order  duty  maxMonths
 | 段 | 管什么 |
 | --- | --- |
 | `fields` | 221 个字段的中文名、列宽、能不能改（`edit:false`） |
-| `files` | 16 份文件的中文名、左右分组、整份是否只读、**哪些路径只读** |
+| `files` | 17 份文件的中文名、左右分组、整份是否只读、**哪些路径只读** |
 | `hints` | 打开某份文件时顶部那句人话说明 |
 
 规则：
@@ -218,13 +218,13 @@ src/                       后端
     rules/battle.js        ★ 战斗（查表 / 手段层 / 压制 / 品阶压制 / 三血条 / 法力≠盾 / 闪避 / 逃跑）
     systems/opening.js     ★ 开局入品：十岁判一次体魄的门（没墙直接站上体魄）
     systems/calendar.js    ★ 战事日历：到点必来、城破成链（war.phase 由它推）
-    systems/hand.js        ★ 桌上五块 + 坊市货架：主事件 / 突破 / 修炼 / 百艺 / 营生（I15：强制事件封住常驻）
+    systems/hand.js        ★ 桌上六块 + 坊市货架：主事件 / 修炼 / 法术 / 百艺 / 营生（I15：强制事件封住常驻）
     systems/draw.js        ★ 事件抽取（四步入池 / 优先批 / 权重归一化 / 冷却 / 名额 / ttl）
     systems/effects.js     ★ do 的执行器（add/money/mod/grant/flag/if/call/judge/train…；I2、I25 在这里拒绝）
     systems/turn.js        ★ 七种动作的结算：wait/train/break/art/use/action/event
     state/demo.js          开局状态（名字 / 天赋 / 背包；等存档替换）
     state/running.js       一局按 gid 存内存（等 saves 表替换）
-  seed/*.json              数据层（16 份）：world rules limits ops invariants calendar
+  seed/*.json              数据层（17 份）：world rules limits ops invariants calendar
                            talents identities items arts actions events conditions
                            macros templates + ★ schema（配置字典）
 
@@ -280,3 +280,8 @@ PROGRESS.md                开发进度与断点
 | `docs/README.md` | 文档总索引（先读这个） |
 | `docs/需求/` | 要什么：世界、修炼、事件、战斗（中文，不写代码） |
 | `docs/设计/` | 怎么做：MVC 分层、不变量、DSL、数值表、界面原型 |
+| **`docs/设计/92-实现差异台账.md`** | **代码与文档到底差在哪**（2026-11-08 全量核对，逐条带 `文件:行` + 严重度 + 该改哪里） |
+| **`docs/需求/99-待裁决-历史定稿冲突.md`** | **还没定的 5 处冲突**（心魔方向 / 心性地板 / 修心门 / 灌顶 / 属性上限），需要拍板 |
+
+> 文档优先级：`docs/` > `归档/` > ~~`.tmp/`~~（`.tmp` 已清理，只留 `cdp.js` 验证脚本）。
+> **接手顺序**：`HANDOVER.md` → `PROGRESS.md` → `设计/92` → `docs/`。

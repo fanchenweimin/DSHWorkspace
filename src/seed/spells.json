@@ -154,7 +154,8 @@
     "effect": "战力 +14 / 档",
     "source": "需求/12 §2 · 玄下",
     "sources": {
-      "market": true
+      "office": 40,
+      "chance": true
     }
   },
   {
@@ -178,7 +179,8 @@
     "effect": "运功：撑起 120 点护盾 / 档",
     "source": "需求/12 §2 · 玄下（防御术法）",
     "sources": {
-      "market": true
+      "office": 50,
+      "chance": true
     }
   },
   {
@@ -202,7 +204,8 @@
     "effect": "闪避 +10% / 档",
     "source": "需求/12 §2 · 玄下（身法）",
     "sources": {
-      "market": true
+      "office": 40,
+      "chance": true
     }
   },
   {
@@ -226,7 +229,7 @@
     "effect": "战力 +22 / 档",
     "source": "需求/12 §2 · 玄中",
     "sources": {
-      "office": 60
+      "chance": true
     },
     "meritCost": 60
   },
@@ -251,7 +254,7 @@
     "effect": "战力 +32 / 档",
     "source": "需求/12 §2 · 玄上（不走坊市）",
     "sources": {
-      "office": 150
+      "chance": true
     },
     "meritCost": 150
   }

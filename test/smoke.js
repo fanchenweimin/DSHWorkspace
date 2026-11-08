@@ -24,6 +24,10 @@ function fresh(name) {
   s.attr.aptitude.base = 66;
   s.attr.insight.base = 71;
   s.attr.heart.base = 62;
+  /* r35：命格/天赋会改属性，测试要固定底子（不然断言跟着随机的命格飘） */
+  s.fate = '';
+  s.talents = [];
+  s.mods = (s.mods || []).filter((m) => !/^(fate|talent)\./.test(String(m.source || '')));
   return s;
 }
 
@@ -731,7 +735,7 @@ test('法术：高境界用低阶术法能以力驭法，不再是废纸（r34�
   assert.ok(r.seg.hp > 0);
 });
 
-test('法术来源：学堂教、坊市买、城主府换（r34）', () => {
+test('法术来源：学堂教、坊市买、城主府换、奇遇得（r35）', () => {
   const spells = require('../src/model/rules/spells');
   const turn = require('../src/model/systems/turn');
   const s = opening();                      /* 府学 */
@@ -751,17 +755,30 @@ test('法术来源：学堂教、坊市买、城主府换（r34）', () => {
   assert.strictEqual(poor.ok, false, '没钱学不了');
   assert.ok(/钱不够/.test(poor.reason), poor.reason);
 
-  /* 城主府：军功不够也不行 */
+  /* 玄阶：不走坊市，只能城主府（军功 + 军职）或奇遇 */
   s.money = { copper: 5000, silver: 0, gold: 0 };
-  s.path.qi.level = 5;                      /* 焚山印要炼气·合一 */
-  const fen = spells.byId('spell.fenshan');
-  assert.strictEqual(spells.sourceOf(s, fen).kind, 'office');
-  const noMerit = turn.act(s, { kind: 'learnSpell', id: 'spell.fenshan' });
-  assert.strictEqual(noMerit.ok, false, '军功不够换不到');
+  s.path.qi.level = 5;
+  const luo = spells.byId('spell.luoshi');
+  assert.strictEqual(luo.rank, 4, '落石术是玄');
+  const luoSrc = spells.sourceOf(s, luo);
+  assert.strictEqual(luoSrc.kind, 'office', '玄阶走城主府，不进坊市');
+  assert.strictEqual(luoSrc.ok, false, '没军职换不到');
+  assert.ok(/军职/.test(luoSrc.why), luoSrc.why);
+
+  /* 给了军职、军功也够 → 能换 */
+  s.flags = s.flags || {};
+  s.flags.office = { army: true };
   s.merit.war = 80;
-  const got = turn.act(s, { kind: 'learnSpell', id: 'spell.fenshan' });
-  assert.strictEqual(got.ok, true, got.reason || '');
-  assert.strictEqual(s.merit.war, 20, '要扣军功');
+  const luoOk = turn.act(s, { kind: 'learnSpell', id: 'spell.luoshi' });
+  assert.strictEqual(luoOk.ok, true, luoOk.reason || '');
+  assert.strictEqual(s.merit.war, 40, '落石术要 40 军功');
+
+  /* 地 / 天阶：只走奇遇，买不到也换不到 */
+  const fen = spells.byId('spell.fenshan');
+  assert.strictEqual(fen.rank, 5, '焚山印是地');
+  const fenSrc = spells.sourceOf(s, fen);
+  assert.strictEqual(fenSrc.kind, 'chance', '地阶只能奇遇');
+  assert.strictEqual(fenSrc.ok, false, '奇遇不能主动学');
 });
 
 test('百艺：升一档出一件成品，进囊中（r34）', () => {
@@ -1322,11 +1339,32 @@ test('修心：破境不清道心（累计制）', () => {
   const rules = require('../src/model/repository/config').get('rules');
   const s = fresh();
   s.path.heart.bar = 100;
+  /* r35：心性 < 90 时修心突破必然失败，所以这条测试必须先把心性抬到 90 */
+  s.attr.heart.base = 95;
 
   const force = realm.judgeBreak(s, { dao: 'heart', tier: 1, force: true }, { rules, rng: () => 0.5 });
   assert.strictEqual(force.ok, true, '事件办成了就该进品');
   assert.strictEqual(s.path.heart.level, 1);
   assert.strictEqual(s.path.heart.bar, 100, '道心不清零，接着往上攒');
+});
+
+test('修心：心性 < 90 突破必然失败（r35）', () => {
+  const realm = require('../src/model/rules/realm');
+  const rules = require('../src/model/repository/config').get('rules');
+  const s = fresh();
+  s.attr.heart.base = 89;
+  s.path.heart.bar = 100;
+
+  /* 事件瓶颈的 force 也救不了：心性不够就是进不去 */
+  const r = realm.judgeBreak(s, { dao: 'heart', tier: 1, force: true }, { rules, rng: () => 0.01 });
+  assert.strictEqual(r.ok, false, '心性 89 必须失败');
+  assert.strictEqual(r.why, 'heart_low');
+  assert.strictEqual(s.path.heart.level, 0, '层级不动');
+
+  /* 正好 90 就放行 */
+  s.attr.heart.base = 90;
+  const r2 = realm.judgeBreak(s, { dao: 'heart', tier: 1, force: true }, { rules, rng: () => 0.01 });
+  assert.strictEqual(r2.ok, true, '心性 90 应当放行');
 });
 
 test('寿元：跟着境界走，到点就死，死后点不动', () => {

@@ -149,11 +149,14 @@ function monthsToNext(state, id) {
 }
 
 /**
- * 这门术法此刻能从哪学（r34：学院 / 坊市 / 城主府）。
+ * 这门术法此刻能从哪学（r35：学院 / 坊市 / 城主府 / 奇遇）。
  * 返回 { kind, label, cost, merit, ok, why }
  *   academy  在学的学堂教（蒙/府/太），免费；卒业或不在校就不行
- *   market   坊市买（书册），花钱
+ *   market   坊市买（书册），花钱；**只到黄上（rank ≤ 3）**
  *   office   城主府用军功换，得先有军职
+ *   chance   奇遇事件，不可主动购买
+ *
+ * 顺序即优先级：学堂（免费）→ 坊市 → 城主府 → 奇遇。
  */
 function sourceOf(state, sp) {
   const rules = config.get('rules') || {};
@@ -161,6 +164,7 @@ function sourceOf(state, sp) {
   const src = sp.sources || { market: true };
   const edu = state.education || {};
   const stage = String(edu.stage || '');
+  const rank = num(sp.rank);
 
   /* ① 学堂：只有在学（且没卒业）才教 */
   if (Array.isArray(src.academy)) {
@@ -170,8 +174,11 @@ function sourceOf(state, sp) {
     }
   }
 
-  /* ② 坊市：花钱买册子 */
-  if (src.market) {
+  /* ② 坊市：花钱买册子。
+     **货架顶格是黄上（rank ≤ 3）**——玄以上不走坊市（需求/12 §2）。
+     配置里若把玄级挂进 market，这里直接拒收，避免"散修买到玄阶"。 */
+  const SHELF_MAX = num((rules.SPELL_SHELF || {}).max != null ? rules.SPELL_SHELF.max : 3);
+  if (src.market && rank <= SHELF_MAX) {
     const pr = sp.price || {};
     const cost = num(pr.copper) + num(pr.silver) * num(C.copper) + num(pr.gold) * num(C.copper) * num(C.silver);
     const ok = mods().moneyTotal(state) >= cost;
@@ -181,14 +188,32 @@ function sourceOf(state, sp) {
     };
   }
 
-  /* ③ 城主府：军功换 */
+  /* ③ 城主府：军功换（需求/12 §0.1.2：还要有军职） */
   if (src.office != null) {
     const merit = num(src.office);
     const has = num((state.merit || {}).war);
-    const ok = has >= merit;
+    const army = !!(state.flags && state.flags.office && state.flags.office.army);
+    const ok = has >= merit && army;
+    const why = !army ? '要先有军职'
+      : (has >= merit ? '' : `军功不够（${has}/${merit}）`);
     return {
-      kind: 'office', label: `城主府 · 军功 ${merit}`, cost: 0, merit,
-      ok, why: ok ? '' : `军功不够（${has}/${merit}）`
+      kind: 'office', label: `城主府 · 军功 ${merit}`, cost: 0, merit, ok, why
+    };
+  }
+
+  /* ④ 奇遇：只能靠事件给，不能主动学 */
+  if (src.chance) {
+    return {
+      kind: 'chance', label: '奇遇得', cost: 0, merit: 0,
+      ok: false, why: '要遇到才行'
+    };
+  }
+
+  /* ⑤ 只有学堂能教、但你已卒业（或者还没到那个学籍） */
+  if (Array.isArray(src.academy)) {
+    return {
+      kind: 'academy', label: '学堂授（已出学门）', cost: 0, merit: 0,
+      ok: false, why: '这门只有学堂教，你已经不在学了'
     };
   }
 

@@ -3,7 +3,7 @@
     "no": 1,
     "id": "evt.edu.graduate.meng",
     "title": "蒙学卒试",
-"desc": "四年蒙学读到头了。先生把名册摊在桌上，念到名字的上前应考。",
+    "desc": "四年蒙学读到头了。先生把名册摊在桌上，念到名字的上前应考。",
     "nature": "主线",
     "priority": 2,
     "weight": 0,
@@ -58,7 +58,7 @@
     "no": 2,
     "id": "evt.edu.graduate.fu",
     "title": "府学卒业",
-"desc": "府学四年也完了。这一场考完，要么进太学，要么就此出去讨生活。",
+    "desc": "府学四年也完了。这一场考完，要么进太学，要么就此出去讨生活。",
     "nature": "主线",
     "priority": 2,
     "weight": 0,
@@ -113,7 +113,7 @@
     "no": 3,
     "id": "evt.edu.exam.great",
     "title": "大考",
-"desc": "十五岁这年有一次大考。台上坐着学正，台下站着一排和你差不多大的孩子。",
+    "desc": "十五岁这年有一次大考。台上坐着学正，台下站着一排和你差不多大的孩子。",
     "nature": "主线",
     "priority": 2,
     "weight": 0,
@@ -254,7 +254,7 @@
     "no": 4,
     "id": "evt.edu.enter.tai",
     "title": "太学放榜",
-"desc": "太学的门槛比府学高得多。祭酒只看两样：气机稳不稳，脑子清不清。",
+    "desc": "太学的门槛比府学高得多。祭酒只看两样：气机稳不稳，脑子清不清。",
     "nature": "主线",
     "priority": 2,
     "weight": 0,
@@ -347,7 +347,7 @@
     "no": 5,
     "id": "evt.edu.graduate.tai",
     "title": "太学卒业",
-"desc": "太学四年，读到头了。祭酒在门口送你们，说往后各自珍重。",
+    "desc": "太学四年，读到头了。祭酒在门口送你们，说往后各自珍重。",
     "nature": "主线",
     "priority": 2,
     "weight": 0,
@@ -399,7 +399,7 @@
     "no": 6,
     "id": "evt.office.enlist",
     "title": "投军",
-"desc": "校场边上支着一张桌子。招兵的人抬头看了你一眼：「叫什么？」",
+    "desc": "校场边上支着一张桌子。招兵的人抬头看了你一眼：「叫什么？」",
     "nature": "身份",
     "priority": 3,
     "weight": 2,
@@ -474,7 +474,7 @@
     "no": 7,
     "id": "evt.heart.firstblood",
     "title": "第一次见血",
-"desc": "路边有人被砍倒。你站在三步外，看见了那把刀。",
+    "desc": "路边有人被砍倒。你站在三步外，看见了那把刀。",
     "nature": "主线",
     "priority": 2,
     "weight": 0,
@@ -557,7 +557,7 @@
     "no": 8,
     "id": "evt.sect.recruit",
     "title": "宗门选徒",
-"desc": "宗门的人每年下山一次。今年他们停在城门口，摆了一张蒲团。",
+    "desc": "宗门的人每年下山一次。今年他们停在城门口，摆了一张蒲团。",
     "nature": "身份",
     "priority": 2,
     "weight": 0,
@@ -628,7 +628,7 @@
     "no": 9,
     "id": "evt.road.pickpurse",
     "title": "路边拾遗",
-"desc": "路边躺着一只钱袋，口子松着，露出几枚铜钱。四下没人。",
+    "desc": "路边躺着一只钱袋，口子松着，露出几枚铜钱。四下没人。",
     "nature": "机缘",
     "priority": 4,
     "weight": 3,
@@ -657,7 +657,7 @@
     "no": 10,
     "id": "evt.road.bandit",
     "title": "劫道",
-"desc": "林子里钻出三个人，手里拿着刀。为首那个说：「留下东西。」",
+    "desc": "林子里钻出三个人，手里拿着刀。为首那个说：「留下东西。」",
     "nature": "灾祸",
     "priority": 3,
     "weight": 2,
@@ -755,7 +755,7 @@
     "no": 11,
     "id": "evt.market.auction",
     "title": "坊市 · 散摊",
-"desc": "散摊上堆着一堆来路不明的东西。摊主不抬头，只说：「看中哪个说话。」",
+    "desc": "散摊上堆着一堆来路不明的东西。摊主不抬头，只说：「看中哪个说话。」",
     "nature": "机缘",
     "priority": 4,
     "weight": 2,
@@ -824,7 +824,7 @@
     "no": 12,
     "id": "evt.disaster.plague",
     "title": "时疫",
-"desc": "城里开始死人。先是城西，然后是隔街。药铺的门前排到了巷口。",
+    "desc": "城里开始死人。先是城西，然后是隔街。药铺的门前排到了巷口。",
     "nature": "灾祸",
     "priority": 3,
     "weight": 2,
@@ -884,7 +884,7 @@
     "no": 13,
     "id": "evt.war.warning.north",
     "title": "北境告急",
-"desc": "关外的马蹄声越来越近。城主府贴了告示，要各家自备药与符。",
+    "desc": "关外的马蹄声越来越近。城主府贴了告示，要各家自备药与符。",
     "nature": "战事",
     "priority": 3,
     "weight": 4,
@@ -934,7 +934,7 @@
     "no": 14,
     "id": "evt.war.patrol",
     "title": "巡夜遇匪",
-"desc": "你被派去巡边。风里有铁锈味，不像风。",
+    "desc": "你被派去巡边。风里有铁锈味，不像风。",
     "nature": "战事",
     "priority": 3,
     "weight": 3,
@@ -1020,7 +1020,7 @@
     "no": 15,
     "id": "evt.war.beast",
     "title": "城外妖兽",
-"desc": "山那边下来一头东西。它站在田里，把人当成草。",
+    "desc": "山那边下来一头东西。它站在田里，把人当成草。",
     "nature": "战事",
     "priority": 3,
     "weight": 2,
@@ -1105,7 +1105,7 @@
     "no": 16,
     "id": "evt.war.duel",
     "title": "斗法帖",
-"desc": "对面派人出来叫阵。你这边没人应声，最后所有人都看向你。",
+    "desc": "对面派人出来叫阵。你这边没人应声，最后所有人都看向你。",
     "nature": "战事",
     "priority": 3,
     "weight": 2,
@@ -1194,7 +1194,7 @@
     "no": 17,
     "id": "evt.art.master",
     "title": "拜师学艺",
-"desc": "巷子尽头那家铺子常年关着门。今天门开了一条缝。",
+    "desc": "巷子尽头那家铺子常年关着门。今天门开了一条缝。",
     "nature": "身份",
     "priority": 3,
     "weight": 2,
@@ -1300,7 +1300,7 @@
     "no": 18,
     "id": "evt.art.order",
     "title": "势力订单",
-"desc": "城主府的管事找上门，要一批货。数目不小，日子很紧。",
+    "desc": "城主府的管事找上门，要一批货。数目不小，日子很紧。",
     "nature": "机缘",
     "priority": 4,
     "weight": 2,
@@ -1353,7 +1353,7 @@
     "no": 19,
     "id": "evt.art.forbidden",
     "title": "黑市的价",
-"desc": "有人把一本册子推到灯下，说这上面的东西能让你快十年。",
+    "desc": "有人把一本册子推到灯下，说这上面的东西能让你快十年。",
     "nature": "灾祸",
     "priority": 4,
     "weight": 1,
@@ -1425,7 +1425,7 @@
     "no": 20,
     "id": "evt.age.warning",
     "title": "寿元将尽",
-"desc": "你最近总觉得冷。夜里醒来，听见自己的心跳变得很慢。",
+    "desc": "你最近总觉得冷。夜里醒来，听见自己的心跳变得很慢。",
     "nature": "主线",
     "priority": 1,
     "weight": 0,
@@ -1459,7 +1459,7 @@
     "no": 21,
     "id": "evt.war.city.beiguan",
     "title": "城战 · 北关",
-"desc": "北关的烽火三天没灭。城墙上的人换了一茬又一茬。",
+    "desc": "北关的烽火三天没灭。城墙上的人换了一茬又一茬。",
     "nature": "战事",
     "template": "tpl.war.city",
     "args": {
@@ -1474,7 +1474,7 @@
     "no": 22,
     "id": "evt.war.city.wangbei",
     "title": "城战 · 望北城",
-"desc": "王北的城墙比北关矮，人却更少。",
+    "desc": "王北的城墙比北关矮，人却更少。",
     "nature": "战事",
     "template": "tpl.war.city",
     "args": {
@@ -1489,7 +1489,7 @@
     "no": 23,
     "id": "evt.war.city.changming",
     "title": "城战 · 长明城",
-"desc": "最后一道墙就在身后。墙里是你的家。",
+    "desc": "最后一道墙就在身后。墙里是你的家。",
     "nature": "战事",
     "template": "tpl.war.city",
     "args": {
@@ -1504,7 +1504,7 @@
     "no": 24,
     "id": "evt.war.nation.call",
     "title": "国战 · 征召",
-"desc": "三座城都丢了。王上下了征召令，所有能拿刀的人都得上。",
+    "desc": "三座城都丢了。王上下了征召令，所有能拿刀的人都得上。",
     "nature": "战事",
     "template": "tpl.war.nation",
     "args": {
@@ -1516,7 +1516,7 @@
     "no": 25,
     "id": "evt.heart.question",
     "title": "问心",
-"desc": "半夜醒来，有个问题一直在你脑子里转，怎么都按不下去。",
+    "desc": "半夜醒来，有个问题一直在你脑子里转，怎么都按不下去。",
     "nature": "主线",
     "priority": 3,
     "weight": 2,
@@ -1576,27 +1576,47 @@
     "no": 26,
     "id": "evt.art.sell",
     "title": "行商收货",
-"desc": "行商在门口卸下担子，一样一样看你的活计。",
+    "desc": "行商在门口卸下担子，一样一样看你的活计。",
     "nature": "机缘",
     "priority": 4,
     "weight": 2,
     "months": 1,
-    "when": [ { "use": "cond.has_art" }, { "use": "cond.in_city" } ],
+    "when": [
+      {
+        "use": "cond.has_art"
+      },
+      {
+        "use": "cond.in_city"
+      }
+    ],
     "choices": [
       {
         "id": "sell",
         "label": "按市价卖给他",
         "do": [
-          { "money": { "copper": 90 } },
-          { "add": ["merit.craft", 3] },
-          { "log": "行商把你的活计翻来覆去看了三遍，最后还是收了。" }
+          {
+            "money": {
+              "copper": 90
+            }
+          },
+          {
+            "add": [
+              "merit.craft",
+              3
+            ]
+          },
+          {
+            "log": "行商把你的活计翻来覆去看了三遍，最后还是收了。"
+          }
         ]
       },
       {
         "id": "hold",
         "label": "留着，等更好的价",
         "do": [
-          { "log": "你没卖。行商笑了笑，说下个月还来。" }
+          {
+            "log": "你没卖。行商笑了笑，说下个月还来。"
+          }
         ]
       }
     ],
@@ -1606,29 +1626,72 @@
     "no": 27,
     "id": "evt.art.rival",
     "title": "同行上门",
-"desc": "隔壁铺子的老师傅来了，说要跟你比一比手上功夫。",
+    "desc": "隔壁铺子的老师傅来了，说要跟你比一比手上功夫。",
     "nature": "灾祸",
     "priority": 4,
     "weight": 1,
     "months": 1,
-    "when": [ { "use": "cond.art_master" }, { "gte": ["clock.age", 16] } ],
+    "when": [
+      {
+        "use": "cond.art_master"
+      },
+      {
+        "gte": [
+          "clock.age",
+          16
+        ]
+      }
+    ],
     "choices": [
       {
         "id": "fight",
         "label": "比一场",
         "do": [
-          { "judge": { "kind": "battle", "scale": 0.8, "kindName": "同行", "match": "spar" } },
+          {
+            "judge": {
+              "kind": "battle",
+              "scale": 0.8,
+              "kindName": "同行",
+              "match": "spar"
+            }
+          },
           {
             "if": {
-              "when": [ { "eq": ["$last.ok", true] } ],
+              "when": [
+                {
+                  "eq": [
+                    "$last.ok",
+                    true
+                  ]
+                }
+              ],
               "then": [
-                { "add": ["reputation.eff", 4] },
-                { "add": ["merit.craft", 4] },
-                { "log": "他的手比你稳，但你的火候更足。铺子里的人记住了你。" }
+                {
+                  "add": [
+                    "reputation.eff",
+                    4
+                  ]
+                },
+                {
+                  "add": [
+                    "merit.craft",
+                    4
+                  ]
+                },
+                {
+                  "log": "他的手比你稳，但你的火候更足。铺子里的人记住了你。"
+                }
               ],
               "else": [
-                { "add": ["reputation.eff", -3] },
-                { "log": "你输了。围看的人散得很快。" }
+                {
+                  "add": [
+                    "reputation.eff",
+                    -3
+                  ]
+                },
+                {
+                  "log": "你输了。围看的人散得很快。"
+                }
               ]
             }
           }
@@ -1638,8 +1701,15 @@
         "id": "yield",
         "label": "让他三尺",
         "do": [
-          { "add": ["reputation.eff", -1] },
-          { "log": "你把台子让了。有人说你懂事，也有人说你怕。" }
+          {
+            "add": [
+              "reputation.eff",
+              -1
+            ]
+          },
+          {
+            "log": "你把台子让了。有人说你懂事，也有人说你怕。"
+          }
         ]
       }
     ],
@@ -1653,15 +1723,27 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "body", "tier": 5 },
+    "gate": {
+      "dao": "body",
+      "tier": 5
+    },
     "desc": "朝元圆满。山门前要一场让人记住的仗，你的名字才能传出这座城。",
     "choices": [
       {
         "id": "go",
         "label": "出战，让人记住",
         "do": [
-          { "judge": { "kind": "break", "dao": "body", "tier": 5, "force": true } },
-          { "log": "那一战打完，山门前有人叫了你的名字。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "body",
+              "tier": 5,
+              "force": true
+            }
+          },
+          {
+            "log": "那一战打完，山门前有人叫了你的名字。"
+          }
         ]
       }
     ],
@@ -1675,15 +1757,27 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "body", "tier": 6 },
+    "gate": {
+      "dao": "body",
+      "tier": 6
+    },
     "desc": "金身圆满。这一关要你在没有法力的时候也敢站着。",
     "choices": [
       {
         "id": "go",
         "label": "空着手，站上去",
         "do": [
-          { "judge": { "kind": "break", "dao": "body", "tier": 6, "force": true } },
-          { "log": "法力尽失的那一刻，你没有退。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "body",
+              "tier": 6,
+              "force": true
+            }
+          },
+          {
+            "log": "法力尽失的那一刻，你没有退。"
+          }
         ]
       }
     ],
@@ -1697,15 +1791,27 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "qi", "tier": 4 },
+    "gate": {
+      "dao": "qi",
+      "tier": 4
+    },
     "desc": "驭凡圆满，太学也卒业了。该给自己立一个「相」了。",
     "choices": [
       {
         "id": "go",
         "label": "闭关立相",
         "do": [
-          { "judge": { "kind": "break", "dao": "qi", "tier": 4, "force": true } },
-          { "log": "你在识海里立起一座相。它睁眼的时候，你也睁眼。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "qi",
+              "tier": 4,
+              "force": true
+            }
+          },
+          {
+            "log": "你在识海里立起一座相。它睁眼的时候，你也睁眼。"
+          }
         ]
       }
     ],
@@ -1719,15 +1825,27 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "qi", "tier": 5 },
+    "gate": {
+      "dao": "qi",
+      "tier": 5
+    },
     "desc": "法相圆满。把散出去的都收回来。",
     "choices": [
       {
         "id": "go",
         "label": "收",
         "do": [
-          { "judge": { "kind": "break", "dao": "qi", "tier": 5, "force": true } },
-          { "log": "万千法门收成一缕，落在你手上。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "qi",
+              "tier": 5,
+              "force": true
+            }
+          },
+          {
+            "log": "万千法门收成一缕，落在你手上。"
+          }
         ]
       }
     ],
@@ -1741,15 +1859,27 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "qi", "tier": 6 },
+    "gate": {
+      "dao": "qi",
+      "tier": 6
+    },
     "desc": "合一圆满。把全部法力散掉，再重新聚起来。",
     "choices": [
       {
         "id": "go",
         "label": "散",
         "do": [
-          { "judge": { "kind": "break", "dao": "qi", "tier": 6, "force": true } },
-          { "log": "法力散尽，你又成了一个凡人。然后你重新开始聚。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "qi",
+              "tier": 6,
+              "force": true
+            }
+          },
+          {
+            "log": "法力散尽，你又成了一个凡人。然后你重新开始聚。"
+          }
         ]
       }
     ],
@@ -1763,15 +1893,27 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "spirit", "tier": 1 },
+    "gate": {
+      "dao": "spirit",
+      "tier": 1
+    },
     "desc": "第一个不是你的生命，在你面前死掉。",
     "choices": [
       {
         "id": "go",
         "label": "看着它死",
         "do": [
-          { "judge": { "kind": "break", "dao": "spirit", "tier": 1, "force": true } },
-          { "log": "你看见了。从此闭不上眼。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "spirit",
+              "tier": 1,
+              "force": true
+            }
+          },
+          {
+            "log": "你看见了。从此闭不上眼。"
+          }
         ]
       }
     ],
@@ -1785,15 +1927,27 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "spirit", "tier": 2 },
+    "gate": {
+      "dao": "spirit",
+      "tier": 2
+    },
     "desc": "承认自己也是一个会死的生命。",
     "choices": [
       {
         "id": "go",
         "label": "承认",
         "do": [
-          { "judge": { "kind": "break", "dao": "spirit", "tier": 2, "force": true } },
-          { "log": "你承认了。心里那面镜子终于照见自己。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "spirit",
+              "tier": 2,
+              "force": true
+            }
+          },
+          {
+            "log": "你承认了。心里那面镜子终于照见自己。"
+          }
         ]
       }
     ],
@@ -1807,15 +1961,27 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "spirit", "tier": 3 },
+    "gate": {
+      "dao": "spirit",
+      "tier": 3
+    },
     "desc": "看见一件事怎么牵出下一件。",
     "choices": [
       {
         "id": "go",
         "label": "看下去",
         "do": [
-          { "judge": { "kind": "break", "dao": "spirit", "tier": 3, "force": true } },
-          { "log": "因果像水纹一样铺开，你站在中间。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "spirit",
+              "tier": 3,
+              "force": true
+            }
+          },
+          {
+            "log": "因果像水纹一样铺开，你站在中间。"
+          }
         ]
       }
     ],
@@ -1829,15 +1995,27 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "spirit", "tier": 4 },
+    "gate": {
+      "dao": "spirit",
+      "tier": 4
+    },
     "desc": "把灵铺出去，铺到看不见的地方。",
     "choices": [
       {
         "id": "go",
         "label": "铺出去",
         "do": [
-          { "judge": { "kind": "break", "dao": "spirit", "tier": 4, "force": true } },
-          { "log": "灵出去很远，回来时带着天地的一点凉。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "spirit",
+              "tier": 4,
+              "force": true
+            }
+          },
+          {
+            "log": "灵出去很远，回来时带着天地的一点凉。"
+          }
         ]
       }
     ],
@@ -1851,15 +2029,27 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "spirit", "tier": 5 },
+    "gate": {
+      "dao": "spirit",
+      "tier": 5
+    },
     "desc": "治下的人念着你的名字。",
     "choices": [
       {
         "id": "go",
         "label": "受这一念",
         "do": [
-          { "judge": { "kind": "break", "dao": "spirit", "tier": 5, "force": true } },
-          { "log": "千万人的念头涌进来，你没有散。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "spirit",
+              "tier": 5,
+              "force": true
+            }
+          },
+          {
+            "log": "千万人的念头涌进来，你没有散。"
+          }
         ]
       }
     ],
@@ -1873,15 +2063,27 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "spirit", "tier": 6 },
+    "gate": {
+      "dao": "spirit",
+      "tier": 6
+    },
     "desc": "把灵量全部还给众生，看你还剩不剩得下自己。",
     "choices": [
       {
         "id": "go",
         "label": "还回去",
         "do": [
-          { "judge": { "kind": "break", "dao": "spirit", "tier": 6, "force": true } },
-          { "log": "灵量散尽，你却没有死。镜子里的人年轻了三十岁。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "spirit",
+              "tier": 6,
+              "force": true
+            }
+          },
+          {
+            "log": "灵量散尽，你却没有死。镜子里的人年轻了三十岁。"
+          }
         ]
       }
     ],
@@ -1895,15 +2097,27 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "heart", "tier": 1 },
+    "gate": {
+      "dao": "heart",
+      "tier": 1
+    },
     "desc": "有一件事，你一直没敢问自己。",
     "choices": [
       {
         "id": "go",
         "label": "问",
         "do": [
-          { "judge": { "kind": "break", "dao": "heart", "tier": 1, "force": true } },
-          { "log": "问出来了。答案是「我不知道」，但你不再怕这个答案。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "heart",
+              "tier": 1,
+              "force": true
+            }
+          },
+          {
+            "log": "问出来了。答案是「我不知道」，但你不再怕这个答案。"
+          }
         ]
       }
     ],
@@ -1917,15 +2131,27 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "heart", "tier": 2 },
+    "gate": {
+      "dao": "heart",
+      "tier": 2
+    },
     "desc": "有些事不是你选的路，却非要你走。",
     "choices": [
       {
         "id": "go",
         "label": "走",
         "do": [
-          { "judge": { "kind": "break", "dao": "heart", "tier": 2, "force": true } },
-          { "log": "你认了这条命，但没有认输。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "heart",
+              "tier": 2,
+              "force": true
+            }
+          },
+          {
+            "log": "你认了这条命，但没有认输。"
+          }
         ]
       }
     ],
@@ -1939,15 +2165,27 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "heart", "tier": 3 },
+    "gate": {
+      "dao": "heart",
+      "tier": 3
+    },
     "desc": "别人骂你，你听着；别人夸你，你也听着。",
     "choices": [
       {
         "id": "go",
         "label": "听着",
         "do": [
-          { "judge": { "kind": "break", "dao": "heart", "tier": 3, "force": true } },
-          { "log": "话进耳朵，不再进心里。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "heart",
+              "tier": 3,
+              "force": true
+            }
+          },
+          {
+            "log": "话进耳朵，不再进心里。"
+          }
         ]
       }
     ],
@@ -1961,18 +2199,424 @@
     "priority": 2,
     "weight": 0,
     "months": 3,
-    "gate": { "dao": "heart", "tier": 4 },
+    "gate": {
+      "dao": "heart",
+      "tier": 4
+    },
     "desc": "规矩已经长在你身上了。现在可以不守，因为你不会越。",
     "choices": [
       {
         "id": "go",
         "label": "不守了",
         "do": [
-          { "judge": { "kind": "break", "dao": "heart", "tier": 4, "force": true } },
-          { "log": "你终于想做什么就做什么，而没有一件事需要后悔。" }
+          {
+            "judge": {
+              "kind": "break",
+              "dao": "heart",
+              "tier": 4,
+              "force": true
+            }
+          },
+          {
+            "log": "你终于想做什么就做什么，而没有一件事需要后悔。"
+          }
         ]
       }
     ],
     "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 45,
+    "id": "evt.heart.crime",
+    "title": "手上有血",
+    "desc": "这一次，你亲手结果了一个人。不是为了活命，只是一时没忍住。",
+    "nature": "灾祸",
+    "priority": 3,
+    "weight": 3,
+    "months": 1,
+    "when": [
+      {
+        "gte": [
+          "clock.age",
+          16
+        ]
+      },
+      {
+        "gte": [
+          "path.body.level",
+          2
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "bear",
+        "label": "认了",
+        "do": [
+          {
+            "add": [
+              "attr.heart.eff",
+              -8
+            ]
+          },
+          {
+            "log": "你没有解释。夜里睡得着，只是不再做梦。"
+          }
+        ]
+      },
+      {
+        "id": "deny",
+        "label": "找理由",
+        "do": [
+          {
+            "add": [
+              "attr.heart.eff",
+              -4
+            ]
+          },
+          {
+            "add": [
+              "reputation.eff",
+              -3
+            ]
+          },
+          {
+            "log": "你给自己编了套说法，说着说着自己都信了。"
+          }
+        ]
+      },
+      {
+        "id": "confess",
+        "label": "去说清楚",
+        "do": [
+          {
+            "add": [
+              "attr.heart.eff",
+              -2
+            ]
+          },
+          {
+            "add": [
+              "reputation.eff",
+              5
+            ]
+          },
+          {
+            "log": "你去官府说了。挨了罚，但心里那块石头落了地。"
+          }
+        ]
+      }
+    ],
+    "source": "r35 · 事件改心性（需求/01 §3.3）"
+  },
+  {
+    "no": 46,
+    "id": "evt.heart.betray",
+    "title": "故人反目",
+    "desc": "你信了十年的人，在背后接了别人的刀。",
+    "nature": "灾祸",
+    "priority": 3,
+    "weight": 3,
+    "months": 1,
+    "when": [
+      {
+        "gte": [
+          "clock.age",
+          20
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "silence",
+        "label": "什么也不说",
+        "do": [
+          {
+            "add": [
+              "attr.heart.eff",
+              -12
+            ]
+          },
+          {
+            "log": "你照常吃饭、照常出门。只有你自己知道，某一处已经空了。"
+          }
+        ]
+      },
+      {
+        "id": "revenge",
+        "label": "去讨个说法",
+        "do": [
+          {
+            "add": [
+              "attr.heart.eff",
+              -6
+            ]
+          },
+          {
+            "add": [
+              "reputation.eff",
+              -4
+            ]
+          },
+          {
+            "log": "刀出鞘的时候，你已经不认识自己了。"
+          }
+        ]
+      },
+      {
+        "id": "letgo",
+        "label": "让他走",
+        "do": [
+          {
+            "add": [
+              "attr.heart.eff",
+              -8
+            ]
+          },
+          {
+            "add": [
+              "path.heart.bar",
+              20
+            ]
+          },
+          {
+            "log": "你放了手。放过他和放过自己，是同一件事。"
+          }
+        ]
+      }
+    ],
+    "source": "r35 · 事件改心性（需求/01 §3.3）"
+  },
+  {
+    "no": 47,
+    "id": "evt.heart.awaken",
+    "title": "半夜有悟",
+    "desc": "你坐在窗下，忽然想通了一件很小、但很久都没想通的事。",
+    "nature": "机缘",
+    "priority": 4,
+    "weight": 1,
+    "months": 1,
+    "when": [
+      {
+        "gte": [
+          "clock.age",
+          18
+        ]
+      },
+      {
+        "notFlag": "flag.heart.awakened"
+      }
+    ],
+    "choices": [
+      {
+        "id": "sit",
+        "label": "坐到天亮",
+        "do": [
+          {
+            "add": [
+              "attr.heart.eff",
+              15
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.heart.awakened",
+              "value": true
+            }
+          },
+          {
+            "log": "天亮的时候你站起来，腿麻了，心里却轻了。这种时刻一辈子遇不上几次。"
+          }
+        ]
+      },
+      {
+        "id": "sleep",
+        "label": "睡觉要紧",
+        "do": [
+          {
+            "log": "你翻个身睡了。第二天什么也想不起来。"
+          }
+        ]
+      }
+    ],
+    "source": "r35 · 稀有「加心性」事件（需求/01 §3.3，一生个位数）"
+  },
+  {
+    "no": 48,
+    "id": "evt.heart.clash",
+    "title": "心关",
+    "desc": "你得回答一个问题：你到底在追什么。",
+    "nature": "主线",
+    "priority": 2,
+    "weight": 2,
+    "months": 1,
+    "when": [
+      {
+        "gte": [
+          "path.heart.level",
+          1
+        ]
+      },
+      {
+        "notFlag": "flag.heart.clash.done"
+      }
+    ],
+    "choices": [
+      {
+        "id": "pass",
+        "label": "答得上",
+        "do": [
+          {
+            "add": [
+              "path.heart.bar",
+              27
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.heart.clash.done",
+              "value": true
+            }
+          },
+          {
+            "log": "你答出来了。像是心里有一层纸，被人从里面捅破了。"
+          }
+        ]
+      },
+      {
+        "id": "fail",
+        "label": "答不上",
+        "do": [
+          {
+            "call": {
+              "macro": "macro.heart.clash.fail",
+              "args": {}
+            }
+          },
+          {
+            "log": "你没答上来。那一夜之后，你开始怀疑自己。"
+          }
+        ]
+      }
+    ],
+    "source": "r35 · 心关失败扣心性（需求/01 §3.4、需求/11 §6.3）"
+  },
+  {
+    "no": 49,
+    "id": "evt.spell.chance.cliff",
+    "title": "崖下有书",
+    "desc": "崖壁的缝里卡着一只皮囊，里面是一卷册子，纸都脆了。",
+    "nature": "机缘",
+    "priority": 4,
+    "weight": 1,
+    "months": 1,
+    "when": [
+      {
+        "gte": [
+          "path.qi.level",
+          3
+        ]
+      },
+      {
+        "notFlag": "flag.spell.chance.cliff"
+      }
+    ],
+    "choices": [
+      {
+        "id": "take",
+        "label": "取下来",
+        "do": [
+          {
+            "flag": {
+              "id": "flag.spell.chance.cliff",
+              "value": true
+            }
+          },
+          {
+            "call": {
+              "macro": "macro.spell.chance.grant",
+              "args": {
+                "spell": "spell.luoshi"
+              }
+            }
+          },
+          {
+            "log": "你认出这是落石术的手录。写它的人早就死了。"
+          }
+        ]
+      },
+      {
+        "id": "leave",
+        "label": "不碰",
+        "do": [
+          {
+            "log": "你看了眼就走了。山里的东西，有时候不该拿。"
+          }
+        ]
+      }
+    ],
+    "source": "r35 · 奇遇术法来源（需求/12 §0.1.2）"
+  },
+  {
+    "no": 50,
+    "id": "evt.spell.chance.sect",
+    "title": "宗门的旧册",
+    "desc": "一位老修士临终前把几本书塞给你，说：别埋了它们。",
+    "nature": "机缘",
+    "priority": 4,
+    "weight": 1,
+    "months": 1,
+    "when": [
+      {
+        "gte": [
+          "path.qi.level",
+          4
+        ]
+      },
+      {
+        "notFlag": "flag.spell.chance.sect"
+      }
+    ],
+    "choices": [
+      {
+        "id": "take",
+        "label": "接过来",
+        "do": [
+          {
+            "flag": {
+              "id": "flag.spell.chance.sect",
+              "value": true
+            }
+          },
+          {
+            "call": {
+              "macro": "macro.spell.chance.grant",
+              "args": {
+                "spell": "spell.fenshan"
+              }
+            }
+          },
+          {
+            "log": "册子封皮上写着三个字：焚山印。"
+          }
+        ]
+      },
+      {
+        "id": "decline",
+        "label": "婉拒",
+        "do": [
+          {
+            "add": [
+              "attr.heart.eff",
+              2
+            ]
+          },
+          {
+            "log": "你陪他坐到天黑。他说，这样也好。"
+          }
+        ]
+      }
+    ],
+    "source": "r35 · 奇遇术法来源（需求/12 §0.1.2）"
   }
 ]
