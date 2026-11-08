@@ -1,0 +1,1978 @@
+[
+  {
+    "no": 1,
+    "id": "evt.edu.graduate.meng",
+    "title": "蒙学卒试",
+"desc": "四年蒙学读到头了。先生把名册摊在桌上，念到名字的上前应考。",
+    "nature": "主线",
+    "priority": 2,
+    "weight": 0,
+    "forced": true,
+    "months": 1,
+    "when": [
+      {
+        "stage": "meng"
+      },
+      {
+        "gte": [
+          "clock.age",
+          10
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "sit",
+        "label": "应考",
+        "do": [
+          {
+            "set": [
+              "education.stage",
+              "fu"
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.edu.meng.done",
+              "value": true
+            }
+          },
+          {
+            "log": "先生在你的名册上画了一个圈。你去府学报到那天，换了身新衣裳。"
+          }
+        ]
+      },
+      {
+        "id": "stay",
+        "label": "再读一年",
+        "do": [
+          {
+            "log": "你又坐回那张矮桌。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/15 §1 · 蒙学 4 年"
+  },
+  {
+    "no": 2,
+    "id": "evt.edu.graduate.fu",
+    "title": "府学卒业",
+"desc": "府学四年也完了。这一场考完，要么进太学，要么就此出去讨生活。",
+    "nature": "主线",
+    "priority": 2,
+    "weight": 0,
+    "forced": true,
+    "months": 1,
+    "when": [
+      {
+        "stage": "fu"
+      },
+      {
+        "gte": [
+          "clock.age",
+          14
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "leave",
+        "label": "收拾书箱",
+        "do": [
+          {
+            "set": [
+              "education.stage",
+              "none"
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.edu.fu.done",
+              "value": true
+            }
+          },
+          {
+            "log": "四年府学，到此为止。明年十五，要考一场大的。"
+          }
+        ]
+      },
+      {
+        "id": "stay",
+        "label": "再留一年",
+        "do": [
+          {
+            "log": "你又把《引气篇》抄了一遍。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/15 §1 · 府学 4 年"
+  },
+  {
+    "no": 3,
+    "id": "evt.edu.exam.great",
+    "title": "大考",
+"desc": "十五岁这年有一次大考。台上坐着学正，台下站着一排和你差不多大的孩子。",
+    "nature": "主线",
+    "priority": 2,
+    "weight": 0,
+    "forced": true,
+    "months": 2,
+    "when": [
+      {
+        "gte": [
+          "clock.age",
+          15
+        ]
+      },
+      {
+        "notFlag": "flag.edu.exam.great"
+      }
+    ],
+    "choices": [
+      {
+        "id": "sit",
+        "label": "应试",
+        "do": [
+          {
+            "flag": {
+              "id": "flag.edu.exam.great",
+              "value": true
+            }
+          },
+          {
+            "if": {
+              "when": [
+                {
+                  "gte": [
+                    "path.qi.level",
+                    4
+                  ]
+                }
+              ],
+              "then": [
+                {
+                  "add": [
+                    "reputation.eff",
+                    10
+                  ]
+                },
+                {
+                  "flag": {
+                    "id": "flag.exam.rank",
+                    "value": "上等"
+                  }
+                },
+                {
+                  "log": "榜下人头攒动。你的名字在第三行，上等。"
+                }
+              ],
+              "else": [
+                {
+                  "if": {
+                    "when": [
+                      {
+                        "gte": [
+                          "path.qi.level",
+                          2
+                        ]
+                      }
+                    ],
+                    "then": [
+                      {
+                        "add": [
+                          "reputation.eff",
+                          5
+                        ]
+                      },
+                      {
+                        "flag": {
+                          "id": "flag.exam.rank",
+                          "value": "中等"
+                        }
+                      },
+                      {
+                        "log": "中等。不算出挑，也够看了。"
+                      }
+                    ],
+                    "else": [
+                      {
+                        "add": [
+                          "reputation.eff",
+                          1
+                        ]
+                      },
+                      {
+                        "flag": {
+                          "id": "flag.exam.rank",
+                          "value": "下等"
+                        }
+                      },
+                      {
+                        "log": "下等。先生拍了拍你的肩，没说什么。"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "skip",
+        "label": "称病不考",
+        "do": [
+          {
+            "flag": {
+              "id": "flag.edu.exam.great",
+              "value": true
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.exam.rank",
+              "value": "缺考"
+            }
+          },
+          {
+            "add": [
+              "reputation.eff",
+              -5
+            ]
+          },
+          {
+            "log": "你在家里躺了两天。第三天，榜出来了。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/15 §1 · 大考（15 岁，只考不判入学）"
+  },
+  {
+    "no": 4,
+    "id": "evt.edu.enter.tai",
+    "title": "太学放榜",
+"desc": "太学的门槛比府学高得多。祭酒只看两样：气机稳不稳，脑子清不清。",
+    "nature": "主线",
+    "priority": 2,
+    "weight": 0,
+    "forced": true,
+    "months": 1,
+    "when": [
+      {
+        "gte": [
+          "clock.age",
+          16
+        ]
+      },
+      {
+        "notFlag": "flag.edu.decided"
+      }
+    ],
+    "choices": [
+      {
+        "id": "enter",
+        "label": "入太学",
+        "when": [
+          {
+            "realm": {
+              "dao": "qi",
+              "gte": 2
+            }
+          }
+        ],
+        "do": [
+          {
+            "set": [
+              "education.stage",
+              "tai"
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.edu.decided",
+              "value": true
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.edu.tai",
+              "value": true
+            }
+          },
+          {
+            "add": [
+              "reputation.eff",
+              8
+            ]
+          },
+          {
+            "log": "十六岁这年，你进了太学。同届五百人，个个都是破过胎的。"
+          }
+        ]
+      },
+      {
+        "id": "assign",
+        "label": "接受分配",
+        "do": [
+          {
+            "set": [
+              "education.stage",
+              "none"
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.edu.decided",
+              "value": true
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.edu.assigned",
+              "value": true
+            }
+          },
+          {
+            "log": "没有破胎，就进不了那道门。名册上你的名字后面写着「分发」。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/15 §1 · 入学判定（16 岁，看有没有破胎）"
+  },
+  {
+    "no": 5,
+    "id": "evt.edu.graduate.tai",
+    "title": "太学卒业",
+"desc": "太学四年，读到头了。祭酒在门口送你们，说往后各自珍重。",
+    "nature": "主线",
+    "priority": 2,
+    "weight": 0,
+    "forced": true,
+    "months": 1,
+    "when": [
+      {
+        "stage": "tai"
+      },
+      {
+        "gte": [
+          "clock.age",
+          20
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "out",
+        "label": "出学",
+        "do": [
+          {
+            "set": [
+              "education.stage",
+              "none"
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.edu.graduated",
+              "value": true
+            }
+          },
+          {
+            "add": [
+              "reputation.eff",
+              12
+            ]
+          },
+          {
+            "log": "四年太学读完。祭酒在门口送你们，说：往后各自珍重。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/15 §1 · 卒业（20 岁，解锁养灵 Lv1 的入场券之一）"
+  },
+  {
+    "no": 6,
+    "id": "evt.office.enlist",
+    "title": "投军",
+"desc": "校场边上支着一张桌子。招兵的人抬头看了你一眼：「叫什么？」",
+    "nature": "身份",
+    "priority": 3,
+    "weight": 2,
+    "months": 2,
+    "when": [
+      {
+        "gte": [
+          "clock.age",
+          18
+        ]
+      },
+      {
+        "realm": {
+          "dao": "qi",
+          "gte": 2
+        }
+      },
+      {
+        "none": [
+          {
+            "flag": "flag.office.army"
+          }
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "join",
+        "label": "应募从军",
+        "do": [
+          {
+            "flag": {
+              "id": "flag.office.army",
+              "value": true
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.office.soldier",
+              "value": true
+            }
+          },
+          {
+            "add": [
+              "merit.war",
+              10
+            ]
+          },
+          {
+            "money": {
+              "copper": 60
+            }
+          },
+          {
+            "log": "你在军册上按了手印。从今天起，你是有编制的人了。"
+          }
+        ]
+      },
+      {
+        "id": "no",
+        "label": "不去",
+        "do": [
+          {
+            "log": "征兵的牌子在墙上贴了三天，你没去。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/02 §5.1 · 城卫（有军职才能主动出战）"
+  },
+  {
+    "no": 7,
+    "id": "evt.heart.firstblood",
+    "title": "第一次见血",
+"desc": "路边有人被砍倒。你站在三步外，看见了那把刀。",
+    "nature": "主线",
+    "priority": 2,
+    "weight": 0,
+    "forced": true,
+    "months": 1,
+    "when": [
+      {
+        "gte": [
+          "clock.age",
+          14
+        ]
+      },
+      {
+        "none": [
+          {
+            "flag": "flag.seen_blood"
+          }
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "face",
+        "label": "看清楚",
+        "do": [
+          {
+            "add": [
+              "path.heart.bar",
+              20
+            ]
+          },
+          {
+            "add": [
+              "attr.heart.eff",
+              2
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.seen_blood",
+              "value": true
+            }
+          },
+          {
+            "log": "你看着那摊血慢慢渗进土里，没有转头。"
+          }
+        ]
+      },
+      {
+        "id": "turn",
+        "label": "转过头",
+        "do": [
+          {
+            "add": [
+              "path.heart.bar",
+              5
+            ]
+          },
+          {
+            "add": [
+              "attr.heart.eff",
+              -1
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.seen_blood",
+              "value": true
+            }
+          },
+          {
+            "log": "你转过头。那一夜没睡好。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/20 §9 · 心关"
+  },
+  {
+    "no": 8,
+    "id": "evt.sect.recruit",
+    "title": "宗门选徒",
+"desc": "宗门的人每年下山一次。今年他们停在城门口，摆了一张蒲团。",
+    "nature": "身份",
+    "priority": 2,
+    "weight": 0,
+    "forced": true,
+    "months": 2,
+    "when": [
+      {
+        "gte": [
+          "attr.aptitude.eff",
+          80
+        ]
+      },
+      {
+        "gte": [
+          "clock.age",
+          16
+        ]
+      },
+      {
+        "none": [
+          {
+            "flag": "flag.joined_sect"
+          }
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "join",
+        "label": "拜入门下",
+        "do": [
+          {
+            "flag": {
+              "id": "flag.joined_sect",
+              "value": true
+            }
+          },
+          {
+            "add": [
+              "reputation.eff",
+              6
+            ]
+          },
+          {
+            "log": "你磕了三个头。师父没说话，只把一枚玉牌推到你面前。"
+          }
+        ]
+      },
+      {
+        "id": "refuse",
+        "label": "婉拒",
+        "do": [
+          {
+            "add": [
+              "reputation.eff",
+              -2
+            ]
+          },
+          {
+            "log": "你说想再想想。使者的脸色淡了。"
+          }
+        ]
+      }
+    ],
+    "source": "设计/04 §7.2"
+  },
+  {
+    "no": 9,
+    "id": "evt.road.pickpurse",
+    "title": "路边拾遗",
+"desc": "路边躺着一只钱袋，口子松着，露出几枚铜钱。四下没人。",
+    "nature": "机缘",
+    "priority": 4,
+    "weight": 3,
+    "months": 0,
+    "when": [
+      {
+        "lte": [
+          "luck",
+          60
+        ]
+      }
+    ],
+    "do": [
+      {
+        "money": {
+          "copper": 2
+        }
+      },
+      {
+        "log": "你在道旁捡到两枚铜钱。"
+      }
+    ],
+    "source": "设计/04 §7.1"
+  },
+  {
+    "no": 10,
+    "id": "evt.road.bandit",
+    "title": "劫道",
+"desc": "林子里钻出三个人，手里拿着刀。为首那个说：「留下东西。」",
+    "nature": "灾祸",
+    "priority": 3,
+    "weight": 2,
+    "months": 1,
+    "when": [
+      {
+        "gte": [
+          "clock.age",
+          14
+        ]
+      },
+      {
+        "lt": [
+          "attr.aptitude.eff",
+          70
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "fight",
+        "label": "拼命",
+        "do": [
+          {
+            "judge": {
+              "kind": "battle",
+              "scale": 0.85,
+              "kindName": "劫匪"
+            }
+          },
+          {
+            "if": {
+              "when": [
+                {
+                  "eq": [
+                    "$last.ok",
+                    true
+                  ]
+                }
+              ],
+              "then": [
+                {
+                  "money": {
+                    "copper": 20
+                  }
+                },
+                {
+                  "add": [
+                    "reputation.eff",
+                    2
+                  ]
+                },
+                {
+                  "log": "你把人打跑了，从地上捡起他掉的钱袋。"
+                }
+              ],
+              "else": [
+                {
+                  "money": {
+                    "copper": -12
+                  }
+                },
+                {
+                  "add": [
+                    "attr.heart.eff",
+                    -1
+                  ]
+                },
+                {
+                  "log": "你被打翻在地，醒来时钱袋空了。"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "pay",
+        "label": "破财免灾",
+        "do": [
+          {
+            "money": {
+              "copper": -15
+            }
+          },
+          {
+            "log": "你把钱袋扔过去，他掂了掂，让开了路。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/13 §10.4 · 委托风险"
+  },
+  {
+    "no": 11,
+    "id": "evt.market.auction",
+    "title": "坊市 · 散摊",
+"desc": "散摊上堆着一堆来路不明的东西。摊主不抬头，只说：「看中哪个说话。」",
+    "nature": "机缘",
+    "priority": 4,
+    "weight": 2,
+    "months": 1,
+    "when": [
+      {
+        "use": "cond.in_city"
+      }
+    ],
+    "choices": [
+      {
+        "id": "buy_guben",
+        "label": "买固本丹",
+        "cost": 200,
+        "openPrice": true,
+        "do": [
+          {
+            "grant": {
+              "item": "item.guben",
+              "n": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "buy_peiyuan",
+        "label": "买培元丹",
+        "cost": 120,
+        "openPrice": true,
+        "do": [
+          {
+            "grant": {
+              "item": "item.peiyuan",
+              "n": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "buy_huichun",
+        "label": "买回春丹",
+        "cost": 80,
+        "openPrice": true,
+        "do": [
+          {
+            "grant": {
+              "item": "item.huichun",
+              "n": 1
+            }
+          }
+        ]
+      },
+      {
+        "id": "look",
+        "label": "只看不买",
+        "do": [
+          {
+            "log": "你把摊上的东西一件件看过去，记住了价钱。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/14 §3 · 坊市（买到的东西进背包）"
+  },
+  {
+    "no": 12,
+    "id": "evt.disaster.plague",
+    "title": "时疫",
+"desc": "城里开始死人。先是城西，然后是隔街。药铺的门前排到了巷口。",
+    "nature": "灾祸",
+    "priority": 3,
+    "weight": 2,
+    "months": 1,
+    "when": [
+      {
+        "use": "cond.in_city"
+      },
+      {
+        "lt": [
+          "attr.heart.eff",
+          60
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "help",
+        "label": "帮着抬人",
+        "do": [
+          {
+            "add": [
+              "path.heart.bar",
+              8
+            ]
+          },
+          {
+            "add": [
+              "attr.heart.eff",
+              1
+            ]
+          },
+          {
+            "add": [
+              "reputation.eff",
+              5
+            ]
+          },
+          {
+            "log": "你抬了三天人。手上洗不掉的药味。"
+          }
+        ]
+      },
+      {
+        "id": "hide",
+        "label": "闭门不出",
+        "do": [
+          {
+            "log": "你把窗子糊死了，听着外面的哭声。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/20 §5 · 灾祸"
+  },
+  {
+    "no": 13,
+    "id": "evt.war.warning.north",
+    "title": "北境告急",
+"desc": "关外的马蹄声越来越近。城主府贴了告示，要各家自备药与符。",
+    "nature": "战事",
+    "priority": 3,
+    "weight": 4,
+    "months": 1,
+    "when": [
+      {
+        "eq": [
+          "war.phase",
+          "warning"
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "prep",
+        "label": "备药、备符",
+        "do": [
+          {
+            "money": {
+              "copper": -30
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.war.prepared",
+              "value": true
+            }
+          },
+          {
+            "log": "你把攒下的钱换成了两枚固本丹。"
+          }
+        ]
+      },
+      {
+        "id": "ignore",
+        "label": "还早",
+        "do": [
+          {
+            "log": "关外的马蹄声，听着像风。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/21 §3 · 预警"
+  },
+  {
+    "no": 14,
+    "id": "evt.war.patrol",
+    "title": "巡夜遇匪",
+"desc": "你被派去巡边。风里有铁锈味，不像风。",
+    "nature": "战事",
+    "priority": 3,
+    "weight": 3,
+    "months": 1,
+    "when": [
+      {
+        "gte": [
+          "clock.age",
+          20
+        ]
+      },
+      {
+        "neq": [
+          "war.phase",
+          "nation"
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "fight",
+        "label": "上前",
+        "do": [
+          {
+            "judge": {
+              "kind": "battle",
+              "scale": 0.9,
+              "kindName": "匪徒"
+            }
+          },
+          {
+            "if": {
+              "when": [
+                {
+                  "eq": [
+                    "$last.ok",
+                    true
+                  ]
+                }
+              ],
+              "then": [
+                {
+                  "add": [
+                    "merit.war",
+                    3
+                  ]
+                },
+                {
+                  "add": [
+                    "reputation.eff",
+                    2
+                  ]
+                }
+              ],
+              "else": [
+                {
+                  "add": [
+                    "attr.heart.eff",
+                    -1
+                  ]
+                },
+                {
+                  "log": "你在墙根躺了半夜，才有人发现你。"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "call",
+        "label": "喊人",
+        "do": [
+          {
+            "log": "你喊了一嗓子，巷子那头亮起一串火把。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/30 §7 · 普通人靠事件撞上战斗"
+  },
+  {
+    "no": 15,
+    "id": "evt.war.beast",
+    "title": "城外妖兽",
+"desc": "山那边下来一头东西。它站在田里，把人当成草。",
+    "nature": "战事",
+    "priority": 3,
+    "weight": 2,
+    "months": 2,
+    "when": [
+      {
+        "gte": [
+          "clock.age",
+          16
+        ]
+      },
+      {
+        "zone": "city"
+      }
+    ],
+    "choices": [
+      {
+        "id": "hunt",
+        "label": "出手猎它",
+        "do": [
+          {
+            "judge": {
+              "kind": "battle",
+              "scale": 1.1,
+              "kindName": "妖兽"
+            }
+          },
+          {
+            "if": {
+              "when": [
+                {
+                  "eq": [
+                    "$last.ok",
+                    true
+                  ]
+                }
+              ],
+              "then": [
+                {
+                  "money": {
+                    "copper": 90
+                  }
+                },
+                {
+                  "add": [
+                    "merit.war",
+                    5
+                  ]
+                },
+                {
+                  "log": "皮剥下来卖了九十铜。肉分给了同巷的人家。"
+                }
+              ],
+              "else": [
+                {
+                  "add": [
+                    "attr.aptitude.eff",
+                    -1
+                  ]
+                },
+                {
+                  "log": "你被它掀翻，肋骨断了两根。养了半年。"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "avoid",
+        "label": "绕开",
+        "do": [
+          {
+            "log": "你绕了远路。第二天听说它咬死了两个猎户。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/13 §7.2 · 妖兽材料"
+  },
+  {
+    "no": 16,
+    "id": "evt.war.duel",
+    "title": "斗法帖",
+"desc": "对面派人出来叫阵。你这边没人应声，最后所有人都看向你。",
+    "nature": "战事",
+    "priority": 3,
+    "weight": 2,
+    "months": 1,
+    "when": [
+      {
+        "realm": {
+          "dao": "qi",
+          "gte": 2
+        }
+      },
+      {
+        "gte": [
+          "clock.age",
+          18
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "accept",
+        "label": "接帖",
+        "do": [
+          {
+            "judge": {
+              "kind": "battle",
+              "scale": 1,
+              "kindName": "同辈"
+            }
+          },
+          {
+            "if": {
+              "when": [
+                {
+                  "eq": [
+                    "$last.ok",
+                    true
+                  ]
+                }
+              ],
+              "then": [
+                {
+                  "add": [
+                    "reputation.eff",
+                    8
+                  ]
+                },
+                {
+                  "add": [
+                    "merit.war",
+                    4
+                  ]
+                }
+              ],
+              "else": [
+                {
+                  "add": [
+                    "reputation.eff",
+                    -4
+                  ]
+                },
+                {
+                  "log": "你输了。帖子被人贴回了你家门口。"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "decline",
+        "label": "不接",
+        "do": [
+          {
+            "add": [
+              "reputation.eff",
+              -2
+            ]
+          }
+        ]
+      }
+    ],
+    "source": "需求/30 §7 · 切磋（有危险线，不掷伤病）"
+  },
+  {
+    "no": 17,
+    "id": "evt.art.master",
+    "title": "拜师学艺",
+"desc": "巷子尽头那家铺子常年关着门。今天门开了一条缝。",
+    "nature": "身份",
+    "priority": 3,
+    "weight": 2,
+    "months": 2,
+    "when": [
+      {
+        "gte": [
+          "clock.age",
+          11
+        ]
+      },
+      {
+        "lte": [
+          "clock.age",
+          20
+        ]
+      },
+      {
+        "none": [
+          {
+            "flag": "flag.art.master"
+          }
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "alchemy",
+        "label": "学丹道",
+        "do": [
+          {
+            "set": [
+              "arts.alchemy.talent",
+              "low"
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.art.master",
+              "value": true
+            }
+          },
+          {
+            "log": "你在丹房守了两个月炉子。师父说：火候是等出来的。"
+          }
+        ]
+      },
+      {
+        "id": "forge",
+        "label": "学器道",
+        "do": [
+          {
+            "set": [
+              "arts.forge.talent",
+              "low"
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.art.master",
+              "value": true
+            }
+          },
+          {
+            "log": "你抡了两个月锤。虎口裂了又合。"
+          }
+        ]
+      },
+      {
+        "id": "medicine",
+        "label": "学医道",
+        "do": [
+          {
+            "set": [
+              "arts.medicine.talent",
+              "low"
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.art.master",
+              "value": true
+            }
+          },
+          {
+            "log": "你跟着郎中认了两个月药。他治病不收穷人的钱。"
+          }
+        ]
+      },
+      {
+        "id": "no",
+        "label": "不学",
+        "do": [
+          {
+            "log": "你对那些瓶瓶罐罐没什么兴趣。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/13 §9 · 百艺天赋（这里只给下品，模拟'有师父肯教'）"
+  },
+  {
+    "no": 18,
+    "id": "evt.art.order",
+    "title": "势力订单",
+"desc": "城主府的管事找上门，要一批货。数目不小，日子很紧。",
+    "nature": "机缘",
+    "priority": 4,
+    "weight": 2,
+    "months": 2,
+    "when": [
+      {
+        "use": "cond.art_master"
+      }
+    ],
+    "choices": [
+      {
+        "id": "take",
+        "label": "接下这单",
+        "do": [
+          {
+            "money": {
+              "copper": 260
+            }
+          },
+          {
+            "add": [
+              "merit.craft",
+              8
+            ]
+          },
+          {
+            "log": "城主府要三十枚聚气丹。你连着熬了两个月的夜。"
+          }
+        ]
+      },
+      {
+        "id": "pass",
+        "label": "推了",
+        "do": [
+          {
+            "add": [
+              "reputation.eff",
+              -1
+            ]
+          },
+          {
+            "log": "你推了这单。管事没说什么，只是记下了。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/13 §3.1 · 势力订单（第二条收入线）"
+  },
+  {
+    "no": 19,
+    "id": "evt.art.forbidden",
+    "title": "黑市的价",
+"desc": "有人把一本册子推到灯下，说这上面的东西能让你快十年。",
+    "nature": "灾祸",
+    "priority": 4,
+    "weight": 1,
+    "months": 1,
+    "when": [
+      {
+        "use": "cond.art_master"
+      },
+      {
+        "gte": [
+          "attr.heart.eff",
+          60
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "take",
+        "label": "收下那本册子",
+        "do": [
+          {
+            "flag": {
+              "id": "flag.art.forbidden",
+              "value": true
+            }
+          },
+          {
+            "add": [
+              "attr.heart.eff",
+              -10
+            ]
+          },
+          {
+            "add": [
+              "reputation.eff",
+              -20
+            ]
+          },
+          {
+            "log": "册子上写着：一炉一人。你把它塞进袖子，手在抖。"
+          }
+        ]
+      },
+      {
+        "id": "burn",
+        "label": "烧了",
+        "do": [
+          {
+            "add": [
+              "path.heart.bar",
+              10
+            ]
+          },
+          {
+            "add": [
+              "attr.heart.eff",
+              2
+            ]
+          },
+          {
+            "log": "你把册子扔进炉子，看它卷成了灰。"
+          }
+        ]
+      }
+    ],
+    "source": "需求/13 §8 · 三禁"
+  },
+  {
+    "no": 20,
+    "id": "evt.age.warning",
+    "title": "寿元将尽",
+"desc": "你最近总觉得冷。夜里醒来，听见自己的心跳变得很慢。",
+    "nature": "主线",
+    "priority": 1,
+    "weight": 0,
+    "forced": true,
+    "months": 0,
+    "when": [
+      {
+        "notFlag": "flag.age.warned"
+      },
+      {
+        "gte": [
+          "clock.age",
+          60
+        ]
+      }
+    ],
+    "do": [
+      {
+        "flag": {
+          "id": "flag.age.warned",
+          "value": true
+        }
+      },
+      {
+        "log": "你开始怕冷了。以前不这样的。"
+      }
+    ],
+    "source": "需求/15 §4 · 寿元预警（接入点）"
+  },
+  {
+    "no": 21,
+    "id": "evt.war.city.beiguan",
+    "title": "城战 · 北关",
+"desc": "北关的烽火三天没灭。城墙上的人换了一茬又一茬。",
+    "nature": "战事",
+    "template": "tpl.war.city",
+    "args": {
+      "city": "beiguan",
+      "order": 1,
+      "months": 5,
+      "defense": 80
+    },
+    "source": "需求/21 §4 · 第一座城"
+  },
+  {
+    "no": 22,
+    "id": "evt.war.city.wangbei",
+    "title": "城战 · 望北城",
+"desc": "王北的城墙比北关矮，人却更少。",
+    "nature": "战事",
+    "template": "tpl.war.city",
+    "args": {
+      "city": "wangbei",
+      "order": 2,
+      "months": 4,
+      "defense": 60
+    },
+    "source": "需求/21 §4 · 粮道与灵脉"
+  },
+  {
+    "no": 23,
+    "id": "evt.war.city.changming",
+    "title": "城战 · 长明城",
+"desc": "最后一道墙就在身后。墙里是你的家。",
+    "nature": "战事",
+    "template": "tpl.war.city",
+    "args": {
+      "city": "changming",
+      "order": 3,
+      "months": 6,
+      "defense": 95
+    },
+    "source": "需求/21 §4 · 最后一道墙"
+  },
+  {
+    "no": 24,
+    "id": "evt.war.nation.call",
+    "title": "国战 · 征召",
+"desc": "三座城都丢了。王上下了征召令，所有能拿刀的人都得上。",
+    "nature": "战事",
+    "template": "tpl.war.nation",
+    "args": {
+      "theater": "north"
+    },
+    "source": "需求/21 §5 · 全国征召"
+  },
+  {
+    "no": 25,
+    "id": "evt.heart.question",
+    "title": "问心",
+"desc": "半夜醒来，有个问题一直在你脑子里转，怎么都按不下去。",
+    "nature": "主线",
+    "priority": 3,
+    "weight": 2,
+    "months": 1,
+    "when": [
+      {
+        "gte": [
+          "clock.age",
+          25
+        ]
+      },
+      {
+        "notFlag": "flag.heart.question"
+      }
+    ],
+    "choices": [
+      {
+        "id": "sit",
+        "label": "闭关问心",
+        "do": [
+          {
+            "add": [
+              "path.heart.bar",
+              30
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.heart.question",
+              "value": true
+            }
+          },
+          {
+            "log": "你在屋里坐了三十天。出来的时候，看什么都清楚了些。"
+          }
+        ]
+      },
+      {
+        "id": "skip",
+        "label": "还没到时候",
+        "do": [
+          {
+            "flag": {
+              "id": "flag.heart.question",
+              "value": true
+            }
+          },
+          {
+            "log": "你觉得自己还答不上那个问题。"
+          }
+        ]
+      }
+    ],
+    "source": "设计/11 §8 · 心关（道心只走事件，I4）"
+  },
+  {
+    "no": 26,
+    "id": "evt.art.sell",
+    "title": "行商收货",
+"desc": "行商在门口卸下担子，一样一样看你的活计。",
+    "nature": "机缘",
+    "priority": 4,
+    "weight": 2,
+    "months": 1,
+    "when": [ { "use": "cond.has_art" }, { "use": "cond.in_city" } ],
+    "choices": [
+      {
+        "id": "sell",
+        "label": "按市价卖给他",
+        "do": [
+          { "money": { "copper": 90 } },
+          { "add": ["merit.craft", 3] },
+          { "log": "行商把你的活计翻来覆去看了三遍，最后还是收了。" }
+        ]
+      },
+      {
+        "id": "hold",
+        "label": "留着，等更好的价",
+        "do": [
+          { "log": "你没卖。行商笑了笑，说下个月还来。" }
+        ]
+      }
+    ],
+    "source": "需求/13 §3.1 · 零售线（百艺的第一条收入线）"
+  },
+  {
+    "no": 27,
+    "id": "evt.art.rival",
+    "title": "同行上门",
+"desc": "隔壁铺子的老师傅来了，说要跟你比一比手上功夫。",
+    "nature": "灾祸",
+    "priority": 4,
+    "weight": 1,
+    "months": 1,
+    "when": [ { "use": "cond.art_master" }, { "gte": ["clock.age", 16] } ],
+    "choices": [
+      {
+        "id": "fight",
+        "label": "比一场",
+        "do": [
+          { "judge": { "kind": "battle", "scale": 0.8, "kindName": "同行", "match": "spar" } },
+          {
+            "if": {
+              "when": [ { "eq": ["$last.ok", true] } ],
+              "then": [
+                { "add": ["reputation.eff", 4] },
+                { "add": ["merit.craft", 4] },
+                { "log": "他的手比你稳，但你的火候更足。铺子里的人记住了你。" }
+              ],
+              "else": [
+                { "add": ["reputation.eff", -3] },
+                { "log": "你输了。围看的人散得很快。" }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "id": "yield",
+        "label": "让他三尺",
+        "do": [
+          { "add": ["reputation.eff", -1] },
+          { "log": "你把台子让了。有人说你懂事，也有人说你怕。" }
+        ]
+      }
+    ],
+    "source": "需求/13 §8 · 同行相轻（百艺不是闷头练就行）"
+  },
+  {
+    "no": 30,
+    "id": "evt.gate.body.5",
+    "title": "武名动四方",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "body", "tier": 5 },
+    "desc": "朝元圆满。山门前要一场让人记住的仗，你的名字才能传出这座城。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "出战，让人记住",
+        "do": [
+          { "judge": { "kind": "break", "dao": "body", "tier": 5, "force": true } },
+          { "log": "那一战打完，山门前有人叫了你的名字。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 31,
+    "id": "evt.gate.body.6",
+    "title": "力破",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "body", "tier": 6 },
+    "desc": "金身圆满。这一关要你在没有法力的时候也敢站着。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "空着手，站上去",
+        "do": [
+          { "judge": { "kind": "break", "dao": "body", "tier": 6, "force": true } },
+          { "log": "法力尽失的那一刻，你没有退。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 32,
+    "id": "evt.gate.qi.4",
+    "title": "立相",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "qi", "tier": 4 },
+    "desc": "驭凡圆满，太学也卒业了。该给自己立一个「相」了。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "闭关立相",
+        "do": [
+          { "judge": { "kind": "break", "dao": "qi", "tier": 4, "force": true } },
+          { "log": "你在识海里立起一座相。它睁眼的时候，你也睁眼。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 33,
+    "id": "evt.gate.qi.5",
+    "title": "万法归一",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "qi", "tier": 5 },
+    "desc": "法相圆满。把散出去的都收回来。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "收",
+        "do": [
+          { "judge": { "kind": "break", "dao": "qi", "tier": 5, "force": true } },
+          { "log": "万千法门收成一缕，落在你手上。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 34,
+    "id": "evt.gate.qi.6",
+    "title": "散功",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "qi", "tier": 6 },
+    "desc": "合一圆满。把全部法力散掉，再重新聚起来。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "散",
+        "do": [
+          { "judge": { "kind": "break", "dao": "qi", "tier": 6, "force": true } },
+          { "log": "法力散尽，你又成了一个凡人。然后你重新开始聚。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 35,
+    "id": "evt.gate.spirit.1",
+    "title": "见众生",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "spirit", "tier": 1 },
+    "desc": "第一个不是你的生命，在你面前死掉。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "看着它死",
+        "do": [
+          { "judge": { "kind": "break", "dao": "spirit", "tier": 1, "force": true } },
+          { "log": "你看见了。从此闭不上眼。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 36,
+    "id": "evt.gate.spirit.2",
+    "title": "见自己",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "spirit", "tier": 2 },
+    "desc": "承认自己也是一个会死的生命。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "承认",
+        "do": [
+          { "judge": { "kind": "break", "dao": "spirit", "tier": 2, "force": true } },
+          { "log": "你承认了。心里那面镜子终于照见自己。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 37,
+    "id": "evt.gate.spirit.3",
+    "title": "见因果",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "spirit", "tier": 3 },
+    "desc": "看见一件事怎么牵出下一件。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "看下去",
+        "do": [
+          { "judge": { "kind": "break", "dao": "spirit", "tier": 3, "force": true } },
+          { "log": "因果像水纹一样铺开，你站在中间。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 38,
+    "id": "evt.gate.spirit.4",
+    "title": "见天地",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "spirit", "tier": 4 },
+    "desc": "把灵铺出去，铺到看不见的地方。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "铺出去",
+        "do": [
+          { "judge": { "kind": "break", "dao": "spirit", "tier": 4, "force": true } },
+          { "log": "灵出去很远，回来时带着天地的一点凉。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 39,
+    "id": "evt.gate.spirit.5",
+    "title": "众生念",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "spirit", "tier": 5 },
+    "desc": "治下的人念着你的名字。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "受这一念",
+        "do": [
+          { "judge": { "kind": "break", "dao": "spirit", "tier": 5, "force": true } },
+          { "log": "千万人的念头涌进来，你没有散。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 40,
+    "id": "evt.gate.spirit.6",
+    "title": "返本",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "spirit", "tier": 6 },
+    "desc": "把灵量全部还给众生，看你还剩不剩得下自己。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "还回去",
+        "do": [
+          { "judge": { "kind": "break", "dao": "spirit", "tier": 6, "force": true } },
+          { "log": "灵量散尽，你却没有死。镜子里的人年轻了三十岁。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 41,
+    "id": "evt.gate.heart.1",
+    "title": "大心关 · 不惑",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "heart", "tier": 1 },
+    "desc": "有一件事，你一直没敢问自己。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "问",
+        "do": [
+          { "judge": { "kind": "break", "dao": "heart", "tier": 1, "force": true } },
+          { "log": "问出来了。答案是「我不知道」，但你不再怕这个答案。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 42,
+    "id": "evt.gate.heart.2",
+    "title": "大心关 · 天命",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "heart", "tier": 2 },
+    "desc": "有些事不是你选的路，却非要你走。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "走",
+        "do": [
+          { "judge": { "kind": "break", "dao": "heart", "tier": 2, "force": true } },
+          { "log": "你认了这条命，但没有认输。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 43,
+    "id": "evt.gate.heart.3",
+    "title": "大心关 · 耳顺",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "heart", "tier": 3 },
+    "desc": "别人骂你，你听着；别人夸你，你也听着。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "听着",
+        "do": [
+          { "judge": { "kind": "break", "dao": "heart", "tier": 3, "force": true } },
+          { "log": "话进耳朵，不再进心里。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  },
+  {
+    "no": 44,
+    "id": "evt.gate.heart.4",
+    "title": "大心关 · 从心而欲",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 0,
+    "months": 3,
+    "gate": { "dao": "heart", "tier": 4 },
+    "desc": "规矩已经长在你身上了。现在可以不守，因为你不会越。",
+    "choices": [
+      {
+        "id": "go",
+        "label": "不守了",
+        "do": [
+          { "judge": { "kind": "break", "dao": "heart", "tier": 4, "force": true } },
+          { "log": "你终于想做什么就做什么，而没有一件事需要后悔。" }
+        ]
+      }
+    ],
+    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+  }
+]

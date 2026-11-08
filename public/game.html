@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>游戏 · 大曜问仙录</title>
+<link rel="stylesheet" href="styles/base.css" />
+<link rel="stylesheet" href="styles/game.css" />
+</head>
+<body class="game-page">
+
+<header class="bar">
+  <a class="back" href="/">← 天下</a>
+  <div class="brand">大曜问仙录<small>月制 · 一年十二月</small></div>
+  <div class="age"><b id="age">10</b><span>岁</span></div>
+  <div class="tag" id="stage">蒙学</div>
+  <div class="tag" id="identity">平民</div>
+  <div class="spacer"></div>
+  <div class="era" id="era">大曜历三〇九年</div>
+  <button class="btn-ghost" id="btnNew">重开</button>
+  <span class="who" id="who"></span>
+</header>
+
+<main class="grid">
+
+  <!-- 左：人物 / 法术 / 百艺 / 囊中·钱。三段都可折叠，免得学到十几门就拖到看不见底 -->
+  <aside class="col left">
+    <div class="whoami">
+      <div class="nm" id="charName">沈砚</div>
+      <div class="sub" id="charSub">蒙学 · 蒙学生 · 10 岁</div>
+    </div>
+
+    <div class="paths" id="paths"></div>
+    <div class="attrs" id="attrs"></div>
+
+    <details class="fold" id="foldSpell" open>
+      <summary class="sec"><span>法术</span><em id="spellCount">0 门</em></summary>
+      <div class="tracks" id="spellTracks"></div>
+    </details>
+
+    <details class="fold" id="foldArt" open>
+      <summary class="sec"><span>百艺</span><em id="artCount">0 门</em></summary>
+      <div class="tracks" id="artTracks"></div>
+    </details>
+
+    <details class="fold" id="foldBag" open>
+      <summary class="sec"><span>囊中</span><em id="bagCount">0 件</em></summary>
+      <div class="bag" id="bag"></div>
+    </details>
+
+    <!-- 钱不放进折叠里：收起囊中也不该看不见自己有多少钱 -->
+    <div class="purse" id="purse"></div>
+  </aside>
+
+  <!-- 中：事件 → 修为 → 法术 → 百艺 → 营生 → 坊市 -->
+  <section class="stage">
+    <div class="time">
+      <div class="time-head">
+        <span class="time-label">本年时间</span>
+        <span class="time-val">剩 <b id="left">12</b> 月</span>
+      </div>
+      <div class="ticks" id="ticks"></div>
+      <div class="tick-labels"><span>0</span><span>3</span><span>6</span><span>9</span><span>12</span></div>
+    </div>
+
+    <div class="hint" id="hint"></div>
+
+    <!-- 一、今年的事：描述在上，选项在下，整个选项都能点 -->
+    <section class="band band-main" id="bandMain">
+      <div class="band-h"><span>今年的事</span><em id="mainMeta"></em></div>
+      <div id="mainCards"></div>
+    </section>
+
+    <!-- 二、修为：没满就是「修炼」，满了就是「突破」 -->
+    <section class="band" id="bandCult" hidden>
+      <div class="band-h"><span>修为</span><em>一次修到满 · 满了就能冲关</em></div>
+      <div class="rail" id="cultRow"></div>
+    </section>
+
+    <!-- 三、法术 -->
+    <section class="band" id="bandSpell" hidden>
+      <div class="band-h"><span>法术</span><em>一次练一季 · 三个月</em></div>
+      <div class="rail" id="spellRow"></div>
+    </section>
+
+    <!-- 四、百艺 -->
+    <section class="band" id="bandArt" hidden>
+      <div class="band-h"><span>百艺</span><em>学过的才练得动</em></div>
+      <div class="rail rail-art" id="artRow"></div>
+    </section>
+
+    <!-- 五、营生 -->
+    <section class="band" id="bandAct" hidden>
+      <div class="band-h"><span>营生</span><em>坊市、委托、切磋、出战、闲居</em></div>
+      <div class="rail" id="actRow"></div>
+    </section>
+
+    <!-- 六、坊市：逛过之后才摆摊，能买也能卖 -->
+    <section class="band band-market" id="bandMarket" hidden>
+      <div class="band-h"><span>坊市 · 买</span><em>明码标价 · 买下进囊中</em></div>
+      <div class="rail rail-shop" id="marketRow"></div>
+      <div class="band-h band-h-sub" id="sellHead"><span>坊市 · 卖</span><em>半价回收囊中之物</em></div>
+      <div class="rail rail-shop" id="sellRow"></div>
+    </section>
+  </section>
+
+  <!-- 右：纪事 / 局势 -->
+  <aside class="col right">
+    <div class="sec">纪事</div>
+    <div class="log" id="log"></div>
+    <div class="sec">局势</div>
+    <div class="kv" id="situation"></div>
+  </aside>
+
+</main>
+
+<!-- 战斗：独立一屏。**尺寸写死**，内容在中间滚动，两边的血条随回合跳 -->
+<div class="battle-mask" id="battleMask" hidden>
+  <div class="battle-box">
+    <div class="bb-h">
+      <span id="bbTitle">切磋</span>
+      <em id="bbSub"></em>
+    </div>
+
+    <div class="bb-board">
+      <div class="bf" id="bfMe"></div>
+      <div class="bf-mid">
+        <span id="bbRound">第 1 回合</span>
+        <i>对</i>
+      </div>
+      <div class="bf" id="bfFoe"></div>
+    </div>
+
+    <div class="bb-lines" id="bbLines"></div>
+
+    <div class="bb-foot">
+      <span id="bbResult"></span>
+      <button class="btn btn-primary xs" id="bbClose" hidden>知道了</button>
+      <button class="btn btn-ghost" id="bbSkip">跳过</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/game.js"></script>
+</body>
+</html>

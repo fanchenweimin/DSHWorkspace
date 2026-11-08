@@ -1,0 +1,169 @@
+/* ── 基础：浅底墨线，大字号，高对比 ─────────────────────────── */
+:root {
+  --bg: #fbf8f1;
+  --bg-2: #f3ecdd;
+  --paper: #ffffff;
+  --ink: #23211c;
+  --ink-2: #454136;
+  --muted: #7b7364;
+  --muted-2: #9a9182;
+  --line: #d9d0bc;
+  --line-2: #c3b79c;
+  --gold: #8d6222;
+  --gold-2: #b8862f;
+  --seal: #a2352c;
+  --jade: #2e6a51;
+
+  --serif: "Songti SC", "SimSun", "Noto Serif SC", "Source Han Serif SC", serif;
+  --sans: "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+
+  --shadow-s: 0 1px 2px rgba(70, 56, 30, .08);
+  --shadow-m: 0 6px 24px rgba(70, 56, 30, .12);
+  --shadow-l: 0 18px 60px rgba(70, 56, 30, .16);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--gold); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* [hidden] 必须真的隐藏：像 .btn 这种写了 display 的元素，
+   作者样式会盖掉浏览器默认的 [hidden]{display:none}，于是"藏起来"的按钮还亮着。
+   （r27 踩过：首页的「继续这一世」在没有存档时也显示出来了。） */
+[hidden] { display: none !important; }
+
+h1, h2, h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: .08em;
+  color: var(--ink);
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+code {
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: .92em;
+  background: rgba(141, 98, 34, .08);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* ── 通用按钮 ─────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 26px;
+  border: 1px solid var(--line-2);
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink-2);
+  font-size: 15px;
+  letter-spacing: .12em;
+  transition: .16s;
+  box-shadow: var(--shadow-s);
+}
+.btn:hover { border-color: var(--gold-2); color: var(--gold); }
+
+.btn-primary {
+  background: linear-gradient(180deg, #2f2a22, #1f1b15);
+  border-color: #1f1b15;
+  color: #f6efdf;
+  padding: 15px 44px;
+  font-size: 19px;
+  font-family: var(--serif);
+  letter-spacing: .32em;
+  box-shadow: 0 10px 30px rgba(40, 32, 18, .28);
+}
+.btn-primary:hover {
+  color: #fff8e6;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 36px rgba(40, 32, 18, .34);
+}
+.btn-primary small {
+  display: block;
+  font-family: var(--sans);
+  font-size: 11px;
+  letter-spacing: .18em;
+  color: #b9ad93;
+  margin-top: 2px;
+}
+
+.btn-ghost {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  color: var(--muted);
+  padding: 8px 14px;
+  font-size: 13px;
+  letter-spacing: .1em;
+}
+.btn-ghost:hover { color: var(--gold); text-decoration: none; }
+
+/* ── 小工具 ───────────────────────────────────────────────── */
+.dim { color: var(--muted); }
+.tiny { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 34px;
+  transform: translateX(-50%);
+  background: #262219;
+  color: #f7f0e0;
+  padding: 10px 20px;
+  border-radius: 3px;
+  font-size: 13px;
+  letter-spacing: .06em;
+  box-shadow: var(--shadow-m);
+  z-index: 90;
+}
+.toast.bad { background: #7d2b23; }
+
+/* ── 开机遮罩 ─────────────────────────────────────────────── */
+.boot {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  z-index: 100;
+  transition: opacity .5s;
+}
+.boot.gone { opacity: 0; pointer-events: none; }
+.boot-text { font-family: var(--serif); letter-spacing: .3em; color: var(--muted); font-size: 14px; }
+.boot-err {
+  max-width: 620px;
+  padding: 16px 20px;
+  border: 1px solid #e0c4b8;
+  background: #fdf3ef;
+  color: #7d2b23;
+  font-size: 13px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+  border-radius: 3px;
+}

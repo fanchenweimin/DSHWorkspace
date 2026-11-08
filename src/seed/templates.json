@@ -1,0 +1,308 @@
+{
+  "_note": "r27：tpl.break.prob / tpl.break.event 已退役——22 品瓶颈改成『修为满就出一张常驻突破卡』（hand.js 生成），不再走事件池。模板只留战事两种。",
+  "tpl.war.city": {
+    "params": [
+      "city",
+      "order",
+      "months",
+      "defense"
+    ],
+    "desc": "城战骨架：三座城共用，只有 defense / months / 文案不同",
+    "nature": "战事",
+    "priority": 1,
+    "forced": true,
+    "months": "$arg.months",
+    "span": true,
+    "ttl": 3,
+    "zone": "city",
+    "when": [
+      {
+        "eq": [
+          "war.phase",
+          "city"
+        ]
+      },
+      {
+        "notFlag": "flag.city_lost.$arg.city"
+      }
+    ],
+    "choices": [
+      {
+        "id": "defend",
+        "label": "守城",
+        "do": [
+          {
+            "judge": {
+              "kind": "battle",
+              "scale": 1.15,
+              "kindName": "攻城敌军"
+            }
+          },
+          {
+            "if": {
+              "when": [
+                {
+                  "eq": [
+                    "$last.ok",
+                    true
+                  ]
+                }
+              ],
+              "then": [
+                {
+                  "add": [
+                    "merit.war",
+                    12
+                  ]
+                },
+                {
+                  "log": "城墙上的火把一夜没灭。"
+                }
+              ],
+              "else": [
+                {
+                  "add": [
+                    "merit.war",
+                    4
+                  ]
+                },
+                {
+                  "add": [
+                    "flags.city_hurt.$arg.city",
+                    1
+                  ]
+                },
+                {
+                  "if": {
+                    "when": [
+                      {
+                        "gte": [
+                          "flags.city_hurt.$arg.city",
+                          2
+                        ]
+                      }
+                    ],
+                    "then": [
+                      {
+                        "flag": {
+                          "id": "flag.city_lost.$arg.city",
+                          "value": true
+                        }
+                      },
+                      {
+                        "log": "第二次了。城头换了旗，你是从水门逃出去的。"
+                      }
+                    ],
+                    "else": [
+                      {
+                        "log": "城墙被撞开一个口子，你退进巷子里。城还没丢——但他们已经进城了。"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "when": [
+          {
+            "gte": [
+              "clock.age",
+              16
+            ]
+          }
+        ],
+        "lockReason": "十六岁以上才被赶上城墙。"
+      },
+      {
+        "id": "sortie",
+        "label": "出城迎战",
+        "do": [
+          {
+            "judge": {
+              "kind": "battle",
+              "scale": 1.35,
+              "kindName": "敌军前锋"
+            }
+          },
+          {
+            "if": {
+              "when": [
+                {
+                  "eq": [
+                    "$last.ok",
+                    true
+                  ]
+                }
+              ],
+              "then": [
+                {
+                  "add": [
+                    "merit.war",
+                    24
+                  ]
+                },
+                {
+                  "log": "你带人冲了出去，身后城门缓缓合上。"
+                }
+              ],
+              "else": [
+                {
+                  "add": [
+                    "merit.war",
+                    6
+                  ]
+                },
+                {
+                  "add": [
+                    "flags.city_hurt.$arg.city",
+                    1
+                  ]
+                },
+                {
+                  "if": {
+                    "when": [
+                      {
+                        "gte": [
+                          "flags.city_hurt.$arg.city",
+                          2
+                        ]
+                      }
+                    ],
+                    "then": [
+                      {
+                        "flag": {
+                          "id": "flag.city_lost.$arg.city",
+                          "value": true
+                        }
+                      },
+                      {
+                        "log": "城门换了旗，这一次是真的丢了。"
+                      }
+                    ],
+                    "else": [
+                      {
+                        "log": "你冲得太远，回来时城门已经破了，人还在往里填。"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "when": [
+          {
+            "gte": [
+              "clock.age",
+              16
+            ]
+          }
+        ],
+        "lockReason": "十六岁以上才被赶上城墙。"
+      },
+      {
+        "id": "flee",
+        "label": "弃城而走",
+        "do": [
+          {
+            "add": [
+              "merit.war",
+              -30
+            ]
+          },
+          {
+            "add": [
+              "reputation.eff",
+              -10
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.city_lost.$arg.city",
+              "value": true
+            }
+          },
+          {
+            "log": "你走了。回头时，城还在烧。"
+          }
+        ]
+      }
+    ]
+  },
+  "tpl.war.nation": {
+    "params": [
+      "theater"
+    ],
+    "desc": "国战骨架：分阶段（初战 → 相持 → 断粮 → 决战 / 求和）",
+    "nature": "战事",
+    "priority": 1,
+    "forced": true,
+    "months": 6,
+    "span": true,
+    "ttl": 5,
+    "zone": "battle",
+    "when": [
+      {
+        "eq": [
+          "war.phase",
+          "nation"
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "enlist",
+        "label": "应征",
+        "do": [
+          {
+            "add": [
+              "merit.war",
+              40
+            ]
+          },
+          {
+            "judge": {
+              "kind": "battle",
+              "scale": 1.2,
+              "kindName": "国战"
+            }
+          },
+          {
+            "log": "军令压在案上，你按了手印。"
+          }
+        ],
+        "when": [
+          {
+            "gte": [
+              "clock.age",
+              18
+            ]
+          }
+        ],
+        "lockReason": "十八岁以上才在征召名册上。"
+      },
+      {
+        "id": "hide",
+        "label": "逃避征召",
+        "do": [
+          {
+            "flag": {
+              "id": "flag.wanted",
+              "value": true
+            }
+          },
+          {
+            "add": [
+              "merit.war",
+              -99
+            ]
+          },
+          {
+            "log": "你把门从里面顶住了。"
+          }
+        ]
+      }
+    ]
+  }
+}

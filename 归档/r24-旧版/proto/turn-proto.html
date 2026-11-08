@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>回合制验证 · 月制 v3</title>
+<style>
+:root{
+  --bg:#0a0d12; --panel:#111721; --panel2:#0c1219; --line:#1e2937;
+  --ink:#dbe4ef; --dim:#7b8a9d; --dim2:#55616f;
+  --jade:#5eead4; --gold:#e0b060; --red:#e26d6d; --blue:#7aa2f7;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background:radial-gradient(1200px 620px at 50% -12%, #17212d, var(--bg));
+  color:var(--ink); font-family:"Noto Serif SC","Songti SC",ui-serif,serif;
+  font-size:14px; overflow:hidden;
+}
+.app{display:grid;grid-template-rows:auto 1fr;height:100vh}
+
+header{
+  display:flex;align-items:center;gap:16px;padding:13px 22px;
+  border-bottom:1px solid var(--line);background:rgba(10,13,18,.7);backdrop-filter:blur(6px);
+}
+.title{font-size:15px;letter-spacing:.18em;color:var(--jade)}
+.title small{display:block;font-size:11px;letter-spacing:.05em;color:var(--dim2);margin-top:2px}
+.age-box{display:flex;align-items:baseline;gap:6px}
+.age-num{font-size:26px;color:var(--gold);line-height:1}
+.age-unit{font-size:12px;color:var(--dim)}
+.phase-tag{
+  font-size:11px;padding:2px 8px;border:1px solid var(--line);border-radius:2px;
+  color:var(--dim);letter-spacing:.1em;
+}
+.spacer{flex:1}
+.numin{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--dim2);letter-spacing:.08em}
+.num{width:52px;background:#0a0f15;border:1px solid var(--line);color:var(--gold);
+  font-family:inherit;font-size:13px;padding:4px 5px;border-radius:2px;text-align:center;outline:none}
+.num:focus{border-color:var(--jade)}
+button{
+  font-family:inherit;font-size:12px;color:var(--ink);background:var(--panel);
+  border:1px solid var(--line);border-radius:3px;padding:7px 14px;cursor:pointer;
+  letter-spacing:.06em;transition:.15s;
+}
+button:hover{border-color:var(--jade);color:var(--jade)}
+button.ghost{background:transparent;color:var(--dim)}
+button:disabled{opacity:.35;cursor:not-allowed;border-color:var(--line);color:var(--dim)}
+
+.main{display:grid;grid-template-columns:280px 1fr 336px;gap:0;overflow:hidden}
+.col{padding:18px;overflow-y:auto}
+.col.left{border-right:1px solid var(--line);background:var(--panel2)}
+.col.right{border-left:1px solid var(--line);background:var(--panel2)}
+.col::-webkit-scrollbar{width:6px}
+.col::-webkit-scrollbar-thumb{background:#1e2937;border-radius:3px}
+
+.sec-title{font-size:11px;color:var(--dim2);letter-spacing:.22em;margin-bottom:12px}
+.stat-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px dashed #1a2431}
+.stat-row:last-child{border-bottom:0}
+.stat-k{color:var(--dim);font-size:12px}
+.stat-v{font-size:14px;color:var(--ink)}
+.stat-v.gold{color:var(--gold)}
+.stat-v.jade{color:var(--jade)}
+.stat-v.sm{font-size:11px;color:var(--dim2)}
+
+.realm-block{margin:16px 0;padding:14px;border:1px solid var(--line);border-radius:3px;background:var(--panel)}
+.realm-name{font-size:16px;color:var(--jade);letter-spacing:.12em}
+.realm-sub{font-size:11px;color:var(--dim2);margin-top:3px}
+.bar{margin-top:10px;height:5px;background:#0a0f15;border-radius:2px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,#2d6a5f,var(--jade));transition:width .35s}
+.bar-txt{display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-top:5px}
+
+.stage{display:flex;flex-direction:column;padding:22px 26px;overflow-y:auto}
+.time-wrap{margin-bottom:22px}
+.time-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+.time-label{font-size:11px;color:var(--dim2);letter-spacing:.2em}
+.time-val{font-size:13px;color:var(--gold)}
+.time-val b{font-size:20px}
+.ticks{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+.tick{position:relative;height:28px;border-radius:2px;background:#131c26;border:1px solid #1a2532;overflow:hidden}
+.tick i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#1d2b3a,#16212d);border-right:1px solid rgba(122,162,247,.22)}
+.tick i.hot{background:linear-gradient(180deg,#2f6f62,#1f4d44);border-right-color:var(--jade)}
+.ticks.month-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--dim2);
+  letter-spacing:.05em;margin-top:5px}
+
+.hint{
+  padding:12px 16px;border-left:2px solid var(--gold);background:rgba(224,176,96,.05);
+  color:#c9b48c;font-size:12.5px;line-height:1.75;margin-bottom:18px;
+}
+.hint.quiet{border-color:var(--line);background:transparent;color:var(--dim)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(214px,1fr));gap:11px}
+.card{
+  position:relative;text-align:left;padding:14px 15px;border:1px solid var(--line);border-radius:3px;
+  background:linear-gradient(170deg,#141b25,#0f151d);cursor:pointer;transition:.18s;
+  font-family:inherit;color:var(--ink);
+}
+.card:hover:not(:disabled){border-color:var(--jade);transform:translateY(-2px);
+  box-shadow:0 8px 24px -12px rgba(94,234,212,.5)}
+.card:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.card-name{font-size:14.5px;letter-spacing:.06em;display:flex;align-items:center;gap:8px}
+.card-cost{margin-left:auto;font-size:11px;color:var(--gold);border:1px solid rgba(224,176,96,.3);
+  padding:1px 6px;border-radius:2px;letter-spacing:.04em;white-space:nowrap}
+.card-desc{font-size:11.5px;color:var(--dim);margin-top:8px;line-height:1.6;min-height:34px}
+.card-why{font-size:11px;color:var(--red);margin-top:6px}
+.card.key{border-color:rgba(224,176,96,.45)}
+.card.key .card-name{color:var(--gold)}
+.card.qi{border-color:rgba(122,162,247,.4)}
+.card.qi .card-name{color:var(--blue)}
+.card.minor{border-style:dashed;opacity:.92}
+.card.minor .card-name{font-size:13px;color:#93a7bd}
+.card.danger:hover:not(:disabled){border-color:var(--red);box-shadow:0 8px 24px -12px rgba(226,109,109,.4)}
+
+.log-item{font-size:12px;line-height:1.8;padding:5px 0 5px 12px;color:var(--dim);
+  border-left:1px solid #1a2431;position:relative}
+.log-item::before{content:"";position:absolute;left:-2.5px;top:12px;width:4px;height:4px;
+  border-radius:50%;background:#2a3a4a}
+.log-item.hi{color:var(--ink)}
+.log-item.good{color:var(--jade)}
+.log-item.bad{color:var(--red)}
+.log-item.gold{color:var(--gold)}
+.log-item.qi{color:var(--blue)}
+.log-auto{font-size:9px;color:var(--dim2);border:1px solid #1a2431;padding:0 3px;
+  border-radius:2px;margin-right:5px;letter-spacing:.05em}
+.log-year{font-size:10px;color:var(--dim2);letter-spacing:.1em;margin:14px 0 4px;
+  border-bottom:1px solid #161f2a;padding-bottom:4px}
+
+.diag{margin-top:18px;padding:12px;border:1px solid var(--line);border-radius:3px;background:var(--panel)}
+.diag-row{display:flex;justify-content:space-between;font-size:11.5px;padding:3px 0;color:var(--dim)}
+.diag-row b{color:var(--ink);font-weight:400}
+.diag-row b.warn{color:var(--gold)}
+.diag-row b.bad{color:var(--red)}
+
+.overlay{position:fixed;inset:0;background:rgba(6,9,13,.86);display:none;
+  align-items:center;justify-content:center;z-index:50;backdrop-filter:blur(3px)}
+.overlay.on{display:flex}
+.modal{max-width:500px;padding:30px 34px;border:1px solid var(--line);border-radius:4px;
+  background:var(--panel);text-align:center}
+.modal h2{font-size:19px;color:var(--gold);letter-spacing:.14em;margin:0 0 14px;font-weight:400}
+.modal p{color:var(--dim);font-size:13px;line-height:1.9;margin:0 0 22px;text-align:left}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="title">回合制验证 v3<small>月制 ｜ 一年 = 12 月</small></div>
+    <div class="age-box"><span class="age-num" id="hAge">7</span><span class="age-unit">岁</span></div>
+    <div class="phase-tag" id="hPhase">蒙学</div>
+    <div class="spacer"></div>
+    <label class="numin">资质<input class="num" id="inApt" type="number" min="30" max="100" value="55"></label>
+    <label class="numin">悟性<input class="num" id="inIns" type="number" min="30" max="100" value="55"></label>
+    <label class="numin">止于<input class="num" id="inEnd" type="number" min="12" max="40" value="20"></label>
+    <button class="ghost" id="btnAuto">自动</button>
+    <button id="btnReset">重开</button>
+  </header>
+
+  <div class="main">
+    <aside class="col left" id="left"></aside>
+    <section class="stage">
+      <div class="time-wrap">
+        <div class="time-head">
+          <span class="time-label">本年时间</span>
+          <span class="time-val">剩 <b id="tLeft">12</b> 月 · <span id="tYear">1.00</span> 年</span>
+        </div>
+        <div class="ticks" id="ticks"></div>
+        <div class="ticks month-labels"><span>0</span><span>3</span><span>6</span><span>9</span><span>12</span></div>
+      </div>
+      <div id="hint"></div>
+      <div class="cards" id="cards"></div>
+    </section>
+    <aside class="col right">
+      <div class="sec-title">纪事</div>
+      <div id="log"></div>
+      <div class="diag" id="diag"></div>
+    </aside>
+  </div>
+</div>
+
+<div class="overlay" id="ov">
+  <div class="modal">
+    <h2>结算</h2>
+    <p id="ovText"></p>
+    <button class="ghost" onclick="document.getElementById('ov').classList.remove('on')">继续观察</button>
+    <button onclick="reset()">重开一局</button>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   常量（对齐 docs/境界数值与修为表.md v5）
+   ============================================================ */
+const P_TICKS = 12;
+const BODY_NAME = ['体魄','脏腑','调息','朝元'];
+const QI_NAME   = ['感气','破胎','驭凡','法相'];
+const P_BODY = [470, 720, 1050, 1500];
+const P_QI   = [100, 320, 500, 900];
+const QI_TO_BODY = 0.30;
+
+const clamp01 = v => Math.max(0, Math.min(1, v));
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const r1 = v => Math.round(v * 10) / 10;
+
+const entryMonths = apt => clamp(r1(3 - (apt - 40) * 2/60), 1, 3);
+const senseMonths = ins => clamp(r1(6 - (ins - 50) * 5/50), 1, 6);
+
+function bodyBreakMonths(target, apt){
+  if(target <= 1) return clamp(r1(3 - (apt - 40) * 2/60), 1, 3);
+  if(target === 2) return clamp(r1(6 - (apt - 40) * 5/60), 1, 6);
+  return clamp(r1(12 - (apt - 40) * 8/60), 4, 12);
+}
+function qiBreakMonths(target, ins){
+  if(target <= 1) return clamp(r1(6 - (ins - 50) * 5/50), 1, 6);
+  if(target === 2) return clamp(r1(12 - (ins - 50) * 9/50), 3, 12);
+  return clamp(r1(24 - (ins - 50) * 18/50), 6, 24);
+}
+
+function bodySucc(target, apt){
+  if(target === 0) return clamp01(0.80 + (apt - 40) * 0.02);
+  if(target === 1) return clamp01(0.90 + (apt - 60) * 0.01);
+  if(target === 2) return clamp01((apt - 60) * 0.05);
+  if(target === 3) return clamp01((apt - 79) * 0.10);
+  return 0;
+}
+function senseRate(ins, fails){
+  const base = clamp01(0.50 + (ins - 60) * 0.025);
+  return clamp01(base + fails * 0.03);
+}
+function qiSucc(target, ins){
+  if(target === 1) return clamp01(Math.max(0.05, 0.30 + (ins - 60) * 0.035));
+  if(target === 2) return clamp01((ins - 70) * 0.05);
+  if(target === 3) return clamp01((ins - 89) * 0.10);
+  return 0;
+}
+
+const bodyPerMonth = apt => apt * 0.2;
+const qiPerMonth   = ins => ins * 0.2;
+
+/* ============================================================ */
+let S;
+function reset(){
+  const g = id => document.getElementById(id);
+  const apt = clamp(Number(g('inApt') && g('inApt').value) || 55, 30, 100);
+  const ins = clamp(Number(g('inIns') && g('inIns').value) || 55, 30, 100);
+  const endAge = clamp(Number(g('inEnd') && g('inEnd').value) || 20, 12, 40);
+
+  S = {
+    age: 7, endAge, time: P_TICKS, apt, ins,
+    body: { st: -1, prof: 0, gate: false },
+    qi:   { st: -1, prof: 0, open: false, read: 0, firstTried: false },
+    entered: false, school: false, arts: false,
+    brokeBody: false, brokeQi: false,
+    drill: 0, ask: 0,
+    yearActions: 0, totalActions: 0, autoYears: 0, idleYears: 0,
+    years: [], log: [], done: false, auto: false, yearHadManual: false,
+    senseAge: null, breakAge: null,
+  };
+  addLog('七岁，入蒙学。', 'gold');
+  render();
+}
+
+function addLog(text, cls){
+  S.log.push({ text, cls: cls || '', age: S.age, auto: S.auto });
+}
+const bodyNeed = () => S.body.st >= 0 ? P_BODY[S.body.st] : P_BODY[0];
+const qiNeed = () => P_QI[Math.max(0, S.qi.st)];
+const realmLabel = () => S.body.st < 0 ? '未入门' : BODY_NAME[S.body.st];
+const mLabel = v => (Math.round(v*10)/10) % 1 === 0 ? Math.round(v) + ' 月' : (Math.round(v*10)/10).toFixed(1) + ' 月';
+
+/* ============================================================ */
+function actions(){
+  const out = [];
+  const add = (id, name, cost, desc, ok, why, cls) =>
+    out.push({ id, name, cost, desc, ok, why: why || '', cls: cls || '' });
+
+  if(S.arts){
+    add('arts', '学百艺', '整年', '府学第四年，全年学百艺，不出修为。', true, '', 'key');
+    return out;
+  }
+
+  if(!S.entered){
+    const t = entryMonths(S.apt);
+    add('enterBody', '蒙学 · 入体魄', mLabel(t),
+      `资质 ${S.apt} → 耗 ${mLabel(t)}。成功率 ${(bodySucc(0,S.apt)*100).toFixed(0)}%，失败明年再试。`,
+      true, '', 'key');
+    return out;
+  }
+
+  /* 锻体破境 */
+  const bfull = S.body.st >= 0 && S.body.prof >= bodyNeed();
+  const bt = bodyBreakMonths(S.body.st + 1, S.apt);
+  const bp = S.body.gate ? clamp01(0.05 + S.drill) : bodySucc(S.body.st + 1, S.apt);
+  let bw = '';
+  if(!bfull) bw = '修为未满';
+  else if(S.body.st >= 3) bw = '第四境须事件解锁';
+  else if(S.brokeBody) bw = '本年已破过一次';
+  else if(S.time < bt) bw = `需 ${mLabel(bt)}，不足`;
+  add('break',
+    S.body.gate ? `破境 · 硬冲 ${(bp*100).toFixed(0)}%` : `破境 · 初判 ${(bp*100).toFixed(0)}%`,
+    mLabel(bt),
+    S.body.gate
+      ? `已出瓶颈，硬冲 ${(bp*100).toFixed(0)}%。失败不扣修为，只耗月。`
+      : '修为已满，先判是否出瓶颈。不出则直接过关。',
+    bfull && S.body.st < 3 && !S.brokeBody && S.time >= bt, bw, S.body.gate ? 'danger' : 'key');
+
+  /* 感气 */
+  if(S.school && !S.qi.open){
+    const st = senseMonths(S.ins);
+    const forced = !S.qi.firstTried && S.ins < 60;
+    const sp = senseRate(S.ins, S.qi.read);
+    add('sense', forced ? '感气 · 初次（必败）' : '感气 · 一试', mLabel(st),
+      forced
+        ? `悟性 ${S.ins} 未过六十，根器未开，此试必然无果。`
+        : `悟性 ${S.ins} → 耗 ${mLabel(st)}，成功率 ${(sp*100).toFixed(0)}%（屡败 +3%）。`,
+      S.time >= st, S.time < st ? `需 ${mLabel(st)}，不足` : '', 'key');
+  }
+
+  /* 炼气修炼 */
+  if(S.qi.open && S.qi.st < 3 && S.qi.prof < qiNeed()){
+    add('qiTrain', '打坐炼气', '全部',
+      `每月 ${qiPerMonth(S.ins).toFixed(1)} 炼气修为，顺带 30% 锻体。`, S.time >= 0.5, '', 'qi');
+  }
+
+  /* 炼气破境 */
+  if(S.qi.open && S.qi.st < 3 && S.qi.prof >= qiNeed()){
+    const qt = qiBreakMonths(S.qi.st + 1, S.ins);
+    const qp = qiSucc(S.qi.st + 1, S.ins);
+    let qw = '';
+    if(S.brokeQi) qw = '本年已破过一次';
+    else if(S.time < qt) qw = `需 ${mLabel(qt)}，不足`;
+    add('qiBreak', `炼气晋品 ${(qp*100).toFixed(0)}%`, mLabel(qt),
+      `突破至${QI_NAME[S.qi.st+1]}，成功率 ${(qp*100).toFixed(0)}%。失败不扣修为。`,
+      !S.brokeQi && S.time >= qt, qw, 'qi');
+  }
+
+  /* 锻体修炼 */
+  const canTrain = S.body.st >= 0 && !bfull && S.time >= 0.5;
+  add('train', '刻苦修炼', '全部',
+    bfull ? '修为已满，修不动了。' : `每月 ${bodyPerMonth(S.apt).toFixed(1)} 锻体修为。`,
+    canTrain, bfull ? '修为已满' : (S.body.st < 0 ? '未入门' : ''), '');
+
+  /* 时间出口 */
+  const dBlocks = Math.floor(S.time / 3);
+  add('drill', '体魄训练', dBlocks ? mLabel(dBlocks*3) : '—',
+    `每 3 月 +5% 破境，本次 +${(Math.min(0.30 - S.drill, dBlocks*0.05)*100).toFixed(0)}%（上限 +30%）。`,
+    S.time >= 3 && S.drill < 0.30,
+    S.drill >= 0.30 ? '已达上限' : (S.time < 3 ? '不足 3 月' : ''), 'minor');
+
+  const aBlocks = Math.floor(S.time / 3);
+  add('ask', '求教老师', aBlocks ? mLabel(aBlocks*3) : '—',
+    `每 3 月 +5% 感气，本次 +${(Math.min(0.50 - S.ask, aBlocks*0.05)*100).toFixed(0)}%（上限 +50%）。`,
+    S.time >= 3 && !S.qi.open && S.ask < 0.50,
+    S.qi.open ? '已感应到气机' : (S.ask >= 0.50 ? '已达上限' : (S.time < 3 ? '不足 3 月' : '')), 'minor');
+
+  add('play', '玩耍', '全部', '把剩余月份用尽。原型中无产出。', true, '', 'minor');
+
+  return out;
+}
+
+/* ============================================================ */
+function execAction(id, isAuto){
+  if(isAuto) S.auto = true; else S.yearHadManual = true;
+  S.yearActions++; S.totalActions++;
+
+  switch(id){
+    case 'enterBody': {
+      const t = entryMonths(S.apt);
+      S.time -= t;
+      if(Math.random() < bodySucc(0, S.apt)){
+        S.body.st = 0; S.entered = true;
+        addLog(`入体魄，耗 ${mLabel(t)}。`, 'good');
+      } else {
+        addLog(`资质有亏，未入体魄（耗 ${mLabel(t)}）。`, 'bad');
+      }
+      break;
+    }
+    case 'arts':
+      S.time = 0;
+      addLog('学百艺，全年无修为。', '');
+      break;
+
+    case 'break': {
+      const target = S.body.st + 1;
+      const t = bodyBreakMonths(target, S.apt);
+      S.time -= t; S.brokeBody = true;
+      const p = S.body.gate ? clamp01(0.05 + S.drill) : bodySucc(target, S.apt);
+      if(Math.random() < p){
+        S.body.st = target; S.body.prof = 0; S.body.gate = false;
+        addLog(`破境成功，入${BODY_NAME[target]}（${(p*100).toFixed(0)}%，耗 ${mLabel(t)}）。`, 'good');
+      } else if(!S.body.gate){
+        S.body.gate = true;
+        addLog(`出现瓶颈，卡在${BODY_NAME[S.body.st]}（初判 ${(p*100).toFixed(0)}%）。`, 'bad');
+      } else {
+        addLog(`硬冲失败（${(p*100).toFixed(0)}%）。`, 'bad');
+      }
+      break;
+    }
+
+    case 'sense': {
+      const st = senseMonths(S.ins);
+      S.time -= st;
+      const forced = !S.qi.firstTried && S.ins < 60;
+      S.qi.firstTried = true;
+      const p = forced ? 0 : senseRate(S.ins, S.qi.read);
+      if(!forced && Math.random() < p){
+        S.qi.open = true; S.qi.st = 0; S.qi.prof = 0;
+        S.senseAge = S.age;
+        addLog(`感应到气机，入感气（耗 ${mLabel(st)}，${(p*100).toFixed(0)}%）。`, 'qi');
+      } else {
+        S.qi.read++;
+        addLog(forced
+          ? `根器未开，此试无果（耗 ${mLabel(st)}）。`
+          : `未感气（${(p*100).toFixed(0)}%，耗 ${mLabel(st)}），下次 +3%。`, 'bad');
+      }
+      break;
+    }
+
+    case 'qiTrain': {
+      const per = qiPerMonth(S.ins);
+      const cap = qiNeed();
+      const use = Math.min(S.time, Math.ceil((cap - S.qi.prof) / per * 2) / 2);
+      S.qi.prof = Math.min(cap, S.qi.prof + use * per);
+      if(S.body.st >= 0 && S.body.prof < bodyNeed())
+        S.body.prof = Math.min(bodyNeed(), S.body.prof + use * bodyPerMonth(S.apt) * QI_TO_BODY);
+      S.time -= use;
+      addLog(`打坐 ${mLabel(use)}，炼气 ${Math.round(S.qi.prof)}/${cap}。`, 'qi');
+      break;
+    }
+
+    case 'qiBreak': {
+      const target = S.qi.st + 1;
+      const t = qiBreakMonths(target, S.ins);
+      S.time -= t; S.brokeQi = true;
+      const p = qiSucc(target, S.ins);
+      if(Math.random() < p){
+        S.qi.st = target; S.qi.prof = 0;
+        if(target === 1) S.breakAge = S.age;
+        addLog(`炼气突破，入${QI_NAME[target]}（${(p*100).toFixed(0)}%，耗 ${mLabel(t)}）。`, 'good');
+      } else {
+        addLog(`炼气瓶颈，未破（${(p*100).toFixed(0)}%）。`, 'bad');
+      }
+      break;
+    }
+
+    case 'train': {
+      const per = bodyPerMonth(S.apt);
+      const need = bodyNeed();
+      const use = Math.min(S.time, Math.ceil((need - S.body.prof) / per * 2) / 2);
+      S.body.prof = Math.min(need, S.body.prof + use * per);
+      S.time -= use;
+      addLog(`修炼 ${mLabel(use)}，修为 ${Math.round(S.body.prof)}/${need}。`, '');
+      break;
+    }
+
+    case 'drill': {
+      const blocks = Math.floor(S.time / 3) || 1;
+      S.drill = Math.min(0.30, S.drill + blocks * 0.05);
+      S.time = Math.max(0, S.time - blocks * 3);
+      addLog(`体魄训练 ${mLabel(blocks*3)}，破境加成 +${(S.drill*100).toFixed(0)}%。`, '');
+      break;
+    }
+
+    case 'ask': {
+      const blocks = Math.floor(S.time / 3) || 1;
+      S.ask = Math.min(0.50, S.ask + blocks * 0.05);
+      S.time = Math.max(0, S.time - blocks * 3);
+      addLog(`求教 ${mLabel(blocks*3)}，感气加成 +${(S.ask*100).toFixed(0)}%。`, '');
+      break;
+    }
+
+    case 'play':
+      addLog(`玩耍 ${mLabel(S.time)}。`, '');
+      S.time = 0;
+      break;
+  }
+
+  if(S.time <= 0.05) nextYear();
+}
+
+function act(id){
+  if(S.done) return;
+  execAction(id, false);
+  autoAdvance();
+  render();
+}
+
+function autoStep(){
+  const all = actions().filter(a => a.ok);
+  if(!all.length) return null;
+  const strong = all.filter(a => !['play','ask','drill'].includes(a.id));
+  if(strong.length >= 2) return null;
+  if(strong.length === 1)
+    return (strong[0].id === 'train' || strong[0].id === 'qiTrain' || strong[0].id === 'arts')
+      ? strong[0] : null;
+  if(all.length >= 2) return null;
+  return all[0];
+}
+function autoAdvance(){
+  let guard = 0;
+  while(!S.done && guard++ < 500){
+    const a = autoStep();
+    if(!a) break;
+    execAction(a.id, true);
+  }
+}
+
+function nextYear(){
+  if(S.time > 0) S.time = 0;
+  S.years.push(S.yearActions);
+
+  if(!S.yearHadManual) S.autoYears++;
+  if(S.yearActions === 0 && S.entered && S.yearHadManual) S.idleYears++;
+
+  S.age++;
+  S.time = P_TICKS;
+  S.yearActions = 0;
+  S.brokeBody = false;
+  S.brokeQi = false;
+  S.auto = false;
+  S.yearHadManual = false;
+  S.arts = (S.age === 14);
+
+  if(S.age === 11){ S.school = true; addLog('— 十一岁 · 入府学（强制）—', 'gold'); }
+  else addLog(`— ${S.age} 岁 —`, '');
+
+  if(S.age > S.endAge){
+    S.done = true;
+    addLog(`${S.endAge} 岁，止。`, 'gold');
+    showSummary();
+  }
+}
+
+function showSummary(){
+  const total = S.years.reduce((a,b)=>a+b,0);
+  const n = S.years.length || 1;
+  document.getElementById('ovText').innerHTML =
+    `共 ${n} 个回合，${total} 次操作，平均每年 <b>${(total/n).toFixed(2)}</b> 次。<br>` +
+    `整年无决策、自动跳过：<b>${S.autoYears}</b> 年；全空转：<b>${S.idleYears}</b> 年。<br><br>` +
+    `锻体：<b>${S.body.st >= 0 ? BODY_NAME[S.body.st] : '未入门'}</b>${S.body.gate ? '（瓶颈中）' : ''}　` +
+    `炼气：<b>${S.qi.open ? QI_NAME[Math.max(0,S.qi.st)] : '未感气'}</b>` +
+    `${S.senseAge ? `（${S.senseAge} 岁开窍）` : ''}${S.breakAge ? `，${S.breakAge} 岁破胎` : ''}。<br>` +
+    `兜底加成：破境 +${(S.drill*100).toFixed(0)}%，感气 +${(S.ask*100).toFixed(0)}%。`;
+  document.getElementById('ov').classList.add('on');
+}
+
+/* ============================================================ */
+function render(){
+  document.getElementById('hAge').textContent = S.age;
+  document.getElementById('hPhase').textContent =
+    S.age <= 10 ? '蒙学' : (S.age <= 14 ? (S.arts ? '府学 · 百艺' : '府学') : '卒业');
+
+  const bp = S.body.st >= 0 ? Math.min(100, S.body.prof / bodyNeed() * 100) : 0;
+  const qp = S.qi.open ? Math.min(100, S.qi.prof / qiNeed() * 100) : 0;
+
+  document.getElementById('left').innerHTML = `
+    <div class="sec-title">角色</div>
+    <div class="stat-row"><span class="stat-k">资质</span><span class="stat-v gold">${S.apt}</span>
+      <span class="stat-v sm">入体魄 ${mLabel(entryMonths(S.apt))}</span></div>
+    <div class="stat-row"><span class="stat-k">悟性</span><span class="stat-v gold">${S.ins}</span>
+      <span class="stat-v sm">感气 ${mLabel(senseMonths(S.ins))}</span></div>
+    <div class="stat-row"><span class="stat-k">月修为</span>
+      <span class="stat-v sm">锻 ${bodyPerMonth(S.apt).toFixed(1)} · 气 ${qiPerMonth(S.ins).toFixed(1)}</span></div>
+    <div class="stat-row"><span class="stat-k">学籍</span><span class="stat-v">${
+      S.school ? (S.arts ? '府学 · 百艺' : (S.age > 14 ? '卒业' : '府学')) : '蒙学'}</span></div>
+
+    <div class="realm-block">
+      <div class="realm-name">${realmLabel()}</div>
+      <div class="realm-sub">锻体 · ${S.body.st < 0 ? '未入门' : '第 ' + (S.body.st+1) + ' 品'}${
+        S.body.gate ? ' · 瓶颈中' : ''}</div>
+      <div class="bar"><div class="bar-fill" style="width:${bp}%"></div></div>
+      <div class="bar-txt"><span>${S.body.st < 0 ? 0 : Math.round(S.body.prof)}</span><span>${bodyNeed()}</span></div>
+    </div>
+
+    <div class="realm-block">
+      <div class="realm-name" style="color:${S.qi.open ? 'var(--blue)' : 'var(--dim2)'}">${
+        S.qi.open ? QI_NAME[Math.max(0,S.qi.st)] : '未感气'}</div>
+      <div class="realm-sub">炼气 · ${S.qi.open
+        ? `${Math.round(S.qi.prof)} / ${qiNeed()}`
+        : (S.qi.firstTried ? `已试 ${S.qi.read} 次` : '尚未尝试')}</div>
+      ${S.qi.open ? `<div class="bar"><div class="bar-fill" style="width:${qp}%;background:linear-gradient(90deg,#2d4a6a,var(--blue))"></div></div>` : ''}
+    </div>
+
+    <div class="stat-row"><span class="stat-k">体魄训练</span>
+      <span class="stat-v ${S.drill ? 'jade' : ''}">+${(S.drill*100).toFixed(0)}% 破境</span></div>
+    <div class="stat-row"><span class="stat-k">求教累积</span>
+      <span class="stat-v ${S.ask ? 'jade' : ''}">+${(S.ask*100).toFixed(0)}% 感气</span></div>
+    <div class="stat-row"><span class="stat-k">本年 / 累计操作</span>
+      <span class="stat-v">${S.yearActions} / ${S.totalActions}</span></div>
+  `;
+
+  const used = P_TICKS - S.time;
+  document.getElementById('tLeft').textContent = (Math.round(S.time*10)/10) % 1 === 0
+    ? Math.round(S.time) : (Math.round(S.time*10)/10).toFixed(1);
+  document.getElementById('tYear').textContent = (S.time / 12).toFixed(2);
+  document.getElementById('ticks').innerHTML = Array.from({length:P_TICKS},(_,i)=>{
+    const f = clamp(used - i, 0, 1);
+    return `<div class="tick"><i class="${f > 0 && f < 1 ? 'hot' : ''}" style="width:${f*100}%"></i></div>`;
+  }).join('');
+
+  let msg = '';
+  const bfull = S.body.st >= 0 && S.body.prof >= bodyNeed();
+  if(!S.entered){
+    msg = `开局唯一动作：入体魄。资质 ${S.apt} → ${mLabel(entryMonths(S.apt))}。`;
+  } else if(S.age === 11 && S.school){
+    msg = `入府学。感气一次 ${mLabel(senseMonths(S.ins))}，一年能试两次。`;
+  } else if(bfull && S.body.st < 3 && !S.brokeBody){
+    msg = S.body.gate
+      ? '修为已满、瓶颈在身。可硬冲，也可做体魄训练把成功率堆上去。'
+      : '修为已满，可发起破境。';
+  } else if(S.qi.open && S.qi.prof >= qiNeed() && !S.brokeQi){
+    msg = '炼气修为已满，可冲破胎。';
+  }
+  document.getElementById('hint').innerHTML = msg ? `<div class="hint">${msg}</div>` : '';
+
+  const acts = actions();
+  document.getElementById('cards').innerHTML = acts.map(a=>`
+    <button class="card ${a.cls}" ${a.ok?'':'disabled'} data-id="${a.id}">
+      <div class="card-name">${a.name}<span class="card-cost">${a.cost}</span></div>
+      <div class="card-desc">${a.desc}</div>
+      ${a.why ? `<div class="card-why">${a.why}</div>` : ''}
+    </button>
+  `).join('');
+  document.querySelectorAll('.card').forEach(b=>{
+    if(!b.disabled) b.onclick = ()=>act(b.dataset.id);
+  });
+
+  const logEl = document.getElementById('log');
+  logEl.innerHTML = S.log.slice(-90).map(l=>{
+    if(l.text.startsWith('—'))
+      return `<div class="log-year">${l.text.replace(/—/g,'').trim()}</div>`;
+    return `<div class="log-item ${l.cls}">${l.auto?'<span class="log-auto">自动</span>':''}${l.text}</div>`;
+  }).join('');
+  logEl.scrollTop = logEl.scrollHeight;
+
+  const total = S.years.reduce((a,b)=>a+b,0);
+  const n = S.years.length || 1;
+  document.getElementById('diag').innerHTML = `
+    <div class="sec-title" style="margin-bottom:8px">复杂度诊断</div>
+    <div class="diag-row"><span>已完成回合</span><b>${n}</b></div>
+    <div class="diag-row"><span>总操作次数</span><b>${total + S.yearActions}</b></div>
+    <div class="diag-row"><span>平均每年操作</span><b class="${(total/n)>3?'warn':''}">${(total/n).toFixed(2)} 次</b></div>
+    <div class="diag-row"><span>自动跳过年份</span><b>${S.autoYears} 年</b></div>
+    <div class="diag-row"><span>空转年份</span><b class="${S.idleYears>2?'bad':''}">${S.idleYears} 年</b></div>
+  `;
+}
+
+function autoRun(){
+  let guard = 0;
+  while(!S.done && guard++ < 800){
+    const a = autoStep();
+    if(a){ execAction(a.id, true); continue; }
+    const ok = actions().filter(x=>x.ok);
+    if(!ok.length) break;
+    const order = ['enterBody','sense','qiBreak','break','qiTrain','train','drill','ask','play'];
+    const pick = order.map(id=>ok.find(x=>x.id===id)).find(Boolean) || ok[0];
+    execAction(pick.id, false);
+  }
+  render();
+}
+
+window.__api = { reset, autoRun, actions, execAction, autoStep, getS:()=>S,
+                 entryMonths, senseMonths, bodyBreakMonths, qiBreakMonths,
+                 bodySucc, senseRate, qiSucc };
+document.getElementById('btnReset').onclick = reset;
+document.getElementById('btnAuto').onclick = () => { reset(); autoRun(); };
+
+reset();
+</script>
+</body>
+</html>

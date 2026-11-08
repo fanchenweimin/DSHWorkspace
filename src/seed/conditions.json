@@ -1,0 +1,226 @@
+{
+  "cond.break_ready": {
+    "params": [
+      "dao",
+      "tier"
+    ],
+    "desc": "修为满、层级差一品、未闭死关 —— 可以冲关（旧模板用；r27 起突破卡直接由 hand 生成）",
+    "all": [
+      {
+        "eq": [
+          "path.$arg.dao.level",
+          "$arg.tierMinus1"
+        ]
+      },
+      {
+        "gte": [
+          "path.$arg.dao.bar",
+          "$prof.$arg.dao.$arg.tier"
+        ]
+      },
+      {
+        "notFlag": "flag.seclusion"
+      }
+    ]
+  },
+  "cond.can_join_army": {
+    "params": [],
+    "desc": "能当兵：破胎以上、40 岁以内、未通缉",
+    "all": [
+      {
+        "realm": {
+          "dao": "qi",
+          "gte": 2
+        }
+      },
+      {
+        "lte": [
+          "clock.age",
+          40
+        ]
+      },
+      {
+        "none": [
+          {
+            "flag": "flag.exiled"
+          }
+        ]
+      }
+    ]
+  },
+  "cond.cognition.spirit": {
+    "params": [],
+    "desc": "养灵认知障已打开：三条入场券任一（自悟 / 太学 / 师承）。三条等价，都不是『已经入门』",
+    "any": [
+      {
+        "all": [
+          {
+            "realm": {
+              "dao": "body",
+              "gte": 4
+            }
+          },
+          {
+            "realm": {
+              "dao": "qi",
+              "gte": 4
+            }
+          }
+        ]
+      },
+      {
+        "flag": "flag.edu.graduated"
+      },
+      {
+        "flag": "flag.spirit.guide"
+      }
+    ]
+  },
+  "cond.can_knock_spirit": {
+    "params": [],
+    "desc": "有资格敲养灵的门：双 80 禀赋 + 认知障已开。注意：≠ 已入养灵（I25）",
+    "all": [
+      {
+        "gte": [
+          "attr.aptitude.eff",
+          80
+        ]
+      },
+      {
+        "gte": [
+          "attr.insight.eff",
+          80
+        ]
+      },
+      {
+        "use": "cond.cognition.spirit"
+      }
+    ]
+  },
+  "cond.in_city": {
+    "params": [],
+    "desc": "人在城里（坊市、委托、征丁都要它）",
+    "all": [
+      {
+        "zone": "city"
+      }
+    ]
+  },
+  "cond.war_active": {
+    "params": [],
+    "desc": "战事期：城战或国战",
+    "all": [
+      {
+        "neq": [
+          "war.phase",
+          "peace"
+        ]
+      }
+    ]
+  },
+  "cond.edu.meng": {
+    "params": [],
+    "desc": "蒙学在读",
+    "all": [
+      {
+        "stage": "meng"
+      }
+    ]
+  },
+  "cond.art_master": {
+    "params": [],
+    "desc": "有过百艺师父（开局天赋或拜师事件任一条都会点亮这个标记）",
+    "all": [
+      {
+        "flag": "flag.art.master"
+      }
+    ]
+  },
+  "cond.has_office": {
+    "params": [],
+    "desc": "有军职：只有他们能主动『出战』",
+    "all": [
+      {
+        "flag": "flag.office.army"
+      }
+    ]
+  },
+  "cond.has_art": {
+    "params": [],
+    "desc": "已经把任何一门百艺练到学徒以上（≥1 阶）",
+    "any": [
+      {
+        "gte": [
+          "arts.alchemy.lvl",
+          1
+        ]
+      },
+      {
+        "gte": [
+          "arts.forge.lvl",
+          1
+        ]
+      },
+      {
+        "gte": [
+          "arts.talisman.lvl",
+          1
+        ]
+      },
+      {
+        "gte": [
+          "arts.array.lvl",
+          1
+        ]
+      },
+      {
+        "gte": [
+          "arts.medicine.lvl",
+          1
+        ]
+      },
+      {
+        "gte": [
+          "arts.planting.lvl",
+          1
+        ]
+      },
+      {
+        "gte": [
+          "arts.beast.lvl",
+          1
+        ]
+      },
+      {
+        "gte": [
+          "arts.puppet.lvl",
+          1
+        ]
+      },
+      {
+        "gte": [
+          "arts.feast.lvl",
+          1
+        ]
+      },
+      {
+        "gte": [
+          "arts.geomancy.lvl",
+          1
+        ]
+      },
+      {
+        "gte": [
+          "arts.appraise.lvl",
+          1
+        ]
+      },
+      {
+        "gte": [
+          "arts.brew.lvl",
+          1
+        ]
+      }
+    ]
+  }
+}

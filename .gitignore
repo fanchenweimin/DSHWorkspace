@@ -1,0 +1,30 @@
+node_modules/
+chrome-*/
+chrome-profile*/
+chrome-cdp/
+.acl-recovery/
+shots/
+*.log
+*.tmp
+test-write.txt
+
+# r25 目录口径：这些是历史/临时物，不进版本库
+app/          # r24 旧原型残留，被预览进程占用删不掉
+归档/         # 旧代码归档
+.tmp/         # 调试脚本与截图
+
+# 环境变量 / 密钥（务必保留）
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# WorkBuddy 本地数据
+.workbuddy/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

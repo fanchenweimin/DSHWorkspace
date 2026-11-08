@@ -1,0 +1,17 @@
+{
+  "name": "dayao-xianlu",
+  "version": "4.0.0",
+  "private": true,
+  "description": "大曜问仙录 · 断天山脉居中、七国环绕的网页文字修仙游戏（零第三方依赖）",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "start:game": "node start.js",
+    "stop": "node stop.js",
+    "test": "node test/smoke.js"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT"
+}

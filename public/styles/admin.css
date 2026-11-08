@@ -1,0 +1,311 @@
+/* ── 配置页：左目录，右表单 ───────────────────────────────── */
+.admin-page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.top {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 11px 22px;
+  border-bottom: 1px solid var(--line);
+  background: #fffdf7;
+  font-size: 13px;
+}
+.top .brand { font-family: var(--serif); font-size: 15px; letter-spacing: .2em; line-height: 1.2; }
+.top .brand small {
+  display: block;
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: var(--muted-2);
+}
+.top .spacer { flex: 1; }
+.top a, .top .link { color: var(--muted); font-size: 12.5px; }
+.top a:hover, .top .link:hover { color: var(--gold); text-decoration: none; }
+.top .link { padding: 0; }
+
+.cfg {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 218px minmax(0, 1fr);
+  gap: 1px;
+  background: var(--line);
+}
+
+/* 左：文件列表 */
+.nav { background: #fdfaf3; padding: 12px 0 24px; overflow-y: auto; }
+.nav-group {
+  font-size: 10px;
+  letter-spacing: .2em;
+  color: var(--muted-2);
+  padding: 10px 16px 6px;
+}
+.nav-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  width: 100%;
+  padding: 7px 16px;
+  text-align: left;
+  font-size: 13px;
+  color: var(--ink-2);
+  border-left: 2px solid transparent;
+}
+.nav-item:hover { background: #f7f0df; }
+.nav-item .fn { font-size: 11px; color: var(--muted-2); margin-left: auto; }
+.nav-item.is-on { background: #f4ecda; border-left-color: var(--gold-2); color: var(--ink); }
+.nav-item.is-over .fn::after { content: ' ·改'; color: var(--gold); }
+
+/* 右：主区 */
+.main { background: var(--bg); display: flex; flex-direction: column; min-height: 0; }
+
+.toolbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 22px 10px;
+  border-bottom: 1px solid var(--line);
+  background: #fffdf7;
+}
+.toolbar .tit { min-width: 0; }
+.toolbar h2 { font-size: 17px; letter-spacing: .08em; }
+.toolbar .meta { display: block; font-size: 11px; color: var(--muted-2); margin-top: 2px; }
+.toolbar .acts { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+.seg { display: flex; border: 1px solid var(--line-2); border-radius: 3px; overflow: hidden; }
+.seg button {
+  padding: 6px 13px;
+  font-size: 12px;
+  color: var(--muted);
+  background: #fffdf7;
+  letter-spacing: .06em;
+}
+.seg button.is-on { background: #2f2a22; color: #f6efdf; }
+
+.btn.sm { padding: 6px 14px; font-size: 12.5px; letter-spacing: .06em; box-shadow: none; }
+.btn-primary.xs {
+  padding: 7px 18px;
+  font-size: 12.5px;
+  letter-spacing: .12em;
+  border-radius: 3px;
+  font-family: var(--sans);
+}
+.btn-primary.xs:disabled { opacity: .4; cursor: default; transform: none; }
+
+.tip {
+  flex: 0 0 auto;
+  padding: 8px 22px;
+  font-size: 11.5px;
+  color: var(--muted);
+  border-bottom: 1px solid #eee5d2;
+  background: #fdfaf3;
+}
+.tip.ok { color: var(--jade); }
+.tip.bad { color: var(--seal); background: #fdf3f1; }
+
+/* 表单区 */
+.formHost { flex: 1; min-height: 0; overflow: auto; padding: 16px 22px 60px; }
+
+#raw {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 16px 20px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: #fffdf7;
+  color: var(--ink-2);
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.75;
+  resize: none;
+  outline: none;
+  white-space: pre;
+  overflow: auto;
+}
+
+/* 分组 */
+.fobj { display: flex; flex-direction: column; gap: 2px; }
+.frow {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 3px 0;
+}
+.frow > label {
+  font-size: 11.5px;
+  color: var(--muted);
+  letter-spacing: .06em;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+details.fgroup { margin: 10px 0 4px; border-top: 1px solid #eee5d2; padding-top: 8px; }
+details.fgroup > summary {
+  cursor: pointer;
+  font-size: 12px;
+  letter-spacing: .14em;
+  color: var(--gold);
+  padding: 4px 0 8px;
+  list-style: none;
+}
+details.fgroup > summary::-webkit-details-marker { display: none; }
+details.fgroup > summary::before { content: '▸ '; color: var(--muted-2); }
+details.fgroup[open] > summary::before { content: '▾ '; }
+.fcount { margin-left: 8px; font-size: 10.5px; color: var(--muted-2); letter-spacing: .04em; }
+
+/* 表格 */
+.ft-wrap { overflow: auto; border: 1px solid var(--line); border-radius: 3px; background: #fffdf7; }
+.ft { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+.ft thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f7f0df;
+  border-bottom: 1px solid var(--line-2);
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-align: left;
+  padding: 7px 9px;
+  white-space: nowrap;
+}
+.ft tbody th.fidx {
+  width: 30px;
+  text-align: right;
+  color: var(--muted-2);
+  font-weight: 400;
+  font-size: 10.5px;
+  padding-right: 8px;
+}
+.ft td { border-top: 1px solid #f0e9da; padding: 4px 6px; vertical-align: top; }
+.ft tbody tr:hover td { background: #fffdf5; }
+.ft td.is-wide { min-width: 220px; }
+
+/* 控件 */
+.fcell-input,
+.fcell-text,
+.fcell-json,
+.fchip {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.6;
+  padding: 3px 5px;
+  outline: none;
+  transition: .12s;
+}
+.fcell-input { border-bottom-color: #eee5d2; }
+.fcell-input:hover, .fcell-text:hover, .fchip:hover { border-color: var(--line); background: #fff; }
+.fcell-input:focus, .fcell-text:focus, .fcell-json:focus, .fchip:focus {
+  border-color: var(--gold-2);
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(184, 134, 47, .12);
+}
+.fcell-input[data-k] { font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: var(--muted); }
+.fcell-text { resize: vertical; min-height: 42px; }
+.fcell-json {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 11px;
+  color: #5a5343;
+  background: #fbf7ec;
+  border-color: #eee5d2;
+  resize: vertical;
+  min-height: 40px;
+}
+.fcell-json.is-bad, .fcell-input.is-bad { border-color: var(--seal); background: #fdf3f1; }
+.fcell-check { margin: 4px 0 0 4px; accent-color: var(--gold); }
+.fcell-empty { color: var(--muted-2); text-align: center; }
+.fcell-ro { font-size: 12px; color: var(--ink-2); }
+.fcell-ro.wrap { display: block; max-width: 520px; line-height: 1.7; }
+.fcell-ro.j { font-size: 10.5px; color: var(--muted); }
+
+.fchips { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.fchip { width: auto; min-width: 76px; flex: 0 1 128px; text-align: center; border-color: var(--line); background: #fffdf7; }
+.chip-ro {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 1px 7px;
+}
+.fempty { font-size: 12px; color: var(--muted-2); padding: 6px 0; }
+.op {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 11.5px;
+  color: var(--gold);
+  background: rgba(184, 134, 47, .08);
+  border-radius: 2px;
+  padding: 1px 6px;
+}
+
+.formHost > .fobj > .frow { padding: 4px 0; }
+
+/* ══ r27：中文名 + 英文名并列 ═══════════════════════════════
+   程序认英文名（id / no），人看中文名。
+   两行显示：上面中文，下面一行小灰字是"程序里叫这个"。
+   ─────────────────────────────────────────────────────────── */
+
+.ft thead th .th-cn { display: block; }
+.ft thead th .th-en,
+.lbl-en {
+  display: block;
+  font-style: normal;
+  font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+  font-size: 9.5px;
+  letter-spacing: 0;
+  color: var(--muted-2);
+}
+.ft thead th .th-en { margin-top: 1px; font-weight: 400; }
+
+/* 对象字段的标签：靠右、两行 */
+.frow > label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+  line-height: 1.35;
+  white-space: normal;
+  text-align: right;
+}
+.frow > label .lbl-en { text-align: right; }
+
+/* 只读格子的长相：灰字，没有下划线，光标也不提示可编辑 */
+.fcell-input.is-ro {
+  color: var(--ink-2);
+  opacity: .72;
+  border-bottom-color: transparent !important;
+  cursor: default;
+  background: transparent;
+}
+.fcell-input.is-ro:hover { border-color: transparent; background: transparent; }
+
+/* 算子中文释义，跟在英文算子后面 */
+.op-cn {
+  display: block;
+  margin-top: 2px;
+  font-style: normal;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .02em;
+}
+
+/* 只读文件在左栏里标出来 */
+.nav-item.is-ro .fn { color: var(--muted-2); }
+.nav-item.is-ro span:first-child { color: var(--muted); }
+

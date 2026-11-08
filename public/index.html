@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>大曜问仙录 · 天下</title>
+<link rel="stylesheet" href="styles/base.css" />
+<link rel="stylesheet" href="styles/home.css" />
+</head>
+<body>
+
+<div id="boot" class="boot">
+  <div class="boot-text">正在展开山河……</div>
+  <div class="boot-err" id="bootErr" hidden></div>
+</div>
+
+<div class="home">
+
+  <div class="home-map" id="homeMap">
+    <svg id="mapSvg" viewBox="0 0 1000 680" preserveAspectRatio="xMidYMid meet"
+         role="img" aria-label="大曜大陆地图：断天山脉居中，七国环绕，大曜在东"></svg>
+  </div>
+
+  <div class="hero">
+    <h1>大曜问仙录</h1>
+    <div class="sub">天下 · 七国</div>
+    <p class="lede">
+      断天山脉横在大陆正中，山那边是妖族。七国绕着它活了三百年，
+      谁也没翻过去。你生在东边的大曜，长明城的灯下。
+    </p>
+  </div>
+
+  <div class="legend">
+    <span><i class="sw-origin"></i>大曜 · 本国</span>
+    <span><i class="sw-line"></i>国界（一线为界）</span>
+    <span><i class="sw-plateau"></i>断天山脉 · 妖族之地</span>
+  </div>
+
+  <div class="corner" id="corner">
+    <!-- 登录状态由 js/home.js 填 -->
+  </div>
+
+  <div class="cta" id="cta">
+    <div class="name-row">
+      <label for="heroName">姓 名</label>
+      <input id="heroName" maxlength="12" autocomplete="off" placeholder="不填，就叫沈砚" />
+    </div>
+
+    <button class="btn btn-ghost cta-cont" id="btnContinue" hidden>
+      继续这一世 <small id="contMeta"></small>
+    </button>
+
+    <button class="btn btn-primary" id="btnStart">
+      开始新游戏
+      <small>十岁 · 蒙学第三排</small>
+    </button>
+
+    <span class="hint" id="ctaHint">无需登录即可开始</span>
+  </div>
+</div>
+
+<div class="map-tip" id="mapTip" hidden>
+  <div class="tn" id="tipName"></div>
+  <div class="ts" id="tipSub"></div>
+  <p class="tf" id="tipFlavor"></p>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/map.js"></script>
+<script src="js/home.js"></script>
+</body>
+</html>

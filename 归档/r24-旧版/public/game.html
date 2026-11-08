@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fbf8ef">
+  <title>修行 · 大曜问仙录</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles/app.css">
+</head>
+<body class="play-page">
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-seal">曜</span>
+        <span>
+          <p class="brand-name">大曜问仙录</p>
+          <p class="brand-sub" id="calendar">景和十二年</p>
+        </span>
+      </a>
+      <span class="chip">年岁 <strong id="age">7</strong></span>
+      <span class="chip" id="school">蒙学</span>
+      <span class="chip" id="identity">城中居民</span>
+      <span class="chip">灵量 <strong id="soulMass">0</strong></span>
+      <div class="topbar-spacer"></div>
+      <div class="account-area" id="account"></div>
+    </header>
+
+    <main class="game-layout">
+      <section>
+        <div class="realm-rail" id="realmRail"></div>
+        <section id="storyPanel"></section>
+      </section>
+
+      <aside class="side">
+        <section class="side-card">
+          <header class="side-head">
+            <div>
+              <p class="panel-label">修行札记</p>
+              <h2>近来命途</h2>
+            </div>
+          </header>
+          <div class="journal-list" id="journal"></div>
+        </section>
+
+        <section class="side-card">
+          <header class="side-head">
+            <div>
+              <p class="panel-label">随身</p>
+              <h2>钱与器</h2>
+            </div>
+          </header>
+          <div id="quickBag"></div>
+        </section>
+
+        <section class="side-note">
+          <p><strong>这一版的新规则</strong></p>
+          <p>破境要机缘，静修不一定够；养灵只认认知；修心可能跌落，甚至身死。</p>
+          <p>事件分八类：默认、普通、奇遇、修炼、委托、强制、门槛、破境。</p>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <div id="drawerRoot" class="drawer-root" hidden>
+    <div class="drawer-backdrop" data-close-drawer></div>
+    <aside class="drawer" role="dialog" aria-modal="true">
+      <header class="drawer-head">
+        <div>
+          <p class="panel-label" id="drawerKicker"></p>
+          <h2 id="drawerTitle"></h2>
+        </div>
+        <button type="button" class="drawer-close" data-close-drawer aria-label="关闭">×</button>
+      </header>
+      <div class="drawer-body" id="drawerBody"></div>
+    </aside>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="/js/main.js"></script>
+</body>
+</html>

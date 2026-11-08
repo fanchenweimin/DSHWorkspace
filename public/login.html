@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>登录 · 大曜问仙录</title>
+<link rel="stylesheet" href="styles/base.css" />
+<link rel="stylesheet" href="styles/login.css" />
+</head>
+<body class="login-page">
+
+<main class="login-card">
+  <h1>登录</h1>
+  <p class="lede">普通游玩不需要登录。这个入口只给管理账号用。</p>
+
+  <form id="form" autocomplete="off">
+    <label>
+      <span>账号</span>
+      <input id="name" name="name" type="text" autocapitalize="off" spellcheck="false" />
+    </label>
+    <label>
+      <span>密码</span>
+      <input id="password" name="password" type="password" />
+    </label>
+    <div class="err" id="err" hidden></div>
+    <button class="btn btn-primary wide" type="submit">登 录</button>
+  </form>
+
+  <div class="foot">
+    <a href="/">← 回到天下</a>
+    <span class="dim">sysadmin 登录后可进配置页</span>
+  </div>
+</main>
+
+<script>
+(function () {
+  const form = document.getElementById('form');
+  const err = document.getElementById('err');
+  const next = new URLSearchParams(location.search).get('next') || '/';
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    err.hidden = true;
+    const body = {
+      name: document.getElementById('name').value.trim(),
+      password: document.getElementById('password').value
+    };
+    const res = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      err.textContent = data.error || '登录失败';
+      err.hidden = false;
+      return;
+    }
+    location.href = next;
+  });
+})();
+</script>
+</body>
+</html>

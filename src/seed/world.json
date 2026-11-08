@@ -1,0 +1,303 @@
+{
+  "_note": "世界地理（r25）。一块大陆，中间断天山脉（妖族），七国环绕，国界只用一条分割线。坐标系 viewBox 0 0 1000 680。",
+  "version": "r25",
+  "era": "大曜历",
+  "startYear": 309,
+  "origin": "dayao",
+  "land": "M 230 96 C 300 62 400 58 490 72 C 560 84 630 66 700 86 C 770 106 830 140 872 186 C 910 228 936 274 928 320 C 920 360 900 386 918 418 C 940 456 926 500 888 524 C 848 550 800 556 766 582 C 736 606 700 640 652 636 C 604 632 570 600 540 578 C 500 548 452 570 404 578 C 340 588 280 566 240 532 C 190 490 162 434 168 378 C 174 330 196 300 186 258 C 176 216 196 130 230 96 Z",
+  "plateau": {
+    "id": "duantian",
+    "name": "断天山脉",
+    "sub": "妖族之地",
+    "path": "M 396 296 C 412 258 462 240 512 246 C 566 252 600 280 606 320 C 612 364 580 396 528 404 C 476 412 424 400 404 368 C 390 344 388 316 396 296 Z",
+    "label": [
+      500,
+      316
+    ],
+    "subLabel": [
+      500,
+      340
+    ],
+    "note": "跨不过去，也守不住。妖族在山里，人只在山脚下。"
+  },
+  "borders": [
+    {
+      "id": "b.dayao.cangwu",
+      "between": [
+        "dayao",
+        "cangwu"
+      ],
+      "d": "M 600 380 Q 760 418 912 450"
+    },
+    {
+      "id": "b.cangwu.zhuli",
+      "between": [
+        "cangwu",
+        "zhuli"
+      ],
+      "d": "M 508 426 Q 546 520 592 604"
+    },
+    {
+      "id": "b.zhuli.zhaowu",
+      "between": [
+        "zhuli",
+        "zhaowu"
+      ],
+      "d": "M 412 402 Q 362 500 332 590"
+    },
+    {
+      "id": "b.zhaowu.yunliang",
+      "between": [
+        "zhaowu",
+        "yunliang"
+      ],
+      "d": "M 382 340 Q 268 344 154 352"
+    },
+    {
+      "id": "b.yunliang.liangye",
+      "between": [
+        "yunliang",
+        "liangye"
+      ],
+      "d": "M 412 270 Q 300 232 190 210"
+    },
+    {
+      "id": "b.liangye.xuanshuo",
+      "between": [
+        "liangye",
+        "xuanshuo"
+      ],
+      "d": "M 470 246 Q 400 150 292 82"
+    },
+    {
+      "id": "b.xuanshuo.dayao",
+      "between": [
+        "xuanshuo",
+        "dayao"
+      ],
+      "d": "M 580 268 Q 720 220 872 192"
+    }
+  ],
+  "countries": [
+    {
+      "id": "dayao",
+      "name": "大曜",
+      "tone": "jade",
+      "start": true,
+      "seat": "长明城",
+      "compass": "东",
+      "flavor": "长明城的灯，三百年没熄过。夜里从北关望过去，像一条伏在地上的金线。",
+      "label": [
+        672,
+        352
+      ],
+      "cities": [
+        {
+          "id": "beiguan",
+          "name": "北关",
+          "kind": "关隘",
+          "at": [
+            712,
+            262
+          ],
+          "side": 1
+        },
+        {
+          "id": "wangbei",
+          "name": "望北城",
+          "kind": "重镇",
+          "at": [
+            756,
+            296
+          ],
+          "side": 1
+        },
+        {
+          "id": "changming",
+          "name": "长明城",
+          "kind": "都城",
+          "start": true,
+          "at": [
+            802,
+            346
+          ],
+          "side": 1
+        },
+        {
+          "id": "nanguan",
+          "name": "南关",
+          "kind": "关隘",
+          "at": [
+            750,
+            410
+          ],
+          "side": -1
+        }
+      ]
+    },
+    {
+      "id": "xuanshuo",
+      "name": "玄朔",
+      "tone": "frost",
+      "seat": "白狼城",
+      "compass": "北",
+      "flavor": "雪落下来就不再化了。那里的人说话都带着白气，也带着刀。",
+      "label": [
+        556,
+        142
+      ],
+      "cities": [
+        {
+          "id": "bailang",
+          "name": "白狼城",
+          "kind": "都城",
+          "at": [
+            600,
+            176
+          ]
+        }
+      ]
+    },
+    {
+      "id": "liangye",
+      "name": "凉野",
+      "tone": "sand",
+      "seat": "沙脊城",
+      "compass": "西北",
+      "flavor": "风把沙子吹成墙。商队走一趟，要留下半条命。",
+      "label": [
+        286,
+        164
+      ],
+      "cities": [
+        {
+          "id": "shaji",
+          "name": "沙脊城",
+          "kind": "都城",
+          "at": [
+            318,
+            198
+          ]
+        }
+      ]
+    },
+    {
+      "id": "yunliang",
+      "name": "云梁",
+      "tone": "pine",
+      "seat": "万松城",
+      "compass": "西",
+      "flavor": "松下听风，风里有松脂和铜锈的味道——他们的书院比城墙还高。",
+      "label": [
+        252,
+        302
+      ],
+      "cities": [
+        {
+          "id": "wansong",
+          "name": "万松城",
+          "kind": "都城",
+          "at": [
+            296,
+            330
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zhaowu",
+      "name": "昭武",
+      "tone": "ochre",
+      "seat": "铁门城",
+      "compass": "西南",
+      "flavor": "铁匠铺的火从不熄。孩子先学打铁，再学拿剑。",
+      "label": [
+        286,
+        486
+      ],
+      "cities": [
+        {
+          "id": "tiemen",
+          "name": "铁门城",
+          "kind": "都城",
+          "at": [
+            330,
+            522
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zhuli",
+      "name": "朱离",
+      "tone": "ember",
+      "seat": "赤壤城",
+      "compass": "南",
+      "flavor": "南边的稻子一年两熟，雨水多得能淹死人，也富得能养死人。",
+      "label": [
+        516,
+        516
+      ],
+      "cities": [
+        {
+          "id": "chirang",
+          "name": "赤壤城",
+          "kind": "都城",
+          "at": [
+            548,
+            566
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cangwu",
+      "name": "苍梧",
+      "tone": "moss",
+      "seat": "潭心城",
+      "compass": "东南",
+      "flavor": "水网密得像掌纹。船家不认路，只认水色。",
+      "label": [
+        768,
+        486
+      ],
+      "cities": [
+        {
+          "id": "tanxin",
+          "name": "潭心城",
+          "kind": "都城",
+          "at": [
+            822,
+            520
+          ]
+        }
+      ]
+    }
+  ],
+  "seas": [
+    {
+      "id": "sea.north",
+      "name": "北溟",
+      "label": [
+        680,
+        62
+      ]
+    },
+    {
+      "id": "sea.south",
+      "name": "南沧",
+      "label": [
+        468,
+        628
+      ]
+    },
+    {
+      "id": "sea.west",
+      "name": "西墟",
+      "label": [
+        120,
+        470
+      ]
+    }
+  ]
+}

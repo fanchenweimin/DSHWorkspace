@@ -1,0 +1,258 @@
+[
+  {
+    "no": 1,
+    "id": "spell.luohan",
+    "name": "罗汉拳",
+    "tier": "黄下",
+    "rank": 1,
+    "means": "physical",
+    "kind": "attack",
+    "req": {
+      "body": 1
+    },
+    "price": {
+      "copper": 0
+    },
+    "power": 3,
+    "dodge": 0,
+    "shield": 0,
+    "desc": "蒙学就教。凡人也能练，练的是筋骨不是气。",
+    "effect": "战力 +3 / 档",
+    "source": "需求/12 §2 · 黄下（坊市白送 / 蒙学必教）",
+    "sources": {
+      "academy": [
+        "meng"
+      ]
+    }
+  },
+  {
+    "no": 2,
+    "id": "spell.yinqi",
+    "name": "引气诀",
+    "tier": "黄下",
+    "rank": 1,
+    "means": "mana",
+    "kind": "attack",
+    "req": {
+      "body": 2
+    },
+    "price": {
+      "copper": 0
+    },
+    "power": 4,
+    "dodge": 0,
+    "shield": 0,
+    "desc": "府学发的第一本册子。会引气，才谈得上术法。",
+    "effect": "战力 +4 / 档",
+    "source": "需求/12 §2 · 黄下",
+    "sources": {
+      "academy": [
+        "meng",
+        "fu"
+      ]
+    }
+  },
+  {
+    "no": 3,
+    "id": "spell.huodan",
+    "name": "火弹术",
+    "tier": "黄中",
+    "rank": 2,
+    "means": "mana",
+    "kind": "attack",
+    "req": {
+      "qi": 1
+    },
+    "price": {
+      "copper": 260
+    },
+    "power": 8,
+    "dodge": 0,
+    "shield": 0,
+    "desc": "坊市里最常见的一手。不漂亮，但真能烧穿甲。",
+    "effect": "战力 +8 / 档",
+    "source": "需求/12 §2 · 黄中（坊市买）",
+    "sources": {
+      "academy": [
+        "fu"
+      ],
+      "market": true
+    }
+  },
+  {
+    "no": 4,
+    "id": "spell.yufeng",
+    "name": "御风步",
+    "tier": "黄中",
+    "rank": 2,
+    "means": "physical",
+    "kind": "attack",
+    "req": {
+      "qi": 1
+    },
+    "price": {
+      "copper": 180
+    },
+    "power": 5,
+    "dodge": 0.06,
+    "shield": 0,
+    "desc": "脚下生风。学会它，打起来能闪开一半的拳头。",
+    "effect": "闪避 +6% / 档",
+    "source": "需求/12 §2 · 黄中（身法）",
+    "sources": {
+      "academy": [
+        "fu"
+      ],
+      "market": true
+    }
+  },
+  {
+    "no": 5,
+    "id": "spell.jingang",
+    "name": "金刚罩",
+    "tier": "黄上",
+    "rank": 3,
+    "means": "mana",
+    "kind": "guard",
+    "req": {
+      "qi": 2
+    },
+    "price": {
+      "copper": 900
+    },
+    "power": 0,
+    "dodge": 0,
+    "shield": 60,
+    "desc": "以法力结成的一层护罩。**这才叫法力盾**——不是有法力就有盾，得练过才有。",
+    "effect": "运功：撑起 60 点护盾 / 档",
+    "source": "需求/12 §2 · 黄上（防御术法）",
+    "sources": {
+      "academy": [
+        "tai"
+      ],
+      "market": true
+    }
+  },
+  {
+    "no": 6,
+    "id": "spell.luoshi",
+    "name": "落石术",
+    "tier": "玄",
+    "rank": 4,
+    "means": "mana",
+    "kind": "attack",
+    "req": {
+      "qi": 3
+    },
+    "price": {
+      "silver": 3
+    },
+    "power": 14,
+    "dodge": 0,
+    "shield": 0,
+    "desc": "掐诀一压，天上掉石头。驭凡之后才压得动。",
+    "effect": "战力 +14 / 档",
+    "source": "需求/12 §2 · 玄下",
+    "sources": {
+      "market": true
+    }
+  },
+  {
+    "no": 7,
+    "id": "spell.huxin",
+    "name": "护心镜诀",
+    "tier": "玄",
+    "rank": 4,
+    "means": "mana",
+    "kind": "guard",
+    "req": {
+      "qi": 3
+    },
+    "price": {
+      "silver": 4
+    },
+    "power": 0,
+    "dodge": 0,
+    "shield": 120,
+    "desc": "在心口结一面镜。挡住了，镜上会裂一道纹。",
+    "effect": "运功：撑起 120 点护盾 / 档",
+    "source": "需求/12 §2 · 玄下（防御术法）",
+    "sources": {
+      "market": true
+    }
+  },
+  {
+    "no": 8,
+    "id": "spell.youlong",
+    "name": "游龙步",
+    "tier": "玄",
+    "rank": 4,
+    "means": "physical",
+    "kind": "attack",
+    "req": {
+      "body": 3
+    },
+    "price": {
+      "silver": 2
+    },
+    "power": 9,
+    "dodge": 0.1,
+    "shield": 0,
+    "desc": "身法练到极处，刀锋从衣角过，人已经在三步之外。",
+    "effect": "闪避 +10% / 档",
+    "source": "需求/12 §2 · 玄下（身法）",
+    "sources": {
+      "market": true
+    }
+  },
+  {
+    "no": 9,
+    "id": "spell.fenshan",
+    "name": "焚山印",
+    "tier": "地",
+    "rank": 5,
+    "means": "mana",
+    "kind": "attack",
+    "req": {
+      "qi": 4
+    },
+    "price": {
+      "gold": 1
+    },
+    "power": 22,
+    "dodge": 0,
+    "shield": 0,
+    "desc": "一枚印下去，半座山要烧起来。法相之后才按得动。",
+    "effect": "战力 +22 / 档",
+    "source": "需求/12 §2 · 玄中",
+    "sources": {
+      "office": 60
+    },
+    "meritCost": 60
+  },
+  {
+    "no": 10,
+    "id": "spell.wulei",
+    "name": "五雷正法",
+    "tier": "天",
+    "rank": 6,
+    "means": "mana",
+    "kind": "attack",
+    "req": {
+      "qi": 5
+    },
+    "price": {
+      "gold": 3
+    },
+    "power": 32,
+    "dodge": 0,
+    "shield": 0,
+    "desc": "召雷。坊市里买不到，只有宗门与军府收着。",
+    "effect": "战力 +32 / 档",
+    "source": "需求/12 §2 · 玄上（不走坊市）",
+    "sources": {
+      "office": 150
+    },
+    "meritCost": 150
+  }
+]

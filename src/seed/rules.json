@@ -1,0 +1,541 @@
+{
+  "_note": "业务层常量镜像（只读）。正式工程里这份值在 src/model/rules/prof.js，UI 只读，不许二次计算。",
+  "version": "r24",
+  "MILESTONE": 4,
+  "SPILL_RATE": 0.1,
+  "MONTH_GAIN": 0.2,
+  "SUCCESS": {
+    "probFloor": 40,
+    "probCoef": 0.003,
+    "firstFail": 0.02,
+    "failAddMin": 0.01,
+    "failAddMax": 0.02,
+    "failCap": 0.03,
+    "pCap": 0.95,
+    "openBase": 0.25,
+    "teachPerSession": 0.03,
+    "teachCap": {
+      "1": 0.06,
+      "2": 0.06,
+      "3": 0.06,
+      "4": 0.12
+    },
+    "event": {
+      "qi4": {
+        "base": 0.1,
+        "attr": "insight",
+        "from": 89,
+        "coef": 0.01
+      },
+      "spirit": {
+        "base": 0.35,
+        "attr": "aptIns",
+        "from": 160,
+        "coef": 0.01
+      },
+      "heart": {
+        "base": 0.3,
+        "attr": "heart",
+        "from": 90,
+        "coef": 0.05
+      },
+      "tier6": {
+        "base": 0.1,
+        "attr": "aptIns",
+        "from": 168,
+        "coef": 0.02
+      }
+    }
+  },
+  "PROF": {
+    "body": [
+      140,
+      310,
+      1600,
+      2500,
+      3900,
+      5700
+    ],
+    "qi": [
+      90,
+      300,
+      900,
+      1800,
+      2800,
+      4000
+    ],
+    "spirit": [
+      5400,
+      13500,
+      21600,
+      27000,
+      37800,
+      54000
+    ],
+    "heart": [
+      100,
+      220,
+      370,
+      550
+    ]
+  },
+  "TIER_G": [
+    null,
+    1.6,
+    2.0,
+    2.2,
+    2.4,
+    2.6
+  ],
+  "TIERS": {
+    "body": [
+      "体魄",
+      "脏腑",
+      "调息",
+      "朝元",
+      "金身",
+      "临虚"
+    ],
+    "qi": [
+      "感气",
+      "破胎",
+      "驭凡",
+      "法相",
+      "合一",
+      "化朽"
+    ],
+    "spirit": [
+      "开视",
+      "启灵",
+      "真域",
+      "神游",
+      "浑然",
+      "回春"
+    ],
+    "heart": [
+      "不惑",
+      "天命",
+      "耳顺",
+      "从心而欲"
+    ]
+  },
+  "DAO": {
+    "body": {
+      "name": "锻体",
+      "bar": "内力",
+      "attr": "aptitude",
+      "rank": 1
+    },
+    "qi": {
+      "name": "炼气",
+      "bar": "法力",
+      "attr": "insight",
+      "rank": 2
+    },
+    "spirit": {
+      "name": "养灵",
+      "bar": "灵力",
+      "attr": "aptIns",
+      "rank": 3
+    },
+    "heart": {
+      "name": "修心",
+      "bar": "道心",
+      "attr": "heart",
+      "rank": 4
+    }
+  },
+  "APPEAR": {
+    "body": [
+      {
+        "tier": 1,
+        "attr": "aptitude",
+        "base": 0.8,
+        "from": 40,
+        "coef": 0.02
+      },
+      {
+        "tier": 2,
+        "attr": "aptitude",
+        "base": 0.9,
+        "from": 60,
+        "coef": 0.01
+      },
+      {
+        "tier": 3,
+        "attr": "aptitude",
+        "base": 0.0,
+        "from": 60,
+        "coef": 0.05
+      },
+      {
+        "tier": 4,
+        "attr": "aptitude",
+        "base": 0.0,
+        "from": 79,
+        "coef": 0.1
+      }
+    ],
+    "qi": [
+      {
+        "tier": 1,
+        "attr": "insight",
+        "base": 0.5,
+        "from": 60,
+        "coef": 0.025
+      },
+      {
+        "tier": 2,
+        "attr": "insight",
+        "base": 0.3,
+        "from": 60,
+        "coef": 0.035
+      },
+      {
+        "tier": 3,
+        "attr": "insight",
+        "base": 0.0,
+        "from": 70,
+        "coef": 0.05
+      }
+    ]
+  },
+  "LIFESPAN": {
+    "body": [
+      [
+        60,
+        85
+      ],
+      [
+        60,
+        85
+      ],
+      [
+        90,
+        105
+      ],
+      [
+        110,
+        130
+      ],
+      [
+        300,
+        350
+      ],
+      [
+        1000,
+        1000
+      ]
+    ],
+    "qi": [
+      [
+        60,
+        85
+      ],
+      [
+        60,
+        85
+      ],
+      [
+        150,
+        180
+      ],
+      [
+        200,
+        240
+      ],
+      [
+        350,
+        400
+      ],
+      [
+        1000,
+        1000
+      ]
+    ],
+    "spirit": [
+      null,
+      null,
+      [
+        400,
+        400
+      ],
+      [
+        700,
+        780
+      ],
+      [
+        950,
+        1000
+      ],
+      null
+    ],
+    "heart": [
+      [
+        1000,
+        1000
+      ],
+      [
+        1400,
+        1400
+      ],
+      [
+        2000,
+        2000
+      ],
+      [
+        3000,
+        3000
+      ]
+    ]
+  },
+  "WAR_MUL": {
+    "peace": 1,
+    "warning": 1.5,
+    "city": 3,
+    "nation": 6
+  },
+  "WAR_PRIORITY": {
+    "peace": "3–4",
+    "warning": "3",
+    "city": "1",
+    "nation": "1"
+  },
+  "PILL": {
+    "public": 0.05,
+    "feed": 0.08,
+    "cap": 0.13,
+    "peiyuan": 1.1
+  },
+  "CURRENCY": {
+    "copper": 100,
+    "silver": 100
+  },
+  "BREAK_GATE": {
+    "_note": "每一关的附加门槛（不是修为门槛）。第 1 品是「入门关」，没有修为条，只看这里；第 2 品起是品内突破，修为练满才准冲。hint 是不满足时给玩家看的一句话。",
+    "body": {
+      "1": {
+        "when": [],
+        "hint": ""
+      },
+      "5": {
+        "when": [
+          {
+            "gte": [
+              "merit.war",
+              100
+            ]
+          }
+        ],
+        "hint": "朝元圆满，还要一次拿得出手的战功。"
+      },
+      "6": {
+        "when": [
+          {
+            "gte": [
+              "merit.war",
+              200
+            ]
+          }
+        ],
+        "hint": "金身圆满。这一关要你在没有法力的时候也敢站着。"
+      }
+    },
+    "qi": {
+      "1": {
+        "when": [
+          {
+            "gte": [
+              "path.body.level",
+              2
+            ]
+          }
+        ],
+        "hint": "气感要在筋骨练开之后才有。先把脏腑坐实。"
+      },
+      "4": {
+        "when": [
+          {
+            "flag": "flag.edu.graduated"
+          }
+        ],
+        "hint": "法相·立相只有太学卒业的人能敲。"
+      },
+      "5": {
+        "when": [],
+        "hint": ""
+      },
+      "6": {
+        "when": [],
+        "hint": ""
+      }
+    },
+    "spirit": {
+      "1": {
+        "when": [
+          {
+            "use": "cond.can_knock_spirit"
+          }
+        ],
+        "hint": "双八十禀赋，还要一张入场券：自悟 / 太学卒业 / 师承。"
+      },
+      "5": {
+        "when": [
+          {
+            "gte": [
+              "reputation.eff",
+              60
+            ]
+          }
+        ],
+        "hint": "神游圆满。还要治下的人认你。"
+      },
+      "6": {
+        "when": [
+          {
+            "gte": [
+              "reputation.eff",
+              80
+            ]
+          }
+        ],
+        "hint": "浑然圆满。把灵量还回去，看你还剩不剩得下自己。"
+      }
+    },
+    "heart": {
+      "1": {
+        "when": [
+          {
+            "gte": [
+              "attr.heart.eff",
+              90
+            ]
+          }
+        ],
+        "hint": "心性 ≥ 90 才能问这一关。"
+      },
+      "2": {
+        "when": [
+          {
+            "gte": [
+              "attr.heart.eff",
+              90
+            ]
+          }
+        ],
+        "hint": "心性 ≥ 90 才能问这一关。"
+      },
+      "3": {
+        "when": [
+          {
+            "gte": [
+              "attr.heart.eff",
+              90
+            ]
+          }
+        ],
+        "hint": "心性 ≥ 90 才能问这一关。"
+      },
+      "4": {
+        "when": [
+          {
+            "gte": [
+              "attr.heart.eff",
+              90
+            ]
+          }
+        ],
+        "hint": "心性 ≥ 90 才能问这一关。"
+      }
+    }
+  },
+  "ARTS": {
+    "_note": "百艺升阶（需求/13 §11.0）。积累 += 基数 × monthCoef；基数 = 资质×w资 + 悟性×w悟。age 是「几岁才谈得上手艺」（需求/13 §2.2）。",
+    "age": 14,
+    "studyCost": 120,
+    "exp1": 120,
+    "exp2": 600,
+    "exp3": 1800,
+    "monthCoef": 0.2,
+    "noArtTalent": 1,
+    "lowTalent": 2,
+    "highTalent": 3,
+    "peakTalent": 4
+  },
+  "BATTLE": {
+    "_note": "战斗数值（设计/30 §4.3 的基准表）。tables 按品阶查：索引 0 = 未入品，1..6 = 品 1..6。血/攻/防看锻体，法力看炼气，灵力与精神看养灵，神志 = 自身心性。manaRegen = 每回合回多少法力（修士不该打两下就肉搏）；dodgeBase = 人人有的基础闪避。",
+    "tables": {
+      "hp": [
+        60,
+        100,
+        180,
+        300,
+        480,
+        750,
+        1200
+      ],
+      "atk": [
+        6,
+        10,
+        16,
+        25,
+        38,
+        58,
+        88
+      ],
+      "def": [
+        2,
+        4,
+        7,
+        11,
+        17,
+        26,
+        40
+      ],
+      "mana": [
+        0,
+        0,
+        60,
+        130,
+        240,
+        420,
+        700
+      ],
+      "spirit": [
+        0,
+        0,
+        70,
+        150,
+        270,
+        450,
+        760
+      ],
+      "mind": [
+        30,
+        70,
+        110,
+        170,
+        250,
+        360,
+        500
+      ]
+    },
+    "timeout": 12,
+    "dangerLine": 0.1,
+    "injuryRate": 0.25,
+    "manaRegen": 0.05,
+    "dodgeBase": 0.04,
+    "fleeBase": 0.25
+  },
+  "TIME": {
+    "_note": "耗时（r33）。months = base × ref / 属性分，再按品阶加权。break 闭关破境 / art 学艺 / spell 学术法 / season 一季。",
+    "ref": 60,
+    "breakBase": 2,
+    "learnBase": 3,
+    "spellBase": 3,
+    "season": 3,
+    "tierFactor": 0.15,
+    "min": 1,
+    "max": 6
+  }
+}

@@ -1,0 +1,252 @@
+[
+  {
+    "no": 1,
+    "id": "act.commission",
+    "name": "接委托",
+    "sub": "护商 · 采药 · 送信",
+    "group": "life",
+    "months": 2,
+    "when": [
+      {
+        "use": "cond.in_city"
+      },
+      {
+        "gte": [
+          "clock.age",
+          14
+        ]
+      }
+    ],
+    "do": [
+      {
+        "money": {
+          "copper": 55
+        }
+      },
+      {
+        "add": [
+          "merit.craft",
+          2
+        ]
+      },
+      {
+        "log": "你接了一趟短活。钱不多，够吃几个月。"
+      }
+    ],
+    "source": "需求/13 §10.4 · 委托（活路，不是出路）"
+  },
+  {
+    "no": 2,
+    "id": "act.duty",
+    "name": "履职",
+    "sub": "戍守 · 差役 · 朝会",
+    "group": "life",
+    "months": 3,
+    "when": [
+      {
+        "flag": "flag.office.army"
+      }
+    ],
+    "do": [
+      {
+        "add": [
+          "merit.office",
+          6
+        ]
+      },
+      {
+        "money": {
+          "copper": 40
+        }
+      },
+      {
+        "log": "三个月的值，站得腿发麻。俸禄按时发了下来。"
+      }
+    ],
+    "source": "需求/20 §6.1"
+  },
+  {
+    "no": 3,
+    "id": "act.combat",
+    "name": "出战",
+    "sub": "只有军职才有的选择",
+    "group": "life",
+    "months": 1,
+    "when": [
+      {
+        "flag": "flag.office.army"
+      }
+    ],
+    "do": [
+      {
+        "judge": {
+          "kind": "battle",
+          "scale": 1.0,
+          "kindName": "敌军",
+          "match": "death"
+        }
+      },
+      {
+        "if": {
+          "when": [
+            {
+              "eq": [
+                "$last.ok",
+                true
+              ]
+            }
+          ],
+          "then": [
+            {
+              "add": [
+                "merit.war",
+                6
+              ]
+            },
+            {
+              "add": [
+                "reputation.eff",
+                2
+              ]
+            }
+          ],
+          "else": [
+            {
+              "add": [
+                "merit.war",
+                1
+              ]
+            },
+            {
+              "log": "这一阵没打赢。你被抬下来的时候还攥着刀。"
+            }
+          ]
+        }
+      }
+    ],
+    "source": "需求/30 §7.1 · 出战是军职的特权（普通人靠事件撞上战斗）"
+  },
+  {
+    "no": 4,
+    "id": "act.market",
+    "name": "逛坊市",
+    "sub": "买卖 · 置换 · 打听消息",
+    "group": "life",
+    "months": 1,
+    "when": [
+      {
+        "use": "cond.in_city"
+      }
+    ],
+    "do": [
+      {
+        "log": "坊市里人挤人，货架上明码标价。"
+      }
+    ],
+    "source": "需求/20 §7 · 坊市：仅在城中，1 月/次；买完进囊中"
+  },
+  {
+    "no": 5,
+    "id": "act.idle",
+    "name": "闲居",
+    "sub": "把今年剩下的日子过完",
+    "group": "life",
+    "months": 0,
+    "restMonths": true,
+    "when": [],
+    "do": [],
+    "source": "需求/13 §10.5 · 安生活法（闲居 = 过完当前年）"
+  },
+  {
+    "no": 6,
+    "id": "act.chore",
+    "name": "帮工",
+    "sub": "码头 · 铺子 · 田里",
+    "group": "life",
+    "months": 1,
+    "when": [
+      {
+        "lte": [
+          "clock.age",
+          16
+        ]
+      }
+    ],
+    "do": [
+      {
+        "money": {
+          "copper": 9
+        }
+      },
+      {
+        "log": "你替人搬了一天货，挣了九个铜板。"
+      }
+    ],
+    "source": "需求/13 §10.1 · 打工（凡人活路）"
+  },
+  {
+    "no": 7,
+    "id": "act.spar",
+    "name": "切磋",
+    "sub": "演武场 · 找个同辈比一场",
+    "group": "life",
+    "months": 1,
+    "when": [
+      {
+        "use": "cond.in_city"
+      },
+      {
+        "gte": [
+          "clock.age",
+          12
+        ]
+      }
+    ],
+    "do": [
+      {
+        "judge": {
+          "kind": "battle",
+          "scale": 0.95,
+          "kindName": "同辈",
+          "match": "spar"
+        }
+      },
+      {
+        "if": {
+          "when": [
+            {
+              "eq": [
+                "$last.ok",
+                true
+              ]
+            }
+          ],
+          "then": [
+            {
+              "add": [
+                "reputation.eff",
+                2
+              ]
+            },
+            {
+              "log": "你赢了。围看的人散开时，有人记住了你的名字。"
+            }
+          ],
+          "else": [
+            {
+              "add": [
+                "reputation.eff",
+                -1
+              ]
+            },
+            {
+              "log": "你输了。切磋不伤人，只是有点没面子。"
+            }
+          ]
+        }
+      }
+    ],
+    "source": "需求/30 §7 · 切磋：有危险线，不掷伤病，不会死",
+    "text": "你到演武场找了个同辈，抱拳，比一场。"
+  }
+]

@@ -1,0 +1,1017 @@
+{
+  "_note": "配置页的'人话说明书'：字段中文名、哪些字段不许人改（机器生成的坐标 / 轮廓 / 语义表）、列宽。form.js 只读这一份，不再把中文名写死在代码里。路径用点分，* 匹配任意一段。",
+  "version": "r27",
+  "fields": {
+    "no": {
+      "label": "主键",
+      "width": 56,
+      "edit": false
+    },
+    "id": {
+      "label": "英文名",
+      "width": 170,
+      "edit": false
+    },
+    "name": {
+      "label": "中文名",
+      "width": 130
+    },
+    "title": {
+      "label": "中文名",
+      "width": 180
+    },
+    "sub": {
+      "label": "一句话",
+      "width": 160
+    },
+    "desc": {
+      "label": "说明",
+      "width": 240
+    },
+    "note": {
+      "label": "备注",
+      "width": 200
+    },
+    "nature": {
+      "label": "性质",
+      "width": 76
+    },
+    "kind": {
+      "label": "类型（攻 / 运功）",
+      "width": 110
+    },
+    "months": {
+      "label": "耗时（月）",
+      "width": 78
+    },
+    "weight": {
+      "label": "权重",
+      "width": 62
+    },
+    "priority": {
+      "label": "优先级",
+      "width": 70
+    },
+    "forced": {
+      "label": "强制",
+      "width": 58
+    },
+    "quota": {
+      "label": "名额",
+      "width": 150
+    },
+    "ttl": {
+      "label": "保留年数",
+      "width": 78
+    },
+    "when": {
+      "label": "条件",
+      "width": 260
+    },
+    "do": {
+      "label": "效果",
+      "width": 260
+    },
+    "choices": {
+      "label": "选项",
+      "width": 300
+    },
+    "label": {
+      "label": "选项文字",
+      "width": 140
+    },
+    "hint": {
+      "label": "提示",
+      "width": 220
+    },
+    "cost": {
+      "label": "花费（铜）",
+      "width": 92
+    },
+    "openPrice": {
+      "label": "明码标价",
+      "width": 82
+    },
+    "args": {
+      "label": "参数",
+      "width": 140
+    },
+    "template": {
+      "label": "模板",
+      "width": 140
+    },
+    "source": {
+      "label": "出处",
+      "width": 200,
+      "edit": false
+    },
+    "flag": {
+      "label": "标记",
+      "width": 130
+    },
+    "flags": {
+      "label": "标记",
+      "width": 130
+    },
+    "value": {
+      "label": "值",
+      "width": 90
+    },
+    "age": {
+      "label": "年龄",
+      "width": 64
+    },
+    "req": {
+      "label": "要求",
+      "width": 160
+    },
+    "benefit": {
+      "label": "好处",
+      "width": 200
+    },
+    "duty": {
+      "label": "职守",
+      "width": 100
+    },
+    "price": {
+      "label": "价格",
+      "width": 110
+    },
+    "duration": {
+      "label": "时长",
+      "width": 90
+    },
+    "mods": {
+      "label": "增益",
+      "width": 170
+    },
+    "use": {
+      "label": "可服用",
+      "width": 76
+    },
+    "effect": {
+      "label": "服后效果",
+      "width": 190
+    },
+    "dao": {
+      "label": "道",
+      "width": 70
+    },
+    "tier": {
+      "label": "品阶",
+      "width": 64
+    },
+    "level": {
+      "label": "层级",
+      "width": 62
+    },
+    "gte": {
+      "label": "大于等于 ≥",
+      "width": 70
+    },
+    "lte": {
+      "label": "小于等于 ≤",
+      "width": 70
+    },
+    "gt": {
+      "label": "大于 >",
+      "width": 70
+    },
+    "lt": {
+      "label": "小于 <",
+      "width": 70
+    },
+    "eq": {
+      "label": "等于",
+      "width": 140
+    },
+    "neq": {
+      "label": "不等于",
+      "width": 140
+    },
+    "any": {
+      "label": "任一满足",
+      "width": 200
+    },
+    "all": {
+      "label": "全部满足",
+      "width": 200
+    },
+    "not": {
+      "label": "不满足",
+      "width": 200
+    },
+    "none": {
+      "label": "都不满足",
+      "width": 200
+    },
+    "notFlag": {
+      "label": "无此标记",
+      "width": 150
+    },
+    "realm": {
+      "label": "境界",
+      "width": 140
+    },
+    "stage": {
+      "label": "学籍",
+      "width": 76
+    },
+    "zone": {
+      "label": "所在",
+      "width": 76
+    },
+    "count": {
+      "label": "计数",
+      "width": 70
+    },
+    "rate": {
+      "label": "速率上下限",
+      "width": 110
+    },
+    "money": {
+      "label": "钱的上下限",
+      "width": 110
+    },
+    "war": {
+      "label": "战事上下限",
+      "width": 110
+    },
+    "merit": {
+      "label": "功勋上下限",
+      "width": 110
+    },
+    "attr": {
+      "label": "属性上下限",
+      "width": 120
+    },
+    "reputation": {
+      "label": "声望",
+      "width": 90
+    },
+    "luck": {
+      "label": "气运",
+      "width": 70
+    },
+    "battle": {
+      "label": "战斗",
+      "width": 130
+    },
+    "art": {
+      "label": "百艺",
+      "width": 130
+    },
+    "train": {
+      "label": "修炼",
+      "width": 130
+    },
+    "conditions": {
+      "label": "条件组",
+      "width": 120
+    },
+    "effects": {
+      "label": "效果算子",
+      "width": 120
+    },
+    "ops": {
+      "label": "算子表",
+      "width": 120
+    },
+    "invariants": {
+      "label": "不变量",
+      "width": 120
+    },
+    "items": {
+      "label": "物品",
+      "width": 120
+    },
+    "fates": {
+      "label": "命格",
+      "width": 120
+    },
+    "talents": {
+      "label": "天赋",
+      "width": 120
+    },
+    "countries": {
+      "label": "国家",
+      "width": 120
+    },
+    "cities": {
+      "label": "城池",
+      "width": 120
+    },
+    "era": {
+      "label": "纪年",
+      "width": 100
+    },
+    "startYear": {
+      "label": "开国年",
+      "width": 90
+    },
+    "origin": {
+      "label": "起始国",
+      "width": 90
+    },
+    "land": {
+      "label": "大陆轮廓（机器生成）",
+      "edit": false
+    },
+    "plateau": {
+      "label": "断天山脉",
+      "width": 120
+    },
+    "shape": {
+      "label": "轮廓（机器生成）",
+      "edit": false
+    },
+    "path": {
+      "label": "轮廓路径（机器生成）",
+      "edit": false
+    },
+    "side": {
+      "label": "城内/城外（机器生成）",
+      "edit": false
+    },
+    "tone": {
+      "label": "色调",
+      "width": 80
+    },
+    "seat": {
+      "label": "都城",
+      "width": 100
+    },
+    "flavor": {
+      "label": "风物",
+      "width": 240
+    },
+    "at": {
+      "label": "坐标（机器生成）",
+      "edit": false
+    },
+    "labelAt": {
+      "label": "题签位置（机器生成）",
+      "edit": false
+    },
+    "compass": {
+      "label": "方位",
+      "width": 70
+    },
+    "start": {
+      "label": "起始国",
+      "width": 76
+    },
+    "version": {
+      "label": "版本",
+      "edit": false
+    },
+    "tbl": {
+      "label": "表",
+      "width": 120
+    },
+    "event": {
+      "label": "事件",
+      "width": 120
+    },
+    "params": {
+      "label": "参数",
+      "width": 130
+    },
+    "order": {
+      "label": "次序",
+      "width": 70
+    },
+    "ifFlag": {
+      "label": "前提标记",
+      "width": 130
+    },
+    "opened": {
+      "label": "已开放",
+      "width": 80
+    },
+    "closed": {
+      "label": "已关闭",
+      "width": 80
+    },
+    "borders": {
+      "label": "国界（机器生成）",
+      "edit": false
+    },
+    "sea": {
+      "label": "海域",
+      "width": 110
+    },
+    "seas": {
+      "label": "海域（机器生成）",
+      "edit": false
+    },
+    "cap": {
+      "label": "上限",
+      "width": 80
+    },
+    "min": {
+      "label": "下限",
+      "width": 80
+    },
+    "max": {
+      "label": "上限",
+      "width": 80
+    },
+    "subLabel": {
+      "label": "副题签",
+      "width": 120
+    },
+    "words": {
+      "label": "题字",
+      "width": 120
+    },
+    "r": {
+      "label": "半径",
+      "width": 70
+    },
+    "wApt": {
+      "label": "资质权重",
+      "width": 90
+    },
+    "wIns": {
+      "label": "悟性权重",
+      "width": 90
+    },
+    "realmReq": {
+      "label": "境界门槛（阶）",
+      "width": 100
+    },
+    "income": {
+      "label": "月入（铜）",
+      "width": 150
+    },
+    "repGain": {
+      "label": "月声望",
+      "width": 110
+    },
+    "levelNames": {
+      "label": "阶名",
+      "width": 200
+    },
+    "bonus": {
+      "label": "每阶好处",
+      "width": 240
+    },
+    "MILESTONE": {
+      "label": "成就线",
+      "width": 90
+    },
+    "SPILL_RATE": {
+      "label": "外溢率",
+      "width": 80
+    },
+    "MONTH_GAIN": {
+      "label": "月增系数",
+      "width": 90
+    },
+    "SUCCESS": {
+      "label": "成功率参数",
+      "width": 140
+    },
+    "PROF": {
+      "label": "修为基数",
+      "width": 200
+    },
+    "TIER_G": {
+      "label": "品阶指数比",
+      "width": 140
+    },
+    "TIERS": {
+      "label": "品名",
+      "width": 220
+    },
+    "DAO": {
+      "label": "四道",
+      "width": 200
+    },
+    "APPEAR": {
+      "label": "出现率参数",
+      "width": 160
+    },
+    "LIFESPAN": {
+      "label": "寿元",
+      "width": 200
+    },
+    "WAR_MUL": {
+      "label": "战事权重倍率",
+      "width": 140
+    },
+    "WAR_PRIORITY": {
+      "label": "战事优先级",
+      "width": 130
+    },
+    "PILL": {
+      "label": "丹药参数",
+      "width": 140
+    },
+    "CURRENCY": {
+      "label": "钱制",
+      "width": 120
+    },
+    "BREAK_GATE": {
+      "label": "瓶颈附加门槛",
+      "width": 200
+    },
+    "ARTS": {
+      "label": "百艺升阶",
+      "width": 160
+    },
+    "BATTLE": {
+      "label": "战斗参数",
+      "width": 160
+    },
+    "probFloor": {
+      "label": "概率下限",
+      "width": 90
+    },
+    "probCoef": {
+      "label": "概率系数",
+      "width": 90
+    },
+    "firstFail": {
+      "label": "初败加成",
+      "width": 90
+    },
+    "failAddMin": {
+      "label": "每次失败加成下限",
+      "width": 130
+    },
+    "failAddMax": {
+      "label": "每次失败加成上限",
+      "width": 130
+    },
+    "failCap": {
+      "label": "加成上限",
+      "width": 90
+    },
+    "pCap": {
+      "label": "概率上限",
+      "width": 90
+    },
+    "teachPerSession": {
+      "label": "每次求教加成",
+      "width": 110
+    },
+    "teachCap": {
+      "label": "求教上限",
+      "width": 130
+    },
+    "base": {
+      "label": "基础",
+      "width": 90
+    },
+    "eff": {
+      "label": "当前",
+      "width": 80
+    },
+    "spiritMass": {
+      "label": "灵蕴",
+      "width": 100
+    },
+    "exp1": {
+      "label": "学徒→1 阶",
+      "width": 110
+    },
+    "exp2": {
+      "label": "1 阶→2 阶",
+      "width": 110
+    },
+    "exp3": {
+      "label": "2 阶→3 阶",
+      "width": 110
+    },
+    "monthCoef": {
+      "label": "月积累系数",
+      "width": 100
+    },
+    "noArtTalent": {
+      "label": "无天赋上限",
+      "width": 100
+    },
+    "lowTalent": {
+      "label": "下品上限",
+      "width": 100
+    },
+    "highTalent": {
+      "label": "上品上限",
+      "width": 100
+    },
+    "peakTalent": {
+      "label": "绝品上限",
+      "width": 100
+    },
+    "hp": {
+      "label": "血量（按锻体品）",
+      "width": 130
+    },
+    "timeout": {
+      "label": "回合上限",
+      "width": 90
+    },
+    "injuryRate": {
+      "label": "战后伤病率",
+      "width": 100
+    },
+    "battleHeal": {
+      "label": "战斗中回血",
+      "width": 100
+    },
+    "between": {
+      "label": "哪两国之间",
+      "width": 150
+    },
+    "d": {
+      "label": "界线路径（机器生成）",
+      "edit": false
+    },
+    "atYear": {
+      "label": "发生年份",
+      "width": 90
+    },
+    "front": {
+      "label": "哪条边",
+      "width": 90
+    },
+    "defense": {
+      "label": "守备值",
+      "width": 90
+    },
+    "theater": {
+      "label": "战区",
+      "width": 90
+    },
+    "span": {
+      "label": "跨年（今年做不完记到明年）",
+      "width": 150
+    },
+    "group": {
+      "label": "分组",
+      "width": 80
+    },
+    "office": {
+      "label": "官职",
+      "width": 90
+    },
+    "monthsServed": {
+      "label": "已服役月数",
+      "width": 100
+    },
+    "craft": {
+      "label": "所需手艺",
+      "width": 110
+    },
+    "aptitude": {
+      "label": "资质",
+      "width": 76
+    },
+    "insight": {
+      "label": "悟性",
+      "width": 76
+    },
+    "1": {
+      "label": "第一品",
+      "width": 90
+    },
+    "2": {
+      "label": "第二品",
+      "width": 90
+    },
+    "3": {
+      "label": "第三品",
+      "width": 90
+    },
+    "4": {
+      "label": "第四品",
+      "width": 90
+    },
+    "5": {
+      "label": "第五品",
+      "width": 90
+    },
+    "6": {
+      "label": "第六品",
+      "width": 90
+    },
+    "restMonths": {
+      "label": "过完当年（闲居）",
+      "width": 110
+    },
+    "openBase": {
+      "label": "入门关成功率下限",
+      "width": 130
+    },
+    "shop": {
+      "label": "坊市有售",
+      "width": 80
+    },
+    "gate": {
+      "label": "事件瓶颈（哪道哪品）",
+      "width": 130
+    },
+    "spells": {
+      "label": "术法",
+      "width": 120
+    },
+    "power": {
+      "label": "术法威力",
+      "width": 80
+    },
+    "learned": {
+      "label": "已学会",
+      "width": 76
+    },
+    "studyCost": {
+      "label": "求学学费（铜）",
+      "width": 110
+    },
+    "sellPrice": {
+      "label": "回收价",
+      "width": 80
+    },
+    "tables": {
+      "label": "战斗基准表（按品查）",
+      "width": 150
+    },
+    "atk": {
+      "label": "攻击力（按锻体品）",
+      "width": 130
+    },
+    "def": {
+      "label": "防御力（按锻体品）",
+      "width": 130
+    },
+    "mana": {
+      "label": "法力（按炼气品）",
+      "width": 130
+    },
+    "spirit": {
+      "label": "灵力（按养灵品）",
+      "width": 130
+    },
+    "mind": {
+      "label": "精神（按养灵品）",
+      "width": 130
+    },
+    "dangerLine": {
+      "label": "切磋危险线（比例）",
+      "width": 130
+    },
+    "manaPerCast": {
+      "label": "每次施法的法力占比",
+      "width": 140
+    },
+    "means": {
+      "label": "手段层（物理/法力/灵力/道）",
+      "width": 150
+    },
+    "dodge": {
+      "label": "闪避（0-1）",
+      "width": 90
+    },
+    "shield": {
+      "label": "护盾量",
+      "width": 80
+    },
+    "manaRegen": {
+      "label": "每回合回法力（比例）",
+      "width": 140
+    },
+    "dodgeBase": {
+      "label": "基础闪避",
+      "width": 90
+    },
+    "match": {
+      "label": "战斗分级（切磋/死斗）",
+      "width": 130
+    },
+    "lockReason": {
+      "label": "锁住的原因",
+      "width": 120
+    },
+    "monthsBy": {
+      "label": "耗时按属性算（break/art/spell）",
+      "width": 130
+    },
+    "flee": {
+      "label": "能不能跑（never/always）",
+      "width": 130
+    },
+    "ref": {
+      "label": "属性基准值",
+      "width": 130
+    },
+    "breakBase": {
+      "label": "突破基准月数",
+      "width": 130
+    },
+    "learnBase": {
+      "label": "学艺基准月数",
+      "width": 130
+    },
+    "spellBase": {
+      "label": "学术法基准月数",
+      "width": 130
+    },
+    "season": {
+      "label": "一季几个月",
+      "width": 130
+    },
+    "tierFactor": {
+      "label": "每品加时比例",
+      "width": 130
+    },
+    "fleeBase": {
+      "label": "逃跑基础成功率",
+      "width": 130
+    },
+    "jie": {
+      "label": "阶（大境界 1-4）",
+      "width": 130
+    },
+    "pin": {
+      "label": "品（黄下1…天6）",
+      "width": 130
+    },
+    "rank": {
+      "label": "品阶（1-6）",
+      "width": 130
+    },
+    "effPin": {
+      "label": "有效品",
+      "width": 130
+    },
+    "effJie": {
+      "label": "有效阶",
+      "width": 130
+    },
+    "effLabel": {
+      "label": "有效阶品",
+      "width": 130
+    },
+    "product": {
+      "label": "产物阶品",
+      "width": 130
+    },
+    "lvlFull": {
+      "label": "阶品全称",
+      "width": 130
+    },
+    "sources": {
+      "label": "来路（学堂/坊市/城主府）",
+      "width": 140
+    },
+    "academy": {
+      "label": "学堂教（哪个学段）",
+      "width": 140
+    },
+    "market": {
+      "label": "坊市有售",
+      "width": 140
+    },
+    "meritCost": {
+      "label": "军功价",
+      "width": 140
+    },
+    "talisman": {
+      "label": "符箓（战前甩出）",
+      "width": 140
+    },
+    "TIME": {
+      "label": "耗时系数",
+      "width": 140
+    },
+    "surrenderAt": {
+      "label": "认输线（血量比例）",
+      "width": 140
+    }
+  },
+  "files": {
+    "rules": {
+      "label": "规则常量",
+      "group": "全局",
+      "readonlyPaths": [
+        "_note"
+      ]
+    },
+    "limits": {
+      "label": "数值上下限",
+      "group": "全局"
+    },
+    "ops": {
+      "label": "算子表",
+      "group": "全局",
+      "readonly": true
+    },
+    "invariants": {
+      "label": "不变量",
+      "group": "全局",
+      "readonly": true
+    },
+    "schema": {
+      "label": "配置说明（本文件）",
+      "group": "全局",
+      "readonly": true
+    },
+    "world": {
+      "label": "七国与大陆",
+      "group": "世界",
+      "readonlyPaths": [
+        "land",
+        "plateau.path",
+        "plateau.label",
+        "plateau.subLabel",
+        "borders",
+        "seas.*.label",
+        "countries.*.label",
+        "countries.*.start",
+        "countries.*.cities.*.side"
+      ]
+    },
+    "calendar": {
+      "label": "日历 · 战事",
+      "group": "世界"
+    },
+    "identities": {
+      "label": "身份",
+      "group": "角色",
+      "readonlyPaths": [
+        "*.id"
+      ]
+    },
+    "items": {
+      "label": "物品",
+      "group": "角色",
+      "readonlyPaths": [
+        "*.id"
+      ]
+    },
+    "talents": {
+      "label": "命格与天赋",
+      "group": "角色"
+    },
+    "arts": {
+      "label": "百艺十二门",
+      "group": "角色",
+      "readonlyPaths": [
+        "*.id"
+      ]
+    },
+    "spells": {
+      "label": "术法五门",
+      "group": "角色",
+      "readonlyPaths": [
+        "*.id"
+      ]
+    },
+    "actions": {
+      "label": "常驻动作",
+      "group": "事件",
+      "readonlyPaths": [
+        "*.id",
+        "*.source"
+      ]
+    },
+    "events": {
+      "label": "事件表",
+      "group": "事件",
+      "readonlyPaths": [
+        "*.id",
+        "*.source",
+        "*.no"
+      ]
+    },
+    "conditions": {
+      "label": "条件组",
+      "group": "事件",
+      "readonlyPaths": [
+        "*.params"
+      ]
+    },
+    "macros": {
+      "label": "宏",
+      "group": "事件",
+      "readonlyPaths": [
+        "*.params"
+      ]
+    },
+    "templates": {
+      "label": "模板",
+      "group": "事件",
+      "readonlyPaths": [
+        "*.params"
+      ]
+    }
+  },
+  "hints": {
+    "events": "主键（no）与英文名（id）是程序调用用的，不给改；要显示给人看的是「中文名」。",
+    "world": "大陆轮廓、国界坐标是算出来的，改了就画歪；要改地图请改 map.js 再重新生成。",
+    "ops": "算子表是语义，不是数值。加算子要动代码，改这里没用。",
+    "invariants": "不变量是硬约束清单，只读。",
+    "rules": "只改数值，别改结构。破境公式在 src/model/rules/ 里，这里改的是它读的常量。"
+  }
+}

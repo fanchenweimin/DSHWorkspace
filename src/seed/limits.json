@@ -1,0 +1,19 @@
+{
+  "attr": {
+    "aptitude": [1, 100],
+    "insight": [1, 100],
+    "heart": [0, 100],
+    "luck": [20, 95],
+    "reputation": [0, 100]
+  },
+  "money": { "copper": [0, null], "silver": [0, null], "gold": [0, null] },
+  "rate": {
+    "month.all": [0, 5],
+    "success.pill": [0, 0.13],
+    "success.teach": [0, 0.12],
+    "success.fail": [0, 0.03],
+    "success.total": [0, 0.95]
+  },
+  "war": { "monthsServed": [0, 12] },
+  "merit": { "war": [0, null], "craft": [0, null], "office": [0, null] }
+}

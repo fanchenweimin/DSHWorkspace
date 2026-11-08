@@ -1,0 +1,305 @@
+/* ── 首页：地图即主体，不做顶部菜单栏 ─────────────────────── */
+.home {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% 8%, #fffdf7 0%, var(--bg) 46%, #f1e9d8 100%);
+}
+
+.home-map {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1vh 1vw;
+}
+.home-map svg { width: 100%; height: 100%; max-height: 96vh; }
+
+/* ── 地图笔触 ─────────────────────────────────────────────── */
+.sea { fill: none; }
+.land {
+  fill: #f7f1e1;
+  stroke: #9c8f74;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  filter: url(#paperGrain);
+}
+.shore { fill: none; stroke: #b8a888; stroke-width: .8; opacity: .55; }
+
+.border {
+  fill: none;
+  stroke: #8a7b5e;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-dasharray: none;
+  opacity: .8;
+}
+
+.plateau {
+  fill: url(#plateauFill);
+  stroke: #7f7563;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+.mt { fill: none; stroke: #6f6653; stroke-width: 1.1; opacity: .62; stroke-linecap: round; }
+
+.hl-dayao {
+  fill: #f0d99a;
+  opacity: .55;
+}
+.hl-edge {
+  fill: none;
+  stroke: var(--gold-2);
+  stroke-width: 2.2;
+  opacity: .9;
+}
+
+/* ── 国名与城 ─────────────────────────────────────────────── */
+.cname {
+  font-family: var(--serif);
+  font-size: 25px;
+  fill: #38332a;
+  letter-spacing: .22em;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: #faf6ea;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  cursor: default;
+}
+.cname.is-origin {
+  fill: #6d4a15;
+  font-size: 30px;
+  font-weight: 600;
+}
+.csub {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  fill: #8d8471;
+  letter-spacing: .16em;
+  text-anchor: middle;
+  stroke: #faf6ea;
+  stroke-width: 3px;
+  paint-order: stroke;
+}
+.pname {
+  font-family: var(--serif);
+  font-size: 15px;
+  fill: #4c4535;
+  letter-spacing: .14em;
+  paint-order: stroke;
+  stroke: #fbf7ec;
+  stroke-width: 3.5px;
+  stroke-linejoin: round;
+}
+.pname.is-capital { fill: #6d4a15; font-size: 16px; }
+.pname.is-origin-city { fill: #8a3d16; }
+
+.city-dot { fill: #6b6047; stroke: #fbf7ec; stroke-width: 1.6; }
+.city-dot.is-capital { fill: var(--gold); r: 4.6; }
+.city-dot.is-start { fill: var(--seal); r: 5.4; }
+.city-halo { fill: none; stroke: var(--seal); stroke-width: 1; opacity: .5; }
+
+.pl-name {
+  font-family: var(--serif);
+  font-size: 17px;
+  fill: #4a554f;
+  letter-spacing: .3em;
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: #eef1ec;
+  stroke-width: 4px;
+}
+.pl-sub {
+  font-family: var(--sans);
+  font-size: 10px;
+  fill: #7c8a83;
+  letter-spacing: .22em;
+  text-anchor: middle;
+  stroke: #eef1ec;
+  stroke-width: 3px;
+  paint-order: stroke;
+}
+.sea-name {
+  font-family: var(--serif);
+  font-size: 13px;
+  fill: #a9b3b6;
+  letter-spacing: .4em;
+  text-anchor: middle;
+}
+
+/* ── 叠层文字 ─────────────────────────────────────────────── */
+.hero {
+  position: absolute;
+  top: 6.5vh;
+  left: 5.2vw;
+  pointer-events: none;
+}
+.hero h1 {
+  font-size: 44px;
+  letter-spacing: .34em;
+  color: #2a251c;
+  text-shadow: 0 1px 0 #fffdf7;
+}
+.hero .sub {
+  margin-top: 10px;
+  font-family: var(--serif);
+  font-size: 15px;
+  letter-spacing: .28em;
+  color: var(--gold);
+}
+.hero .lede {
+  margin-top: 18px;
+  max-width: 340px;
+  font-size: 13.5px;
+  line-height: 2;
+  color: var(--ink-2);
+}
+
+.legend {
+  position: absolute;
+  left: 5.2vw;
+  bottom: 5vh;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: .08em;
+}
+.legend i {
+  display: inline-block;
+  width: 22px;
+  height: 9px;
+  border-radius: 1px;
+  margin-right: 9px;
+  vertical-align: middle;
+  border: 1px solid rgba(0, 0, 0, .12);
+}
+.legend .sw-origin { background: #f0d99a; border-color: var(--gold-2); }
+.legend .sw-line { background: none; border: none; border-top: 1.6px solid #8a7b5e; height: 0; }
+.legend .sw-plateau { background: #dfe6e0; border-color: #7f7563; }
+
+.cta {
+  position: absolute;
+  right: 5.2vw;
+  bottom: 5.5vh;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  animation: rise .8s ease-out both;
+}
+.cta .hint { font-size: 12px; color: var(--muted); letter-spacing: .1em; }
+
+/* 姓名一行：不弹窗、不占地方，就在按钮上面 */
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: rgba(255, 253, 246, .92);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  box-shadow: var(--shadow-s);
+}
+.name-row label {
+  font-family: var(--serif);
+  font-size: 12.5px;
+  letter-spacing: .3em;
+  color: var(--gold);
+}
+.name-row input {
+  width: 170px;
+  padding: 4px 8px;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  font-family: var(--serif);
+  font-size: 16px;
+  letter-spacing: .12em;
+  color: var(--ink);
+  outline: none;
+  text-align: right;
+}
+.name-row input:focus { border-bottom-color: var(--gold-2); }
+.name-row input::placeholder { color: var(--muted-2); font-size: 13px; letter-spacing: .08em; }
+
+.cta-cont {
+  border: 1px solid var(--line-2);
+  background: rgba(255, 253, 246, .9);
+  padding: 9px 22px;
+  font-family: var(--serif);
+  font-size: 16px;
+  letter-spacing: .22em;
+  color: var(--ink-2);
+}
+.cta-cont small {
+  display: inline-block;
+  margin-left: 8px;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  letter-spacing: .06em;
+  color: var(--muted);
+}
+.cta-cont:hover { border-color: var(--gold-2); color: var(--gold); }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+.corner {
+  position: absolute;
+  top: 5.4vh;
+  right: 5.2vw;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12.5px;
+  color: var(--muted);
+  letter-spacing: .08em;
+}
+.corner .who { color: var(--gold); }
+
+/* ── 悬停题签 ─────────────────────────────────────────────── */
+.map-tip {
+  position: fixed;
+  z-index: 40;
+  min-width: 210px;
+  max-width: 300px;
+  padding: 12px 15px;
+  background: rgba(255, 253, 246, .97);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  box-shadow: var(--shadow-m);
+  pointer-events: none;
+  transform: translate(14px, 14px);
+}
+.map-tip .tn {
+  font-family: var(--serif);
+  font-size: 17px;
+  letter-spacing: .16em;
+  color: var(--ink);
+}
+.map-tip .ts {
+  margin-top: 3px;
+  font-size: 11.5px;
+  color: var(--muted);
+  letter-spacing: .1em;
+}
+.map-tip .tf {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  line-height: 1.85;
+  color: var(--ink-2);
+}
+
+@media (max-width: 900px) {
+  .hero h1 { font-size: 30px; }
+  .hero .lede { display: none; }
+  .legend { display: none; }
+}

@@ -1,0 +1,112 @@
+[
+  {
+    "no": 1,
+    "id": "id.meng",
+    "name": "蒙学生",
+    "kind": "学",
+    "age": [7, 10],
+    "req": [ { "stage": "meng" } ],
+    "benefit": "识字、锻体根基、通用凡品功法",
+    "duty": null,
+    "source": "需求/15 §1"
+  },
+  {
+    "no": 2,
+    "id": "id.fu",
+    "name": "府学生",
+    "kind": "学",
+    "age": [11, 14],
+    "req": [ { "stage": "fu" } ],
+    "benefit": "引气、选百艺、准备大考",
+    "duty": null,
+    "source": "需求/15 §1"
+  },
+  {
+    "no": 3,
+    "id": "id.tai",
+    "name": "太学生",
+    "kind": "学",
+    "age": [16, 19],
+    "req": [ { "stage": "tai" }, { "realm": { "dao": "qi", "gte": 2 } } ],
+    "benefit": "养灵认知障提前打开；法相那道门只有他们能敲",
+    "duty": null,
+    "source": "需求/15 §1 · 太学只招已破胎"
+  },
+  {
+    "no": 4,
+    "id": "id.soldier",
+    "name": "士兵",
+    "kind": "军",
+    "age": [18, 60],
+    "req": [ { "flag": "flag.office.army" } ],
+    "benefit": "有俸禄、有编制；**能主动出战**（平民不能）",
+    "duty": { "perYear": 1, "months": 3 },
+    "source": "需求/30 §7.1 · 出战是军职的特权"
+  },
+  {
+    "no": 5,
+    "id": "id.guard",
+    "name": "城卫",
+    "kind": "军",
+    "age": [20, 60],
+    "req": [ { "flag": "flag.office.army" }, { "gte": ["merit.war", 60] } ],
+    "benefit": "俸禄、城防战时有名额",
+    "duty": { "perYear": 1, "months": 3 },
+    "source": "需求/02 §5.1"
+  },
+  {
+    "no": 6,
+    "id": "id.squad",
+    "name": "队正",
+    "kind": "军",
+    "age": [20, 80],
+    "req": [ { "realm": { "dao": "qi", "gte": 4 } }, { "gte": ["merit.war", 200] } ],
+    "benefit": "领兵、战功系数 +20%",
+    "duty": { "perYear": 1, "months": 4 },
+    "source": "需求/02 §5.1"
+  },
+  {
+    "no": 7,
+    "id": "id.general",
+    "name": "将军",
+    "kind": "军",
+    "age": [25, 200],
+    "req": [ { "realm": { "dao": "qi", "gte": 4 } }, { "gte": ["merit.war", 800] }, { "gte": ["attr.heart.eff", 80] } ],
+    "benefit": "统兵，可主动出战；养灵修炼 +50%（灵量份额）",
+    "duty": { "perYear": 1, "months": 6 },
+    "source": "需求/02 §5.1"
+  },
+  {
+    "no": 8,
+    "id": "id.lord",
+    "name": "城主",
+    "kind": "政",
+    "age": [30, 400],
+    "req": [ { "realm": { "dao": "spirit", "gte": 1 } }, { "gte": ["attr.heart.eff", 90] }, { "gte": ["merit.office", 500] } ],
+    "benefit": "一城灵脉，养灵修炼 +200%",
+    "duty": { "perYear": 1, "months": 6 },
+    "source": "需求/02 §5.1"
+  },
+  {
+    "no": 9,
+    "id": "id.wanderer",
+    "name": "散修",
+    "kind": "民",
+    "age": [12, 120],
+    "req": [],
+    "benefit": "无税、无役，也没有人替你挡邪修",
+    "duty": null,
+    "source": "需求/02 §4.3"
+  },
+  {
+    "no": 10,
+    "id": "id.evil",
+    "name": "邪修",
+    "kind": "禁",
+    "age": [12, 120],
+    "req": [ { "flag": "flag.art.forbidden" } ],
+    "benefit": "破境快，人即生灵",
+    "duty": null,
+    "source": "需求/02 §4.4"
+  }
+]

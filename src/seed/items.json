@@ -1,0 +1,406 @@
+[
+  {
+    "no": 1,
+    "id": "item.peiyuan",
+    "name": "培元丹",
+    "kind": "丹药",
+    "use": true,
+    "price": {
+      "copper": 120
+    },
+    "duration": {
+      "kind": "years",
+      "value": 1
+    },
+    "mods": [
+      {
+        "target": "rate.month.all",
+        "op": "mul",
+        "value": 1.1
+      }
+    ],
+    "effect": "月修为 ×1.10，一年。",
+    "desc": "最普通的补药，也是穷人家孩子唯一吃得起的。",
+    "source": "需求/13 §4.2"
+  },
+  {
+    "no": 2,
+    "id": "item.guben",
+    "name": "固本丹",
+    "kind": "丹药",
+    "use": true,
+    "price": {
+      "copper": 200
+    },
+    "duration": {
+      "kind": "years",
+      "value": 1
+    },
+    "mods": [
+      {
+        "target": "rate.success.pill",
+        "op": "add",
+        "value": 0.05
+      }
+    ],
+    "effect": "当年破境成功率 +5%，与喂招合计上限 +13%。",
+    "desc": "当年破境成功率 +5%。不消墙，只让撞过去快一点。",
+    "source": "需求/11 §6 · 嗑药 +0.05"
+  },
+  {
+    "no": 3,
+    "id": "item.huichun",
+    "name": "回春丹",
+    "kind": "丹药",
+    "use": false,
+    "battleHeal": 30,
+    "price": {
+      "copper": 80
+    },
+    "effect": "战斗中血量 +30（自动服用一枚）。",
+    "desc": "穷人救命。80 铜里材料 50、工费 20，净利 10 铜。",
+    "source": "需求/13 §5.1 · 1 阶丹"
+  },
+  {
+    "no": 4,
+    "id": "item.wudao",
+    "name": "悟道丹",
+    "kind": "丹药",
+    "use": true,
+    "price": {
+      "gold": 2
+    },
+    "duration": {
+      "kind": "years",
+      "value": 1
+    },
+    "mods": [
+      {
+        "target": "attr.insight.eff",
+        "op": "add",
+        "value": 5
+      }
+    ],
+    "effect": "悟性 +5，一年。",
+    "desc": "炼气只认这类药——它涨的是脑子，不是骰子。",
+    "source": "需求/13 §4.3.0"
+  },
+  {
+    "no": 5,
+    "id": "item.xisui",
+    "name": "洗髓丹",
+    "kind": "丹药",
+    "use": true,
+    "price": {
+      "gold": 5
+    },
+    "duration": {
+      "kind": "permanent"
+    },
+    "mods": [
+      {
+        "target": "attr.aptitude.eff",
+        "op": "add",
+        "value": 3
+      }
+    ],
+    "effect": "资质 +3，永久。",
+    "desc": "贵不在那 3 点，在往后十几年的每一次判定都变了。",
+    "source": "需求/13 §4.2"
+  },
+  {
+    "no": 6,
+    "id": "item.yaoyu",
+    "name": "药浴",
+    "kind": "汤剂",
+    "use": true,
+    "price": {
+      "gold": 1
+    },
+    "duration": {
+      "kind": "permanent"
+    },
+    "mods": [
+      {
+        "target": "attr.aptitude.eff",
+        "op": "add",
+        "value": 1
+      }
+    ],
+    "effect": "资质 +1，永久（最多三次）。",
+    "desc": "三年药浴，一年一点。世家子弟的起跑线。",
+    "source": "需求/13 §4.2"
+  },
+  {
+    "no": 7,
+    "id": "item.tieJian",
+    "name": "铁剑",
+    "kind": "器物",
+    "use": false,
+    "price": {
+      "copper": 120
+    },
+    "mods": [
+      {
+        "target": "battle.atk",
+        "op": "add",
+        "value": 6
+      }
+    ],
+    "effect": "持有时攻击 +6。",
+    "desc": "凡器·粗制。谁都用得起，坏了不心疼。",
+    "source": "需求/13 §5.3 · 器物四档"
+  },
+  {
+    "no": 8,
+    "id": "item.baolian",
+    "name": "百炼剑",
+    "kind": "器物",
+    "use": false,
+    "price": {
+      "copper": 650
+    },
+    "mods": [
+      {
+        "target": "battle.atk",
+        "op": "mul",
+        "value": 1.15
+      }
+    ],
+    "effect": "持有时伤害 +15%。",
+    "desc": "凡器·精制。百炼的工时是粗制的三倍以上。",
+    "source": "需求/13 §5.3"
+  },
+  {
+    "no": 9,
+    "id": "item.yufu",
+    "name": "青玉护符",
+    "kind": "法器",
+    "mods": [
+      {
+        "target": "battle.shield",
+        "op": "add",
+        "value": 40
+      }
+    ],
+    "price": {
+      "silver": 3
+    },
+    "shop": true,
+    "use": false,
+    "effect": "常驻 40 点护盾（法力盾的器物来源）",
+    "source": "需求/13 §2 · 法器：护盾不是有法力就有，要有东西撑着"
+  },
+  {
+    "no": 10,
+    "id": "item.huxinjing",
+    "name": "玄铁护心镜",
+    "kind": "法器",
+    "mods": [
+      {
+        "target": "battle.shield",
+        "op": "add",
+        "value": 90
+      }
+    ],
+    "price": {
+      "gold": 2
+    },
+    "shop": true,
+    "use": false,
+    "effect": "常驻 90 点护盾",
+    "source": "需求/13 §2 · 法器"
+  },
+  {
+    "no": 11,
+    "id": "item.qingfeng",
+    "name": "轻身靴",
+    "kind": "法器",
+    "mods": [
+      {
+        "target": "battle.dodge",
+        "op": "add",
+        "value": 0.05
+      }
+    ],
+    "price": {
+      "silver": 2
+    },
+    "shop": true,
+    "use": false,
+    "effect": "闪避 +5%",
+    "source": "需求/30 §4.5 · 身法类器物"
+  },
+  {
+    "no": 12,
+    "id": "item.leifu",
+    "name": "雷火符",
+    "kind": "符箓",
+    "talisman": {
+      "power": 45
+    },
+    "price": {
+      "copper": 80
+    },
+    "shop": true,
+    "use": false,
+    "effect": "战前自动甩出，先炸一下（约 45 点，盾挡一半）",
+    "source": "需求/30 §6 · 符箓：低阶修士打高阶对手的翻盘手"
+  },
+  {
+    "no": 13,
+    "id": "craft.alchemy",
+    "name": "丹道成品",
+    "kind": "成品",
+    "price": {
+      "copper": 160
+    },
+    "shop": false,
+    "use": false,
+    "effect": "练艺出来的实物，能拿去坊市卖",
+    "source": "需求/13 §3 · 百艺的第一条收入线（产物比人低一品）"
+  },
+  {
+    "no": 14,
+    "id": "craft.forge",
+    "name": "器道成品",
+    "kind": "成品",
+    "price": {
+      "copper": 160
+    },
+    "shop": false,
+    "use": false,
+    "effect": "练艺出来的实物，能拿去坊市卖",
+    "source": "需求/13 §3 · 百艺的第一条收入线（产物比人低一品）"
+  },
+  {
+    "no": 15,
+    "id": "craft.talisman",
+    "name": "符道成品",
+    "kind": "成品",
+    "price": {
+      "copper": 160
+    },
+    "shop": false,
+    "use": false,
+    "effect": "练艺出来的实物，能拿去坊市卖",
+    "source": "需求/13 §3 · 百艺的第一条收入线（产物比人低一品）"
+  },
+  {
+    "no": 16,
+    "id": "craft.array",
+    "name": "阵道成品",
+    "kind": "成品",
+    "price": {
+      "copper": 160
+    },
+    "shop": false,
+    "use": false,
+    "effect": "练艺出来的实物，能拿去坊市卖",
+    "source": "需求/13 §3 · 百艺的第一条收入线（产物比人低一品）"
+  },
+  {
+    "no": 17,
+    "id": "craft.medicine",
+    "name": "医道成品",
+    "kind": "成品",
+    "price": {
+      "copper": 160
+    },
+    "shop": false,
+    "use": false,
+    "effect": "练艺出来的实物，能拿去坊市卖",
+    "source": "需求/13 §3 · 百艺的第一条收入线（产物比人低一品）"
+  },
+  {
+    "no": 18,
+    "id": "craft.planting",
+    "name": "灵植成品",
+    "kind": "成品",
+    "price": {
+      "copper": 160
+    },
+    "shop": false,
+    "use": false,
+    "effect": "练艺出来的实物，能拿去坊市卖",
+    "source": "需求/13 §3 · 百艺的第一条收入线（产物比人低一品）"
+  },
+  {
+    "no": 19,
+    "id": "craft.beast",
+    "name": "御兽成品",
+    "kind": "成品",
+    "price": {
+      "copper": 160
+    },
+    "shop": false,
+    "use": false,
+    "effect": "练艺出来的实物，能拿去坊市卖",
+    "source": "需求/13 §3 · 百艺的第一条收入线（产物比人低一品）"
+  },
+  {
+    "no": 20,
+    "id": "craft.puppet",
+    "name": "傀儡成品",
+    "kind": "成品",
+    "price": {
+      "copper": 160
+    },
+    "shop": false,
+    "use": false,
+    "effect": "练艺出来的实物，能拿去坊市卖",
+    "source": "需求/13 §3 · 百艺的第一条收入线（产物比人低一品）"
+  },
+  {
+    "no": 21,
+    "id": "craft.feast",
+    "name": "灵膳成品",
+    "kind": "成品",
+    "price": {
+      "copper": 160
+    },
+    "shop": false,
+    "use": false,
+    "effect": "练艺出来的实物，能拿去坊市卖",
+    "source": "需求/13 §3 · 百艺的第一条收入线（产物比人低一品）"
+  },
+  {
+    "no": 22,
+    "id": "craft.geomancy",
+    "name": "堪舆成品",
+    "kind": "成品",
+    "price": {
+      "copper": 160
+    },
+    "shop": false,
+    "use": false,
+    "effect": "练艺出来的实物，能拿去坊市卖",
+    "source": "需求/13 §3 · 百艺的第一条收入线（产物比人低一品）"
+  },
+  {
+    "no": 23,
+    "id": "craft.appraise",
+    "name": "鉴宝成品",
+    "kind": "成品",
+    "price": {
+      "copper": 160
+    },
+    "shop": false,
+    "use": false,
+    "effect": "练艺出来的实物，能拿去坊市卖",
+    "source": "需求/13 §3 · 百艺的第一条收入线（产物比人低一品）"
+  },
+  {
+    "no": 24,
+    "id": "craft.brew",
+    "name": "灵酿成品",
+    "kind": "成品",
+    "price": {
+      "copper": 160
+    },
+    "shop": false,
+    "use": false,
+    "effect": "练艺出来的实物，能拿去坊市卖",
+    "source": "需求/13 §3 · 百艺的第一条收入线（产物比人低一品）"
+  }
+]

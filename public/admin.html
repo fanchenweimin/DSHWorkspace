@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>配置 · 大曜问仙录</title>
+<link rel="stylesheet" href="styles/base.css" />
+<link rel="stylesheet" href="styles/admin.css" />
+</head>
+<body class="admin-page">
+
+<header class="top">
+  <div class="brand">配置<small>只有 sysadmin 看得到</small></div>
+  <div class="spacer"></div>
+  <a href="/">天下</a>
+  <a href="/game.html">游戏</a>
+  <button class="link" id="logout">退出</button>
+</header>
+
+<main class="cfg">
+  <nav class="nav" id="nav"></nav>
+
+  <section class="main">
+    <header class="toolbar">
+      <div class="tit">
+        <h2 id="fileName">—</h2>
+        <span class="meta" id="fileMeta"></span>
+      </div>
+      <div class="acts">
+        <div class="seg" id="seg">
+          <button data-view="form" class="is-on">表单</button>
+          <button data-view="raw">源码</button>
+        </div>
+        <button class="btn sm" id="btnRevert">放弃</button>
+        <button class="btn sm" id="btnReset">还原</button>
+        <button class="btn-primary xs" id="btnSave">保存</button>
+      </div>
+    </header>
+
+    <div class="tip" id="tip"></div>
+
+    <div class="formHost" id="formHost"></div>
+    <textarea id="raw" spellcheck="false" hidden></textarea>
+  </section>
+</main>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="js/form.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

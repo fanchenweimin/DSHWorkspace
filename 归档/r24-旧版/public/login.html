@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fbf8ef">
+  <title>登录 · 大曜问仙录</title>
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles/app.css">
+</head>
+<body>
+  <div class="auth-wrap">
+    <header class="topbar" style="border:none">
+      <a class="brand" href="/">
+        <span class="brand-seal">曜</span>
+        <span><p class="brand-name">大曜 · 景和</p></span>
+      </a>
+      <div class="topbar-spacer"></div>
+      <a class="chip" href="/">返回首页</a>
+    </header>
+
+    <main class="auth-card">
+      <p class="story-kicker">天机有锁</p>
+      <h1>登录</h1>
+      <p style="color:var(--muted);font-size:0.84rem;line-height:1.8">
+        普通游玩无需登录。只有管理员账号能看到隐藏属性、寿命与选项数值，并进入配置页。
+      </p>
+
+      <div id="alreadyLogged" class="auth-hint" hidden>
+        <p id="alreadyText"></p>
+        <a class="btn btn-small" href="/">回到首页</a>
+        <a class="btn btn-small" id="alreadyAdmin" href="/admin.html" hidden>进入配置</a>
+      </div>
+
+      <form id="loginForm">
+        <label for="username">账号</label>
+        <input id="username" name="username" autocomplete="username" required placeholder="sysadmin">
+        <label for="password">密码</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="请输入密码">
+        <p id="loginError" class="form-error" hidden></p>
+        <button type="submit" class="btn btn-primary">登录</button>
+      </form>
+
+      <div class="auth-hint">
+        <p><strong>默认账号</strong></p>
+        <p><code>sysadmin</code> / <code>sysadmin</code>：管理员，可看隐藏属性与配置。</p>
+        <p><code>user</code> / <code>useradmin</code>：普通账号，玩家视图。</p>
+      </div>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="/js/scenes/login/login.scene.js"></script>
+</body>
+</html>

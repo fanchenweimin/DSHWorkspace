@@ -1,0 +1,13 @@
+{
+  "fates": [
+    { "id": "fate.guxing", "name": "孤星", "desc": "六亲缘薄，遇事只有自己。气运下限 +5，上限 −5。", "mods": [ { "target": "luck.min", "op": "add", "value": 5 }, { "target": "luck.max", "op": "add", "value": -5 } ] },
+    { "id": "fate.ziwei", "name": "紫微", "desc": "生来像坐在灯下。气运上限 +8。", "mods": [ { "target": "luck.max", "op": "add", "value": 8 } ] },
+    { "id": "fate.jiangxing", "name": "将星", "desc": "临阵不乱。战事类事件权重 ×1.2。", "mods": [ { "target": "rate.war.weight", "op": "mul", "value": 1.2 } ] },
+    { "id": "fate.wenqu", "name": "文曲", "desc": "读书快。求学每次 +0.035（原 +0.03）。", "mods": [ { "target": "rate.study", "op": "add", "value": 0.005 } ] }
+  ],
+  "talents": [
+    { "id": "tal.guomu", "name": "过目不忘", "desc": "功法值 +10。", "mods": [ { "target": "gongfa.value", "op": "add", "value": 10 } ] },
+    { "id": "tal.shenli", "name": "天生神力", "desc": "资质 +8、悟性 −5。", "mods": [ { "target": "attr.aptitude.eff", "op": "add", "value": 8 }, { "target": "attr.insight.eff", "op": "add", "value": -5 } ] },
+    { "id": "tal.qingxin", "name": "心静如水", "desc": "心性衰减减半。", "mods": [ { "target": "rate.heart.decay", "op": "mul", "value": 0.5 } ] }
+  ]
+}
