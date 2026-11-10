@@ -313,6 +313,18 @@ function breakAct(state, payload) {
     return { ok: false, reason: '这一年这一道已经破过了。' };
   }
 
+  /* r40.2：**同一个瓶颈、同一年，只准冲一次**（需求/15 §1.3）。
+     这一段必须在 `commit` **之前**——否则失败也会扣 3 个月、写一条
+     「你闭关冲调息」的纪事，玩家一年能连点好几次，日志里看起来就像
+     "突破重复了"，而实际上境界一次都没动。
+     入门关豁免（体魄/感气那种，当年可以一直试）。 */
+  if (!isEntry && card.kind === 'prob') {
+    const tried = (state.path[dao].triedYear || {})[tier];
+    if (num(tried) === num(state.clock.year)) {
+      return { ok: false, reason: '这一品今年已经冲过了，等明年再来。' };
+    }
+  }
+
   /* ── 层级已到位 → 这一步是"真实境界突破" ──────────────
      r40：事件瓶颈先由事件通 lv，再在这里由玩家手动进品。
      概率瓶颈正常不会停在这个状态：它的判定与进品已在同一次点击里完成；

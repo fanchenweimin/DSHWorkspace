@@ -1816,6 +1816,78 @@ test('r40.1 突破名额：每道一年一次，各道分开算', () => {
   assert.ok(!e.turn.brokeThisYear || !e.turn.brokeThisYear.qi, '入门关不记账');
 });
 
+
+test('r40.2 同一个瓶颈：同年只准冲一次（失败也不给第二次）', () => {
+  const demo = require('../src/model/state/demo');
+  const turn = require('../src/model/systems/turn');
+  const realm = require('../src/model/rules/realm');
+  const rules = require('../src/model/repository/config').get('rules');
+
+  const mk = () => {
+    const s = demo.initial('测', { rng: () => 0.5 });
+    s.clock.age = 11;
+    s.education.stage = 'fu';
+    s.education.graduated = false;
+    s.flags = { edu: { meng: { done: true }, ganqi: { entered: true } }, study: {} };
+    s.turn = { mainDone: true };
+    s.path.body.level = 2;
+    s.path.body.lv = 2;
+    s.path.body.bar = rules.PROF.body[1];
+    return s;
+  };
+
+  /* ① 有墙 + 掷不过 → 失败，但**要记账**（以前 no_wall/失败都不记） */
+  const s = mk();
+  s.path.body.wall = { 3: true };
+  s.path.body.attempts = 1;                  /* 跳过首次必败 */
+  const r1 = realm.raiseLevel(s, { dao: 'body', tier: 3 }, { rules, rng: () => 0.999 });
+  assert.strictEqual(r1.ok, false, '该失败');
+  assert.strictEqual(s.path.body.level, 2, '境界没动');
+  assert.strictEqual(num(s.path.body.triedYear[3]), s.clock.year, '失败也要记账');
+
+  /* ② 同年再点：业务层直接拒，且**不扣月** */
+  const before = s.monthsUsed;
+  const r2 = turn.act(s, { kind: 'break', dao: 'body', tier: 3 });
+  assert.strictEqual(r2.ok, false, '同年不该再允许');
+  assert.ok(/今年已经冲过/.test(String(r2.reason || '')), r2.reason);
+  assert.strictEqual(s.monthsUsed, before, '被拒时不该扣月');
+
+  /* ③ **没墙（q 掷空）也要记账**：以前这一支直接返回，不留痕迹 */
+  const t = mk();
+  t.path.body.wall = { 3: false };           /* 没墙 */
+  const r3 = realm.raiseLevel(t, { dao: 'body', tier: 3 }, { rules, rng: () => 0.5 });
+  assert.strictEqual(r3.ok, true, '没墙该直接通');
+  assert.strictEqual(num(t.path.body.triedYear[3]), t.clock.year, '没墙也要记账');
+
+  /* ④ 入门关不受这条限制：同年可以一直试 */
+  const e = demo.initial('测2', { rng: () => 0.5 });
+  e.turn = {};
+  e.path.body.lv = 0;
+  e.path.body.level = 0;
+  e.path.body.wall = { 1: true };
+  for (let i = 0; i < 3; i += 1) {
+    const r = realm.raiseLevel(e, { dao: 'body', tier: 1 }, { rules, rng: () => 0.999 });
+    assert.notStrictEqual(r.why, 'one_per_year', '入门关不该被年份拦');
+  }
+  assert.ok(!e.path.body.triedYear || !e.path.body.triedYear[1], '入门关不记账');
+
+  /* ⑤ 跨年后恢复 */
+  const c = mk();
+  c.path.body.wall = { 3: true };
+  c.path.body.attempts = 1;
+  realm.raiseLevel(c, { dao: 'body', tier: 3 }, { rules, rng: () => 0.999 });
+  assert.ok(num(c.path.body.triedYear[3]) === c.clock.year);
+  c.path.body.triedYear = {};                /* rollYear 会清空 */
+  c.path.body.attempts = 2;
+  const r5 = realm.raiseLevel(c, { dao: 'body', tier: 3 }, { rules, rng: () => 0.999 });
+  assert.notStrictEqual(r5.why, 'one_per_year', '新的一年该放行');
+});
+
+function num(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
 /* ── 串起来跑 ───────────────────────────────────────── */
 (async () => {
   for (const [name, fn] of cases) {

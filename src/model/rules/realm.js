@@ -335,6 +335,14 @@ function raiseLevel(state, params, ctx) {
   if (path.wall[tier] === undefined) path.wall[tier] = rng() < q;   // 一品只掷一次
 
   if (!path.wall[tier]) {
+    /* r40.2：**没墙也要记"今年试过"**。
+       以前只有"有墙、真掷了"才记账，于是 `q=0` 的人当年可以直接进品、
+       脸上不留痕迹——再点下一个瓶颈又通一次，看起来就是"一年破好几次"。
+       没墙是运气好，不是白名单：它照样吃掉这一年的这一道。 */
+    if (!isEntry) {
+      path.triedYear = path.triedYear || {};
+      path.triedYear[tier] = num(state.clock && state.clock.year);
+    }
     setLv(tier);
     return { ok: true, why: 'no_wall', q };
   }
