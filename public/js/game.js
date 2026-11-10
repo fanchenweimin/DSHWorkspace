@@ -453,7 +453,6 @@
     const host = $('comRow');
     const list = [];
     const rows = DATA.commissions || [];
-    const opened = !!(DATA.market && DATA.market.length) || state.comOffer;
 
     for (const c of rows) {
       /* 14 岁前没百艺 → 整块不出现（需求/15 §1.2） */

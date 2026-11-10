@@ -1658,6 +1658,29 @@ test('r39 接口：payload 必须带 events 数组（老前端按数组读）', 
   assert.strictEqual(table.events[0].id, table.main.id);
 });
 
+
+test('r39.2 前端 render() 不许抛异常，且开局能画出主事件卡', () => {
+  const { payloadFor, runRender } = require('./frontend-harness');
+
+  /* 7 岁：开局那张强制事件必须真的画出来（之前被一个未定义变量整页吃掉） */
+  const mk = runRender(payloadFor(7));
+  const html = mk('mainCards').innerHTML;
+
+  assert.ok(html.length > 100, '主事件卡该有内容，实际 ' + html.length + ' 字');
+  assert.ok(html.includes('头一天进蒙学'), '7 岁该画出「头一天进蒙学」');
+  assert.ok(html.includes('站直了让他看'), '该有一个可点的选项');
+  assert.strictEqual(mk('bandMain').hidden, false, '主事件块不该藏起来');
+});
+
+test('r39.2 前端 render()：14 岁前后、无主卡时也不抛', () => {
+  const { payloadFor, runRender } = require('./frontend-harness');
+
+  /* 14 岁（有百艺） */
+  assert.doesNotThrow(() => runRender(payloadFor(14)), '14 岁渲染不该抛');
+  /* 20 岁（学籍 none，无主卡） */
+  assert.doesNotThrow(() => runRender(payloadFor(20)), '20 岁渲染不该抛');
+});
+
 /* ── 串起来跑 ───────────────────────────────────────── */
 (async () => {
   for (const [name, fn] of cases) {
