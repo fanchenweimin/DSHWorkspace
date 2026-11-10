@@ -53,6 +53,9 @@ function publicState(state) {
   for (const dao of ['body', 'qi', 'spirit', 'heart']) {
     const p = state.path[dao];
     const level = Number(p.level) || 0;
+    /* r39：`lv` 是层级（门通到第几层），可以**超前于** level。
+       界面靠它判断"这道门通了没有"，所以必须发出去。 */
+    const lv = Number(p.lv != null ? p.lv : p.level) || 0;
     const tier = level + 1;
     const prof = rules.PROF[dao] || [];
     const cap = realm.barMax(state, dao, rules);
@@ -62,6 +65,9 @@ function publicState(state) {
 
     path[dao] = {
       level,
+      lv,
+      /* 层级到位 = 只剩"点不点突破"；没到位 = 还要先冲这道门 */
+      levelReady: lv >= tier,
       bar: round1(p.bar),
       barMax: cap == null ? null : round1(cap),
       /* 入门关（第 1 品）没有修为条；品内突破要先把修为练满 */
@@ -169,12 +175,19 @@ function payload(req, gid, state, extra) {
     /* r35：角色卡也要按 viewer 裁——隐藏属性 / 寿命只给 sysadmin（设计/40 §1.1） */
     state: cropState(publicState(state), viewer),
     main: table.main ? cropEvent(mainFor(state), viewer) : null,
+    /* r39：`events` 是 main 的数组形态（老前端按数组读），别再漏掉 */
+    events: table.events ? cropEvents(mainFor(state) ? [mainFor(state)] : [], viewer) : [],
     breaks: table.breaks,
     train: table.train,
     arts: table.arts,
     spells: table.spells,
+    /* r39：法术分"练"与"学"两份，界面各画一栏 */
+    spellPractice: table.spellPractice || [],
+    spellLearn: table.spellLearn || [],
     artAge: table.artAge,
     actions: cropActions(table.actions),
+    /* r39：委托与百艺挂钩，每门一条线 */
+    commissions: require('../model/systems/commission').available(state),
     market: turn.marketOf(state),
     bag: bagOf(state),
     locked: table.locked,
@@ -210,7 +223,8 @@ async function act(req, res) {
     choice: body.choice,
     dao: body.dao,
     tier: body.tier,
-    mode: body.mode
+    mode: body.mode,
+    art: body.art          /* r39：委托要用它选是哪门百艺 */
   });
 
   if (result.ok) running.save(gid, state);

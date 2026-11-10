@@ -15,8 +15,26 @@
 
 const DEFAULT_NAME = '沈砚';
 
+/**
+ * 一道的状态（r36）。
+ *
+ * **`level` 与 `lv` 是两件事**（需求/11 §1.3）：
+ *   - `level` = **境界**，站到第几品。只有 `commitTier()` 能写，进品才变。
+ *   - `lv`    = **层级**，这道门的关窍通到第几层。可能**超前于** `level`
+ *               （事件先到、玩家还没点突破）。
+ *
+ * 所以「能突破但不突破」是合法状态：`lv >= level + 1` 而 `level` 没动。
+ */
 function pathState() {
-  return { level: 0, bar: 0, attempts: 0, fail: 0, wall: {}, study: {} };
+  return {
+    level: 0,        /* 境界（站在第几品） */
+    lv: 0,           /* 层级（门通到第几层） */
+    bar: 0,
+    attempts: 0,
+    fail: 0,
+    wall: {},
+    study: {}
+  };
 }
 
 /**
@@ -174,7 +192,8 @@ function initial(name, opts) {
 
   return {
     name: nm,
-    clock: { age: 10, year: 309, month: 1 },
+    /* r38：**七岁开局，刚入蒙学**（需求/15 §1）。开局年份 309，战争按年龄推（30 岁 = 332 年）。 */
+    clock: { age: 7, year: 309, month: 1 },
     lifespan: 72,
     zone: 'city',
     luck: roll.luck,
@@ -209,10 +228,10 @@ function initial(name, opts) {
     spiritMass: { own: 0, city: 0 },
     turn: { breakthroughUsed: false },
     log: [
-      '大曜历三〇九年，你十岁，在蒙学坐第三排。',
-      roll.aptitude >= 75 ? '先生说你筋骨长得快，是块练武的料。'
-        : roll.aptitude >= 55 ? '先生说你筋骨长得不算慢。'
-          : '先生说你筋骨单薄，得多吃些。',
+      '大曜历三〇九年，你七岁，第一天进蒙学。',
+      roll.aptitude >= 75 ? '先生让你站直了看，说你筋骨长得快，是块练武的料。'
+        : roll.aptitude >= 55 ? '先生让你站直了看，说你筋骨长得不算慢。'
+          : '先生让你站直了看，说你筋骨单薄，得多吃些。',
       roll.insight >= 75 ? '你背书过目不忘，先生很满意。'
         : roll.insight >= 55 ? '你背书不快也不慢。'
           : '你背书总要比别人多念三遍。',

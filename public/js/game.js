@@ -52,16 +52,21 @@
     $('charName').textContent = S.name;
     $('charSub').textContent = `${S.stage} · ${S.identity.name} · ${S.clock.age} 岁`;
 
-    $('paths').innerHTML = DAO.map(([dao, name, barName]) => {
+    /* r36：**没涉及到的境界整行隐藏**（设计/40 §3.2.1）。
+       判据：这一道连品都没入（level === 0）→ 玩家还没有这个能力 → 不画。
+       注意这跟"灰着"不同：灰着是"够得着但条件没满足"，隐藏是"还没有"。 */
+    $('paths').innerHTML = DAO.filter(([dao]) => {
+      const p = S.path[dao] || {};
+      return (p.level || 0) > 0;
+    }).map(([dao, name, barName]) => {
       const p = S.path[dao];
       const lv = p.level || 0;
       const max = p.barMax || 0;
       const full = max > 0 && p.bar >= max - 0.001;
-      const label = lv === 0 ? `→ ${p.nextTitle || '—'}` : (TIERS[dao][lv - 1] || '—');
+      const label = TIERS[dao][lv - 1] || '—';
 
       let meta;
       if (p.top) meta = '这一道已经到顶';
-      else if (lv === 0) meta = '还没进这一品';
       else if (full) meta = p.nextTitle ? `修为已满 · 只差「${p.nextTitle}」` : '修为已满';
       else meta = `${Math.round(p.bar)} / ${max || '—'}`;
 
@@ -72,17 +77,26 @@
       return `<div class="path">
         <div class="path-top">
           <span class="path-name">${name}<em>${barName}</em></span>
-          <span class="path-lv ${lv === 0 ? 'is-zero' : ''}">${esc(label)}</span>
+          <span class="path-lv">${esc(label)}</span>
         </div>
         ${bar}
         <div class="path-meta">${esc(meta)}</div>
       </div>`;
     }).join('');
 
-    $('attrs').innerHTML = [
-      ['资质', S.attr.aptitude], ['悟性', S.attr.insight],
-      ['心性', S.attr.heart], ['气运', S.luck]
-    ].map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('');
+    /* r35：隐藏属性只给 sysadmin。玩家拿到的 state 里没有 attr / luck，
+       所以整块「资质/悟性/心性/气运」直接不画（不是画成 "--"）。 */
+    const attrs = $('attrs');
+    if (S.attr && typeof S.attr === 'object') {
+      attrs.innerHTML = [
+        ['资质', S.attr.aptitude], ['悟性', S.attr.insight],
+        ['心性', S.attr.heart], ['气运', S.luck]
+      ].map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('');
+      attrs.hidden = false;
+    } else {
+      attrs.innerHTML = '';
+      attrs.hidden = true;
+    }
   }
 
   /* ── 左栏：法术 / 百艺的进度 ──────────────────────────────
@@ -297,31 +311,41 @@
     const host = $('spellRow');
     const list = [];
 
-    for (const s of DATA.spells || []) {
+    /* r39：后端已经分好两份——`spellPractice`（已学，怎么练）与 `spellLearn`（今天能学）。
+       老接口只给 `spells` 时退回去按 known 自己分。 */
+    const practice = DATA.spellPractice || (DATA.spells || []).filter((s) => s.known);
+    const learn = DATA.spellLearn || (DATA.spells || []).filter((s) => !s.known);
+
+    for (const s of practice) {
       /* 阶必须写在品阶前面（r34）：一个"黄下"看不出是 1 阶还是 2 阶 */
       const gname = `${s.jie} 阶 · ${s.tier}`;
       const months = s.months || 3;
       const over = months > S.monthsLeft;
       const base = busy || S.monthsLeft <= 0;
 
-      if (s.known) {
-        if (!s.need) continue;                   /* 到圆满就不画（没得练了） */
-        const note = s.usable
-          ? (s.effLabel ? ` · 现为 ${s.effLabel}` : '')
-          : ' · 入门放不出来';
-        /* 练法术可以练到一半（剩几个月就练几个月），只有"一点月都没有"才灰 */
-        const part = over ? ` · 今年只剩 ${S.monthsLeft} 月，先练这些` : '';
-        list.push(`<button class="chip" data-kind="spell" data-id="${esc(s.id)}"
-          data-card="sp:${esc(s.id)}" ${base ? 'disabled' : ''}
-          title="${esc(s.desc || '')}">
-          <span class="chip-name">${esc(s.name)}<em>${esc(gname)} · ${esc(s.lvlName)}</em></span>
-          <span class="chip-meta">练满一档 ${monthsText(months)}${esc(note)}${esc(part)}</span>
-          <span class="chip-bar"><i style="width:${pct(s.exp, s.need)}%"></i></span>
-        </button>`);
-        continue;
-      }
+      if (!s.need) continue;                   /* 到圆满就不画（没得练了） */
+      const note = s.usable
+        ? (s.effLabel ? ` · 现为 ${s.effLabel}` : '')
+        : ' · 入门放不出来';
+      /* 练法术可以练到一半（剩几个月就练几个月），只有"一点月都没有"才灰 */
+      const part = over ? ` · 今年只剩 ${S.monthsLeft} 月，先练这些` : '';
+      list.push(`<button class="chip" data-kind="spell" data-id="${esc(s.id)}"
+        data-card="sp:${esc(s.id)}" ${base ? 'disabled' : ''}
+        title="${esc(s.desc || '')}">
+        <span class="chip-name">${esc(s.name)}<em>${esc(gname)} · ${esc(s.lvlName)}</em></span>
+        <span class="chip-meta">练满一档 ${monthsText(months)}${esc(note)}${esc(part)}</span>
+        <span class="chip-bar"><i style="width:${pct(s.exp, s.need)}%"></i></span>
+      </button>`);
+    }
 
-      /* 没学的：把"去哪学、要什么"写清楚；条件不够就灰着说明原因 */
+    for (const s of learn) {
+      const gname = `${s.jie} 阶 · ${s.tier}`;
+      const months = s.months || 3;
+      const over = months > S.monthsLeft;
+      const base = busy || S.monthsLeft <= 0;
+
+      /* 没学的：把"去哪学、要什么"写清楚；条件不够就灰着说明原因。
+         r39：**境界不够的、没来路的，后端已经不发了**——能到这里的就是"今天能学"。 */
       const locked = !!s.locked;
       const poor = locked || !s.sourceOk;
       const why = locked ? s.lockHint : (s.sourceOk ? '' : s.sourceWhy);
@@ -424,6 +448,44 @@
     host.innerHTML = show ? list.join('') : '';
   }
 
+  /* ── 六半、委托（r39）：一门百艺一条线 ───────────────── */
+  function renderCommissions() {
+    const host = $('comRow');
+    const list = [];
+    const rows = DATA.commissions || [];
+    const opened = !!(DATA.market && DATA.market.length) || state.comOffer;
+
+    for (const c of rows) {
+      /* 14 岁前没百艺 → 整块不出现（需求/15 §1.2） */
+      if (S.age < 14) break;
+
+      const over = c.months > S.monthsLeft;
+      const base = busy || S.monthsLeft <= 0;
+
+      if (!c.unlocked) {
+        /* 手艺不够：**灰着写明原因**（r34 的门摆在明面上），不藏 */
+        list.push(`<button class="chip chip-buy is-lock" disabled
+          title="${esc(c.desc)}">
+          <span class="chip-name">${esc(c.name)}<em>要 ${c.need} 档</em></span>
+          <span class="chip-meta">${esc(c.lockedWhy)}</span>
+        </button>`);
+        continue;
+      }
+
+      const risk = c.outing ? ' · 出城' : '';
+      list.push(`<button class="chip" data-kind="commission" data-id="${esc(c.art)}"
+        data-card="com:${esc(c.art)}" ${base || over ? 'disabled' : ''}
+        title="${esc(c.desc)}">
+        <span class="chip-name">${esc(c.name)}<em>${esc(c.art)} · 第 ${c.lv} 档</em></span>
+        <span class="chip-meta">正活 ${c.main.pay} 铜${risk} · ${monthsText(c.months)}${over ? ' · 月不够' : ''}</span>
+      </button>`);
+    }
+
+    const show = !S.dead && !DATA.locked && S.age >= 14 && list.length > 0;
+    $('bandCom').hidden = !show;
+    host.innerHTML = show ? list.join('') : '';
+  }
+
   /* ── 六、坊市（买 + 卖） ──────────────────────────────── */
   function renderMarket() {
     const buyHost = $('marketRow');
@@ -463,12 +525,16 @@
   }
 
   function renderSituation() {
+    /* r35：寿元只给 sysadmin（设计/40 §1.1）。玩家拿不到就整行不画。 */
+    const lifespanRow = (S.lifespan != null)
+      ? `<div><span>寿元</span><b>${S.lifespan}</b></div>`
+      : '';
     $('situation').innerHTML =
       `<div><span>所在</span><b>${esc(ZONE[S.zone] || '路上')}</b></div>
        <div><span>局势</span><b>${WAR[S.war] || S.war}</b></div>
        <div><span>声望</span><b>${S.reputation}</b></div>
        <div><span>军功</span><b>${S.merit.war}</b></div>
-       <div><span>寿元</span><b>${S.lifespan}</b></div>
+       ${lifespanRow}
        ${S.injury ? '<div><span>身体</span><b class="is-bad">带伤 · 修得慢</b></div>' : ''}`;
   }
 
@@ -484,6 +550,7 @@
     renderSpells();
     renderArts();
     renderActs();
+    renderCommissions();
     renderMarket();
     renderLog();
     renderSituation();
@@ -704,6 +771,7 @@
     else if (kind === 'sell') act({ kind: 'sell', id }, key);
     else if (kind === 'wait') act({ kind: 'wait' }, key);
     else if (kind === 'action') act({ kind: 'action', id }, key);
+    else if (kind === 'commission') act({ kind: 'action', id: 'act.commission', art: id }, key);
   }
 
   function wire() {

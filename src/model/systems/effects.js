@@ -327,6 +327,54 @@ const OPS = {
     throw new EffectError('roll 尚未实现：缺 tables 数据源（设计/04 §9）');
   },
 
+  /**
+   * 掷一次概率，把结果写进 `$last.ok`（r35）。
+   *
+   * 为什么不是 `judge(attr)`：`judgeAttr` 的公式是 `0.5 + (a−b)×scale`，
+   * 想表达"三成概率"得让 `a−b` 恰好凑出 −0.2，写起来不可读、也容易被改坏。
+   * 这个算子只做一件事：**按给定概率掷一次**。
+   *
+   * 参数：{ p: 0.3 } 或 { chance: 0.3 }
+   */
+  random(arg, ctx) {
+    const raw = (arg && (arg.p != null ? arg.p : arg.chance)) != null
+      ? (arg.p != null ? arg.p : arg.chance)
+      : 0.5;
+    const p = Math.min(1, Math.max(0, num(valueOf(raw, ctx))));
+    const roll = ctx.rng();
+    return { ok: roll < p, why: 'random', p, roll };
+  },
+
+  /**
+   * 学会一门术法（r35，需求/12 §0.1.2 奇遇来源）。
+   *
+   * 为什么不写 `set: ['spells.$arg.spell.lvl', 0]`：
+   * 路径会被按点号拆成段，`$arg.spell` 里的点让拼接塌掉（实测写成空键）。
+   * 所以给一个专门的算子——**它一次只做一件事：把这门术法记成已学**。
+   *
+   * 参数：{ spell: 'spell.xxx', lvl?: 0 }   lvl 默认 0（入门，放不出来）
+   * 已学过就不动（奇遇不降级）。
+   */
+  learn(arg, ctx) {
+    const id = ident(arg && arg.spell, ctx);
+    if (!id || id.startsWith('$arg')) throw new EffectError(`learn 缺 spell：${id}`);
+    const lvl = num(valueOf(arg.lvl != null ? arg.lvl : 0, ctx));
+
+    const spells = require('../rules/spells');
+    const all = spells.list();
+    const def = all.find((s) => s.id === id);
+    if (!def) throw new EffectError(`没有这门术法：${id}`);
+
+    ctx.state.spells = ctx.state.spells || {};
+    if (ctx.state.spells[id]) {
+      note(ctx, '这门你早就学过了');
+      return { ok: true, spell: id, already: true };
+    }
+    ctx.state.spells[id] = { lvl, exp: 0 };
+    note(ctx, `学会「${def.name || id}」`);
+    return { ok: true, spell: id, lvl, already: false };
+  },
+
   call(arg, ctx) {
     const name = ident(arg.macro, ctx);
     const macro = (ctx.macros || {})[name];
@@ -354,7 +402,16 @@ const OPS = {
     }
     const kind = String(arg.kind || '');
 
-    if (kind === 'break') return realm.judgeBreak(ctx.state, params, ctx);
+    /* r36：`kind` 只认三种字面量（raise / break / attr），**不做 $arg 替换**——
+       它是"判定器名字"，不是值。所以事件通道由 `byEvent` 参数决定，不靠 kind。 */
+    const byEventRaw = arg.byEvent != null ? valueOf(arg.byEvent, ctx) : params.byEvent;
+    const byEvent = byEventRaw === true || byEventRaw === 'true';
+
+    if (kind === 'raise') return realm.raiseLevel(ctx.state, { ...params, byEvent: true }, ctx);
+    if (kind === 'break') {
+      /* 概率瓶颈走这条；带上 byEvent 时，raiseLevel 会按事件通道处理 */
+      return realm.raiseLevel(ctx.state, { ...params, byEvent }, ctx);
+    }
     if (kind === 'attr') return judgeAttr(params, ctx);
 
     /* 战斗：三层结算在 rules/battle.js，这里只把战报写进纪事 */

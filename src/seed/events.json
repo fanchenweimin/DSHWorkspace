@@ -1,29 +1,84 @@
 [
   {
     "no": 1,
-    "id": "evt.edu.graduate.meng",
-    "title": "蒙学卒试",
-    "desc": "四年蒙学读到头了。先生把名册摊在桌上，念到名字的上前应考。",
+    "id": "evt.edu.enter.meng",
+    "title": "头一天进蒙学",
+    "desc": "先生让你站直了看。他说：筋骨开没开，一眼就知道。",
     "nature": "主线",
-    "priority": 2,
+    "priority": 1,
     "weight": 0,
     "forced": true,
-    "months": 1,
+    "months": 3,
     "when": [
       {
-        "stage": "meng"
+        "eq": [
+          "clock.age",
+          7
+        ]
       },
       {
-        "gte": [
-          "clock.age",
-          10
+        "none": [
+          {
+            "flag": "flag.edu.meng.entered"
+          }
         ]
       }
     ],
     "choices": [
       {
-        "id": "sit",
-        "label": "应考",
+        "id": "stand",
+        "label": "站直了让他看",
+        "hint": "这一关要过一次判定。成了就站在体魄上；没成也还能再试。",
+        "do": [
+          {
+            "flag": {
+              "id": "flag.edu.meng.entered",
+              "value": true
+            }
+          },
+          {
+            "call": {
+              "macro": "macro.break.attempt",
+              "args": {
+                "dao": "body",
+                "tier": 1,
+                "byEvent": true
+              }
+            }
+          },
+          {
+            "log": "先生在你肩上按了一把，说：去吧，跟得上。"
+          }
+        ]
+      }
+    ],
+    "source": "r39 · 7 岁进蒙学（需求/15 §1.1）"
+  },
+  {
+    "no": 2,
+    "id": "evt.edu.graduate.meng",
+    "title": "蒙学毕业",
+    "desc": "四年蒙学，今天是最后一天。先生把书箱还给你，说：府学在城东。",
+    "nature": "主线",
+    "priority": 1,
+    "weight": 0,
+    "forced": true,
+    "months": 1,
+    "when": [
+      {
+        "eq": [
+          "clock.age",
+          10
+        ]
+      },
+      {
+        "stage": "meng"
+      }
+    ],
+    "choices": [
+      {
+        "id": "leave",
+        "label": "收拾书箱，去府学",
         "do": [
           {
             "set": [
@@ -38,96 +93,36 @@
             }
           },
           {
-            "log": "先生在你的名册上画了一个圈。你去府学报到那天，换了身新衣裳。"
-          }
-        ]
-      },
-      {
-        "id": "stay",
-        "label": "再读一年",
-        "do": [
-          {
-            "log": "你又坐回那张矮桌。"
+            "log": "你背着书箱走出蒙学的门。府学在城东，比这里大得多。"
           }
         ]
       }
     ],
-    "source": "需求/15 §1 · 蒙学 4 年"
-  },
-  {
-    "no": 2,
-    "id": "evt.edu.graduate.fu",
-    "title": "府学卒业",
-    "desc": "府学四年也完了。这一场考完，要么进太学，要么就此出去讨生活。",
-    "nature": "主线",
-    "priority": 2,
-    "weight": 0,
-    "forced": true,
-    "months": 1,
-    "when": [
-      {
-        "stage": "fu"
-      },
-      {
-        "gte": [
-          "clock.age",
-          14
-        ]
-      }
-    ],
-    "choices": [
-      {
-        "id": "leave",
-        "label": "收拾书箱",
-        "do": [
-          {
-            "set": [
-              "education.stage",
-              "none"
-            ]
-          },
-          {
-            "flag": {
-              "id": "flag.edu.fu.done",
-              "value": true
-            }
-          },
-          {
-            "log": "四年府学，到此为止。明年十五，要考一场大的。"
-          }
-        ]
-      },
-      {
-        "id": "stay",
-        "label": "再留一年",
-        "do": [
-          {
-            "log": "你又把《引气篇》抄了一遍。"
-          }
-        ]
-      }
-    ],
-    "source": "需求/15 §1 · 府学 4 年"
+    "source": "r39 · 10 岁蒙学毕业（没有\"再读一年\"）"
   },
   {
     "no": 3,
     "id": "evt.edu.exam.great",
     "title": "大考",
-    "desc": "十五岁这年有一次大考。台上坐着学正，台下站着一排和你差不多大的孩子。",
+    "desc": "府学三年一次的对比试。考完就散，成绩进档。",
     "nature": "主线",
-    "priority": 2,
+    "priority": 1,
     "weight": 0,
     "forced": true,
-    "months": 2,
+    "months": 6,
     "when": [
       {
-        "gte": [
+        "eq": [
           "clock.age",
           15
         ]
       },
       {
-        "notFlag": "flag.edu.exam.great"
+        "none": [
+          {
+            "flag": "flag.edu.exam.great"
+          }
+        ]
       }
     ],
     "choices": [
@@ -147,25 +142,22 @@
                 {
                   "gte": [
                     "path.qi.level",
-                    4
+                    3
                   ]
                 }
               ],
               "then": [
                 {
-                  "add": [
-                    "reputation.eff",
-                    10
-                  ]
-                },
-                {
                   "flag": {
-                    "id": "flag.exam.rank",
+                    "id": "flag.edu.exam.rank",
                     "value": "上等"
                   }
                 },
                 {
-                  "log": "榜下人头攒动。你的名字在第三行，上等。"
+                  "add": [
+                    "reputation.eff",
+                    8
+                  ]
                 }
               ],
               "else": [
@@ -181,94 +173,68 @@
                     ],
                     "then": [
                       {
-                        "add": [
-                          "reputation.eff",
-                          5
-                        ]
-                      },
-                      {
                         "flag": {
-                          "id": "flag.exam.rank",
+                          "id": "flag.edu.exam.rank",
                           "value": "中等"
                         }
                       },
                       {
-                        "log": "中等。不算出挑，也够看了。"
+                        "add": [
+                          "reputation.eff",
+                          4
+                        ]
                       }
                     ],
                     "else": [
+                      {
+                        "flag": {
+                          "id": "flag.edu.exam.rank",
+                          "value": "下等"
+                        }
+                      },
                       {
                         "add": [
                           "reputation.eff",
                           1
                         ]
-                      },
-                      {
-                        "flag": {
-                          "id": "flag.exam.rank",
-                          "value": "下等"
-                        }
-                      },
-                      {
-                        "log": "下等。先生拍了拍你的肩，没说什么。"
                       }
                     ]
                   }
                 }
               ]
             }
-          }
-        ]
-      },
-      {
-        "id": "skip",
-        "label": "称病不考",
-        "do": [
-          {
-            "flag": {
-              "id": "flag.edu.exam.great",
-              "value": true
-            }
           },
           {
-            "flag": {
-              "id": "flag.exam.rank",
-              "value": "缺考"
-            }
-          },
-          {
-            "add": [
-              "reputation.eff",
-              -5
-            ]
-          },
-          {
-            "log": "你在家里躺了两天。第三天，榜出来了。"
+            "log": "考完了。你站在府学的院子里，等放榜。"
           }
         ]
       }
     ],
-    "source": "需求/15 §1 · 大考（15 岁，只考不判入学）"
+    "source": "r39 · 15 岁大考（没有\"称病不考\"）"
   },
   {
     "no": 4,
     "id": "evt.edu.enter.tai",
     "title": "太学放榜",
-    "desc": "太学的门槛比府学高得多。祭酒只看两样：气机稳不稳，脑子清不清。",
+    "desc": "太学的名额下来了。榜上有名的，去太学；没有的，自己去谋生路。",
     "nature": "主线",
-    "priority": 2,
+    "priority": 1,
     "weight": 0,
     "forced": true,
     "months": 1,
     "when": [
       {
-        "gte": [
+        "eq": [
           "clock.age",
           16
         ]
       },
       {
-        "notFlag": "flag.edu.decided"
+        "none": [
+          {
+            "flag": "flag.edu.decided"
+          }
+        ]
       }
     ],
     "choices": [
@@ -277,12 +243,13 @@
         "label": "入太学",
         "when": [
           {
-            "realm": {
-              "dao": "qi",
-              "gte": 2
-            }
+            "gte": [
+              "path.qi.level",
+              2
+            ]
           }
         ],
+        "hint": "要炼气·破胎才进得去。进去之后是四年。",
         "do": [
           {
             "set": [
@@ -305,22 +272,29 @@
           {
             "add": [
               "reputation.eff",
-              8
+              6
             ]
           },
           {
-            "log": "十六岁这年，你进了太学。同届五百人，个个都是破过胎的。"
+            "log": "你在太学的名册上按了手印。"
           }
         ]
       },
       {
-        "id": "assign",
-        "label": "接受分配",
+        "id": "decline",
+        "label": "不去",
+        "hint": "不欠太学，也不受它管。从此自己走。",
         "do": [
           {
             "set": [
               "education.stage",
               "none"
+            ]
+          },
+          {
+            "set": [
+              "education.graduated",
+              true
             ]
           },
           {
@@ -331,28 +305,28 @@
           },
           {
             "flag": {
-              "id": "flag.edu.assigned",
-              "value": true
+              "id": "flag.edu.tai",
+              "value": false
             }
           },
           {
-            "log": "没有破胎，就进不了那道门。名册上你的名字后面写着「分发」。"
+            "log": "你把名册推了回去。走出门的时候，天很亮。"
           }
         ]
       }
     ],
-    "source": "需求/15 §1 · 入学判定（16 岁，看有没有破胎）"
+    "source": "r39 · 16 岁入太学判定（唯一可\"不进\"的节点）"
   },
   {
     "no": 5,
-    "id": "evt.edu.graduate.tai",
-    "title": "太学卒业",
-    "desc": "太学四年，读到头了。祭酒在门口送你们，说往后各自珍重。",
+    "id": "evt.edu.tai.study",
+    "title": "太学的第一个半年",
+    "desc": "太学不讲功法，讲\"灵\"。你听不太懂，但记了下来。",
     "nature": "主线",
-    "priority": 2,
+    "priority": 1,
     "weight": 0,
     "forced": true,
-    "months": 1,
+    "months": 6,
     "when": [
       {
         "stage": "tai"
@@ -360,8 +334,61 @@
       {
         "gte": [
           "clock.age",
-          20
+          16
         ]
+      },
+      {
+        "none": [
+          {
+            "flag": "flag.edu.tai.studied"
+          }
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "listen",
+        "label": "听下去",
+        "do": [
+          {
+            "flag": {
+              "id": "flag.edu.tai.studied",
+              "value": true
+            }
+          },
+          {
+            "add": [
+              "path.qi.bar",
+              60
+            ]
+          },
+          {
+            "log": "半年下来，你终于能听懂一半。"
+          }
+        ]
+      }
+    ],
+    "source": "r39 · 16 岁太学学习（需求/15 §1.1）"
+  },
+  {
+    "no": 6,
+    "id": "evt.edu.graduate.tai",
+    "title": "太学卒业",
+    "desc": "四年过去了。今天散学，各奔东西。",
+    "nature": "主线",
+    "priority": 1,
+    "weight": 0,
+    "forced": true,
+    "months": 1,
+    "when": [
+      {
+        "eq": [
+          "clock.age",
+          19
+        ]
+      },
+      {
+        "stage": "tai"
       }
     ],
     "choices": [
@@ -369,6 +396,12 @@
         "id": "out",
         "label": "出学",
         "do": [
+          {
+            "set": [
+              "education.graduated",
+              true
+            ]
+          },
           {
             "set": [
               "education.stage",
@@ -384,91 +417,16 @@
           {
             "add": [
               "reputation.eff",
-              12
-            ]
-          },
-          {
-            "log": "四年太学读完。祭酒在门口送你们，说：往后各自珍重。"
-          }
-        ]
-      }
-    ],
-    "source": "需求/15 §1 · 卒业（20 岁，解锁养灵 Lv1 的入场券之一）"
-  },
-  {
-    "no": 6,
-    "id": "evt.office.enlist",
-    "title": "投军",
-    "desc": "校场边上支着一张桌子。招兵的人抬头看了你一眼：「叫什么？」",
-    "nature": "身份",
-    "priority": 3,
-    "weight": 2,
-    "months": 2,
-    "when": [
-      {
-        "gte": [
-          "clock.age",
-          18
-        ]
-      },
-      {
-        "realm": {
-          "dao": "qi",
-          "gte": 2
-        }
-      },
-      {
-        "none": [
-          {
-            "flag": "flag.office.army"
-          }
-        ]
-      }
-    ],
-    "choices": [
-      {
-        "id": "join",
-        "label": "应募从军",
-        "do": [
-          {
-            "flag": {
-              "id": "flag.office.army",
-              "value": true
-            }
-          },
-          {
-            "flag": {
-              "id": "flag.office.soldier",
-              "value": true
-            }
-          },
-          {
-            "add": [
-              "merit.war",
               10
             ]
           },
           {
-            "money": {
-              "copper": 60
-            }
-          },
-          {
-            "log": "你在军册上按了手印。从今天起，你是有编制的人了。"
-          }
-        ]
-      },
-      {
-        "id": "no",
-        "label": "不去",
-        "do": [
-          {
-            "log": "征兵的牌子在墙上贴了三天，你没去。"
+            "log": "你从太学出来，手里只有一纸文书。"
           }
         ]
       }
     ],
-    "source": "需求/02 §5.1 · 城卫（有军职才能主动出战）"
+    "source": "r39 · 19 岁太学毕业"
   },
   {
     "no": 7,
@@ -579,7 +537,7 @@
       {
         "none": [
           {
-            "flag": "flag.joined_sect"
+            "flag": "flag.sect"
           }
         ]
       }
@@ -591,7 +549,7 @@
         "do": [
           {
             "flag": {
-              "id": "flag.joined_sect",
+              "id": "flag.sect",
               "value": true
             }
           },
@@ -1215,7 +1173,7 @@
       {
         "none": [
           {
-            "flag": "flag.art.master"
+            "flag": "flag.master"
           }
         ]
       }
@@ -1233,7 +1191,7 @@
           },
           {
             "flag": {
-              "id": "flag.art.master",
+              "id": "flag.master",
               "value": true
             }
           },
@@ -1254,7 +1212,7 @@
           },
           {
             "flag": {
-              "id": "flag.art.master",
+              "id": "flag.master",
               "value": true
             }
           },
@@ -1275,7 +1233,7 @@
           },
           {
             "flag": {
-              "id": "flag.art.master",
+              "id": "flag.master",
               "value": true
             }
           },
@@ -1367,6 +1325,13 @@
           "attr.heart.eff",
           60
         ]
+      },
+      {
+        "none": [
+          {
+            "flag": "flag.art.forbidden"
+          }
+        ]
       }
     ],
     "choices": [
@@ -1393,14 +1358,27 @@
             ]
           },
           {
+            "learn": {
+              "spell": "spell.luoshi",
+              "lvl": 0
+            }
+          },
+          {
             "log": "册子上写着：一炉一人。你把它塞进袖子，手在抖。"
           }
-        ]
+        ],
+        "hint": "收下。心性掉一大截、名声也毁了，但这本册子里有一门玄阶术法——坊市买不到。"
       },
       {
         "id": "burn",
         "label": "烧了",
         "do": [
+          {
+            "flag": {
+              "id": "flag.art.forbidden",
+              "value": true
+            }
+          },
           {
             "add": [
               "path.heart.bar",
@@ -2232,7 +2210,7 @@
     "desc": "这一次，你亲手结果了一个人。不是为了活命，只是一时没忍住。",
     "nature": "灾祸",
     "priority": 3,
-    "weight": 3,
+    "weight": 1,
     "months": 1,
     "when": [
       {
@@ -2246,6 +2224,13 @@
           "path.body.level",
           2
         ]
+      },
+      {
+        "none": [
+          {
+            "flag": "flag.heart.crime.done"
+          }
+        ]
       }
     ],
     "choices": [
@@ -2254,25 +2239,21 @@
         "label": "认了",
         "do": [
           {
+            "flag": {
+              "id": "flag.heart.crime.done",
+              "value": true
+            }
+          },
+          {
             "add": [
               "attr.heart.eff",
               -8
             ]
           },
           {
-            "log": "你没有解释。夜里睡得着，只是不再做梦。"
-          }
-        ]
-      },
-      {
-        "id": "deny",
-        "label": "找理由",
-        "do": [
-          {
-            "add": [
-              "attr.heart.eff",
-              -4
-            ]
+            "money": {
+              "copper": 400
+            }
           },
           {
             "add": [
@@ -2281,14 +2262,49 @@
             ]
           },
           {
+            "log": "你没有解释。夜里睡得着，只是不再做梦。"
+          }
+        ],
+        "hint": "认下这件事。心性降得多，但你会拿到他身上的东西。"
+      },
+      {
+        "id": "deny",
+        "label": "找理由",
+        "do": [
+          {
+            "flag": {
+              "id": "flag.heart.crime.done",
+              "value": true
+            }
+          },
+          {
+            "add": [
+              "attr.heart.eff",
+              -4
+            ]
+          },
+          {
+            "add": [
+              "attr.insight.eff",
+              2
+            ]
+          },
+          {
             "log": "你给自己编了套说法，说着说着自己都信了。"
           }
-        ]
+        ],
+        "hint": "找理由搪塞过去。心性降得少，还能保住名声以外的东西。"
       },
       {
         "id": "confess",
         "label": "去说清楚",
         "do": [
+          {
+            "flag": {
+              "id": "flag.heart.crime.done",
+              "value": true
+            }
+          },
           {
             "add": [
               "attr.heart.eff",
@@ -2298,13 +2314,14 @@
           {
             "add": [
               "reputation.eff",
-              5
+              8
             ]
           },
           {
             "log": "你去官府说了。挨了罚，但心里那块石头落了地。"
           }
-        ]
+        ],
+        "hint": "去说清楚。心性降得最少，还落个好名声。"
       }
     ],
     "source": "r35 · 事件改心性（需求/01 §3.3）"
@@ -2315,14 +2332,21 @@
     "title": "故人反目",
     "desc": "你信了十年的人，在背后接了别人的刀。",
     "nature": "灾祸",
-    "priority": 3,
-    "weight": 3,
+    "priority": 2,
+    "weight": 1,
     "months": 1,
     "when": [
       {
         "gte": [
           "clock.age",
           20
+        ]
+      },
+      {
+        "none": [
+          {
+            "flag": "flag.heart.betray.done"
+          }
         ]
       }
     ],
@@ -2332,20 +2356,39 @@
         "label": "什么也不说",
         "do": [
           {
+            "flag": {
+              "id": "flag.heart.betray.done",
+              "value": true
+            }
+          },
+          {
             "add": [
               "attr.heart.eff",
               -12
             ]
           },
           {
+            "add": [
+              "attr.insight.eff",
+              5
+            ]
+          },
+          {
             "log": "你照常吃饭、照常出门。只有你自己知道，某一处已经空了。"
           }
-        ]
+        ],
+        "hint": "咽下去。心性降得最多，但你从此不再信人，也就看得更清。"
       },
       {
         "id": "revenge",
         "label": "去讨个说法",
         "do": [
+          {
+            "flag": {
+              "id": "flag.heart.betray.done",
+              "value": true
+            }
+          },
           {
             "add": [
               "attr.heart.eff",
@@ -2353,20 +2396,35 @@
             ]
           },
           {
+            "judge": {
+              "kind": "battle",
+              "scale": 1.1,
+              "kindName": "故人",
+              "match": "death"
+            }
+          },
+          {
             "add": [
               "reputation.eff",
-              -4
+              6
             ]
           },
           {
             "log": "刀出鞘的时候，你已经不认识自己了。"
           }
-        ]
+        ],
+        "hint": "去讨个说法。要打一场，但打完了心气顺。"
       },
       {
         "id": "letgo",
         "label": "让他走",
         "do": [
+          {
+            "flag": {
+              "id": "flag.heart.betray.done",
+              "value": true
+            }
+          },
           {
             "add": [
               "attr.heart.eff",
@@ -2382,10 +2440,12 @@
           {
             "log": "你放了手。放过他和放过自己，是同一件事。"
           }
-        ]
+        ],
+        "hint": "让他走。心性降一些，但道心会长。"
       }
     ],
-    "source": "r35 · 事件改心性（需求/01 §3.3）"
+    "source": "r35 · 事件改心性（需求/01 §3.3）",
+    "forced": true
   },
   {
     "no": 47,
@@ -2618,5 +2678,520 @@
       }
     ],
     "source": "r35 · 奇遇术法来源（需求/12 §0.1.2）"
+  },
+  {
+    "no": 51,
+    "id": "evt.teach.enlighten",
+    "title": "他愿意替你推一次门",
+    "desc": "有人在你面前坐下，说：这一关你自己过不去，我替你推一把。代价你清楚。",
+    "nature": "机缘",
+    "priority": 3,
+    "weight": 2,
+    "months": 1,
+    "when": [
+      {
+        "gte": [
+          "clock.age",
+          16
+        ]
+      },
+      {
+        "any": [
+          {
+            "flag": "flag.master"
+          },
+          {
+            "flag": "flag.sect"
+          },
+          {
+            "flag": "flag.favor"
+          }
+        ]
+      },
+      {
+        "notFlag": "flag.enlighten.used"
+      }
+    ],
+    "choices": [
+      {
+        "id": "accept",
+        "label": "受他灌顶",
+        "hint": "这一关基本必过。代价：心性 −6、一笔钱、欠一份人情、下一扇门更难。",
+        "do": [
+          {
+            "add": [
+              "attr.heart.eff",
+              -6
+            ]
+          },
+          {
+            "money": {
+              "silver": -20
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.enlighten.used",
+              "value": true
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.favor",
+              "value": true
+            }
+          },
+          {
+            "call": {
+              "macro": "macro.enlighten.apply",
+              "args": {}
+            }
+          },
+          {
+            "log": "他的手按在你额上。有什么东西，从外面被推开了。"
+          },
+          {
+            "log": "你活下来了，但你知道这笔账记着。"
+          }
+        ]
+      },
+      {
+        "id": "decline",
+        "label": "自己来",
+        "hint": "什么都不欠。这一关还是得自己熬。",
+        "do": [
+          {
+            "add": [
+              "attr.heart.eff",
+              3
+            ]
+          },
+          {
+            "log": "你把手按在自己心口，说：我自己来。"
+          },
+          {
+            "log": "他看了你一会儿，笑了。"
+          }
+        ]
+      }
+    ],
+    "source": "r36 · 灌顶是普通事件（需求/11 §7.4）"
+  },
+  {
+    "no": 52,
+    "id": "evt.favor.ask",
+    "title": "开口求人",
+    "desc": "有件事你自己办不成。城里有个人办得成——但他凭什么帮你？",
+    "nature": "身份",
+    "priority": 3,
+    "weight": 2,
+    "months": 1,
+    "when": [
+      {
+        "gte": [
+          "clock.age",
+          18
+        ]
+      },
+      {
+        "gte": [
+          "reputation.eff",
+          10
+        ]
+      },
+      {
+        "none": [
+          {
+            "flag": "flag.favor"
+          }
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "ask",
+        "label": "去开口",
+        "hint": "他会应。但这笔账从此记着——将来他要你还，你不能说不。",
+        "do": [
+          {
+            "flag": {
+              "id": "flag.favor",
+              "value": true
+            }
+          },
+          {
+            "add": [
+              "reputation.eff",
+              -2
+            ]
+          },
+          {
+            "log": "你在他门口站了半个时辰。他出来了，说：行。"
+          },
+          {
+            "log": "一个\"行\"字，你欠下了。"
+          }
+        ]
+      },
+      {
+        "id": "self",
+        "label": "自己扛",
+        "hint": "不欠任何人。这件事大概率办不成。",
+        "do": [
+          {
+            "add": [
+              "attr.heart.eff",
+              3
+            ]
+          },
+          {
+            "add": [
+              "reputation.eff",
+              3
+            ]
+          },
+          {
+            "log": "你把话咽了回去。回去的路上，你走得很慢。"
+          }
+        ]
+      }
+    ],
+    "source": "r37 · 人情（需求/11 §7.4.2 灌顶前置三选一之一）"
+  },
+  {
+    "no": 53,
+    "id": "evt.edu.enter.ganqi",
+    "title": "入感气",
+    "desc": "府学的第一堂气功课。先生让人盘膝坐下，说：试着感觉自己这一口气。",
+    "nature": "主线",
+    "priority": 1,
+    "weight": 0,
+    "forced": true,
+    "months": 6,
+    "when": [
+      {
+        "eq": [
+          "clock.age",
+          11
+        ]
+      },
+      {
+        "none": [
+          {
+            "flag": "flag.edu.ganqi.entered"
+          }
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "sit",
+        "label": "盘膝坐下",
+        "hint": "这一关要过一次判定。成了就站在感气上；没成也还能再试。",
+        "do": [
+          {
+            "flag": {
+              "id": "flag.edu.ganqi.entered",
+              "value": true
+            }
+          },
+          {
+            "call": {
+              "macro": "macro.break.attempt",
+              "args": {
+                "dao": "qi",
+                "tier": 1,
+                "byEvent": true
+              }
+            }
+          },
+          {
+            "log": "你听见自己胸腔里有一点动静。很轻，但确实有。"
+          }
+        ]
+      }
+    ],
+    "source": "r39 · 11 岁入感气（需求/15 §1.1）"
+  },
+  {
+    "no": 54,
+    "id": "evt.art.choose",
+    "title": "选一门手艺",
+    "desc": "十四岁了。先生问你：往后想靠什么吃饭？",
+    "nature": "主线",
+    "priority": 1,
+    "weight": 0,
+    "forced": true,
+    "months": 6,
+    "when": [
+      {
+        "eq": [
+          "clock.age",
+          14
+        ]
+      },
+      {
+        "none": [
+          {
+            "flag": "flag.art.chosen"
+          }
+        ]
+      }
+    ],
+    "choices": [
+      {
+        "id": "alchemy",
+        "label": "丹道",
+        "hint": "炼丹、治病、卖钱。锻体的人最认这个。",
+        "do": [
+          {
+            "set": [
+              "arts.alchemy.learned",
+              true
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.art.chosen",
+              "value": true
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.art.main",
+              "value": "alchemy"
+            }
+          },
+          {
+            "log": "你进了丹房。第一件事是认药，认了三个月。"
+          }
+        ]
+      },
+      {
+        "id": "forge",
+        "label": "器道",
+        "hint": "打兵器、修法器。军中要人。",
+        "do": [
+          {
+            "set": [
+              "arts.forge.learned",
+              true
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.art.chosen",
+              "value": true
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.art.main",
+              "value": "forge"
+            }
+          },
+          {
+            "log": "你抡了半年的锤。虎口裂了又合。"
+          }
+        ]
+      },
+      {
+        "id": "talisman",
+        "label": "符道",
+        "hint": "画符。穷人的法术。",
+        "do": [
+          {
+            "set": [
+              "arts.talisman.learned",
+              true
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.art.chosen",
+              "value": true
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.art.main",
+              "value": "talisman"
+            }
+          },
+          {
+            "log": "你磨了半年墨。画坏的纸堆到屋顶。"
+          }
+        ]
+      },
+      {
+        "id": "medicine",
+        "label": "医道",
+        "hint": "看病。谁都得求到你头上。",
+        "do": [
+          {
+            "set": [
+              "arts.medicine.learned",
+              true
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.art.chosen",
+              "value": true
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.art.main",
+              "value": "medicine"
+            }
+          },
+          {
+            "log": "你跟着郎中认了半年药。他治病不收穷人的钱。"
+          }
+        ]
+      },
+      {
+        "id": "planting",
+        "label": "灵植",
+        "hint": "种药。上游的生意。",
+        "do": [
+          {
+            "set": [
+              "arts.planting.learned",
+              true
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.art.chosen",
+              "value": true
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.art.main",
+              "value": "planting"
+            }
+          },
+          {
+            "log": "你在城外守着半亩药圃，守了半年。"
+          }
+        ]
+      },
+      {
+        "id": "beast",
+        "label": "御兽",
+        "hint": "驯兽、坐骑。野外的行当。",
+        "do": [
+          {
+            "set": [
+              "arts.beast.learned",
+              true
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.art.chosen",
+              "value": true
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.art.main",
+              "value": "beast"
+            }
+          },
+          {
+            "log": "你被一头小兽咬了半年，它终于肯跟你走。"
+          }
+        ]
+      },
+      {
+        "id": "feast",
+        "label": "灵膳",
+        "hint": "做饭。凡人也能吃。",
+        "do": [
+          {
+            "set": [
+              "arts.feast.learned",
+              true
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.art.chosen",
+              "value": true
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.art.main",
+              "value": "feast"
+            }
+          },
+          {
+            "log": "你在灶前站了半年。手上的刀工成了。"
+          }
+        ]
+      },
+      {
+        "id": "appraise",
+        "label": "鉴宝",
+        "hint": "掌眼。不赔就是赚。",
+        "do": [
+          {
+            "set": [
+              "arts.appraise.learned",
+              true
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.art.chosen",
+              "value": true
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.art.main",
+              "value": "appraise"
+            }
+          },
+          {
+            "log": "你跟着掌柜看了半年的货。眼睛开始毒了。"
+          }
+        ]
+      },
+      {
+        "id": "brew",
+        "label": "灵酿",
+        "hint": "酿酒。越陈越值钱。",
+        "do": [
+          {
+            "set": [
+              "arts.brew.learned",
+              true
+            ]
+          },
+          {
+            "flag": {
+              "id": "flag.art.chosen",
+              "value": true
+            }
+          },
+          {
+            "flag": {
+              "id": "flag.art.main",
+              "value": "brew"
+            }
+          },
+          {
+            "log": "你封了半年的坛子。闻着就知道哪坛会成。"
+          }
+        ]
+      }
+    ],
+    "source": "r39 · 14 岁学百艺（任选一门，需求/15 §1.1）"
   }
 ]

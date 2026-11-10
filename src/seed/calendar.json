@@ -1,9 +1,59 @@
 {
   "tbl.calendar": [
-    { "atYear": 312, "event": "evt.war.warning.north", "params": { "front": "north" }, "order": 1, "note": "北境告急：非强制，给一年准备" },
-    { "atYear": 313, "event": "evt.war.city.beiguan", "params": { "city": "beiguan", "order": 1, "months": 5, "defense": 80 }, "order": 2, "note": "第一座城：北关" },
-    { "atYear": 313, "event": "evt.war.city.wangbei", "params": { "city": "wangbei", "order": 2, "months": 4, "defense": 60 }, "ifFlag": "flag.city_lost.beiguan", "note": "北关破了才来" },
-    { "atYear": 313, "event": "evt.war.city.changming", "params": { "city": "changming", "order": 3, "months": 6, "defense": 95 }, "ifFlag": "flag.city_lost.wangbei", "note": "最后一道墙" },
-    { "atYear": 314, "event": "evt.war.nation.call", "params": { "theater": "north" }, "ifFlag": "flag.city_lost.changming", "note": "三城尽失 → 国战" }
-  ]
+    {
+      "event": "evt.war.warning.north",
+      "params": {
+        "front": "north"
+      },
+      "order": 1,
+      "note": "北境告急：非强制，给一年准备",
+      "atAge": 30
+    },
+    {
+      "event": "evt.war.city.beiguan",
+      "params": {
+        "city": "beiguan",
+        "order": 1,
+        "months": 5,
+        "defense": 80
+      },
+      "order": 2,
+      "note": "第一座城：北关",
+      "atAge": 31
+    },
+    {
+      "event": "evt.war.city.wangbei",
+      "params": {
+        "city": "wangbei",
+        "order": 2,
+        "months": 4,
+        "defense": 60
+      },
+      "ifFlag": "flag.city_lost.beiguan",
+      "note": "北关破了才来",
+      "atAge": 32
+    },
+    {
+      "event": "evt.war.city.changming",
+      "params": {
+        "city": "changming",
+        "order": 3,
+        "months": 6,
+        "defense": 95
+      },
+      "ifFlag": "flag.city_lost.wangbei",
+      "note": "最后一道墙",
+      "atAge": 33
+    },
+    {
+      "event": "evt.war.nation.call",
+      "params": {
+        "theater": "north"
+      },
+      "ifFlag": "flag.city_lost.changming",
+      "note": "三城尽失 → 国战",
+      "atAge": 34
+    }
+  ],
+  "_note": "r38：战事按**角色年龄**触发（atAge），不按绝对年份。30 岁预警 → 31 城战 → 34 国战。"
 }

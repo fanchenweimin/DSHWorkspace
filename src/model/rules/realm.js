@@ -258,10 +258,18 @@ function breakWall(state, dao, tier) {
 }
 
 /**
- * 判「破境」。参数 {dao, tier}。
- * 返回 {ok, why, q, p, roll}：`why` 既是日志也是置灰文案（设计/20 §8）。
+ * ① **更新 LV 层级**（r36）。参数 {dao, tier}。
+ *
+ * 这一函数**只改 `path.level`，不改境界、不进品**——它回答的是
+ * 「这道这道门的关窍，你通了没有」。通没通和"进不进门"是两件事（需求/11 §1.3）。
+ *
+ * 两条路：
+ *   - 事件瓶颈：**由事件判定**（`params.byEvent`）。事件办成了就更新，不掷 q/b。
+ *   - 概率瓶颈：掷 `q`（有没有墙）→ 掷 `p`（门多宽）。
+ *
+ * 返回 { ok, why, q, p, roll }：`why` 既是日志也是置灰文案。
  */
-function judgeBreak(state, params, ctx) {
+function raiseLevel(state, params, ctx) {
   const dao = String(params.dao || '');
   const tier = num(params.tier);
   const rules = ctx.rules;
@@ -269,21 +277,20 @@ function judgeBreak(state, params, ctx) {
   const path = state.path[dao];
 
   if (!path) return { ok: false, why: 'no_such_dao' };
-  if (path.level >= tier) return { ok: false, why: 'already' };
-  if (path.level < tier - 1) return { ok: false, why: 'level_gap' };
+  /* r36：这里比的是 **lv（层级）**，不是 level（境界）。层级可以超前于境界。 */
+  const lvNow = num(path.lv != null ? path.lv : path.level);
+  if (lvNow >= tier) return { ok: false, why: 'already' };
+  if (lvNow < tier - 1) return { ok: false, why: 'level_gap' };
 
   const kind = bottleneckOf(dao, tier);
-  /* r30：事件瓶颈（品 5/6、养灵、修心、法相…）**只能由事件开**。
-     硬闯没用——没有那件事，你修一万年也进不去。 */
-  const force = !!(params && params.force);
-  if (kind !== 'prob' && !force) return { ok: false, why: 'need_event' };
+  const byEvent = !!(params && params.byEvent);
 
-  /* r32：**每年只能破一次境界，但"入门"不算**（感气入门、体魄入门这种）。
-     入门问的是"能不能开始"，不是"能不能再进一步"，所以不占当年的名额。 */
-  const isEntry = num(path.level) === 0 && tier === 1;
+  /* 事件瓶颈**只能由事件开**：没有那件事，硬闯一万次也没用。 */
+  if (kind !== 'prob' && !byEvent) return { ok: false, why: 'need_event' };
+  /* 概率瓶颈不该走事件通道 */
+  if (kind === 'prob' && byEvent) return { ok: false, why: 'not_event_bottleneck' };
 
-  /* r35：修心的门是**一次性**的，且心性 < 90 → **必然失败**（需求/11 §6.1–§6.2）。
-     这一检查要放在 force 之前：连"事件直接把门推开"也不行——心性不够就是进不去。 */
+  /* 修心：心性 < 90 → **必然失败**（需求/11 §6.1）。事件也救不了。 */
   if (dao === 'heart') {
     const H = rules.HEART || {};
     const need = num(H.heartBreakNeed != null ? H.heartBreakNeed : 90);
@@ -293,47 +300,53 @@ function judgeBreak(state, params, ctx) {
     }
   }
 
-  /* r35：`force` 也吃"一年一次"。
-     r34 之前 force 绕过这条，导致 15 条 evt.gate.* 可以同年连破两个瓶颈。
-     需求/20 §10.2 写的是"全局一次，不分道、不分品"，没有例外。 */
-  if (!isEntry && state.turn && state.turn.breakthroughUsed) {
-    return { ok: false, why: 'one_per_year' };
-  }
-  /* r27 / r28：这里**不检查修为条**。
-     ① 入门关（第 1 品）根本没有修为条，只看瓶颈；
-     ② 品内突破的"修为得先修满"是**资格**问题，放在业务层 `turn.breakAct()`
-        里拦（那边能给出"还差多少"的人话），不塞进纯判定。 */
+  /* 只写 lv，**不动 level、不清条**——层级通了不等于进品。 */
+  const setLv = (t) => {
+    path.lv = t;
+    path.attempts = 0;
+    path.fail = 0;
+    if (path.wall) delete path.wall[t];
+    breakWall(state, dao, t);
+  };
 
-  /* 事件瓶颈：事件办成了就直接进品，不再掷第二次骰（r30） */
-  if (force) {
-    state.turn = state.turn || {};
-    if (!isEntry) state.turn.breakthroughUsed = true;
-    commitTier(state, dao, tier, rules);
-    return { ok: true, why: 'event', q: 0, forced: true };
+  /* 事件瓶颈：事件判定通过 → 直接更新 LV。**不占年度突破名额。** */
+  if (byEvent) {
+    setLv(tier);
+    return { ok: true, why: 'event', q: 0, byEvent: true };
   }
 
+  /* ── 概率瓶颈：掷 q → 掷 p ─────────────────────────────── */
+  const isEntry = lvNow === 0 && tier === 1;
+
+  /* r39：**入门关可以同年多试，品内小境界一年一次**（需求/15 §1.3）。
+     - 入门关（第 1 品）：只受月份限制，不受年限限制——7 岁开体魄失败了还能再冲
+     - 品内（第 2 品起）：同一品、同一年，只准冲一次，否则"磨"就成了唯一解 */
+  if (!isEntry) {
+    path.triedYear = path.triedYear || {};
+    const year = num(state.clock && state.clock.year);
+    if (num(path.triedYear[tier]) === year) {
+      return { ok: false, why: 'one_per_year' };
+    }
+  }
+
+  /* `q` 与 `p` 只是"这道门通不通"，不是"进不进品"，所以不吃"一年一次"。 */
   const q = appearRate(state, dao, tier, rules);
   path.wall = path.wall || {};
-  if (path.wall[tier] === undefined) path.wall[tier] = rng() < q;   // 一品只掷一次（§4.1）
+  if (path.wall[tier] === undefined) path.wall[tier] = rng() < q;   // 一品只掷一次
 
-  /* r35：**没墙（q=0 掷空）不占年度名额**（设计/11 §4 + §10）。
-     r34 之前这行在掷 q 之前，运气好的人也要被罚一年。 */
   if (!path.wall[tier]) {
-    commitTier(state, dao, tier, rules);
+    setLv(tier);
     return { ok: true, why: 'no_wall', q };
   }
 
-  /* 到这里才算"真的开始冲关"：占掉今年的名额 */
-  state.turn = state.turn || {};
-  if (!isEntry) state.turn.breakthroughUsed = true;
-
-  /**
-   * 入门关（第 1 品）和品内突破不是一回事：
-   * 它问的是"这个人能不能开始"，不是"能不能再进一步"。
-   * 所以基数抬到 openBase，也不吃"首次必败"——否则资质 40 的人会一辈子站在门外。
-   */
   const entry = tier === 1;
   const S = rules.SUCCESS || {};
+
+  /* 真开始掷了才记"今年试过"——没墙的人不算试过 */
+  if (!isEntry) {
+    path.triedYear = path.triedYear || {};
+    path.triedYear[tier] = num(state.clock && state.clock.year);
+  }
 
   path.attempts = num(path.attempts) + 1;
   if (!entry && path.attempts === 1) {
@@ -345,7 +358,7 @@ function judgeBreak(state, params, ctx) {
     ? Math.max(successBase(state, dao, tier, rules), num(S.openBase != null ? S.openBase : 0.25))
     : successBase(state, dao, tier, rules);
 
-  /* 灌顶（r35）：一次性，把这一次判定抬到"基本保送"（需求/11 §7.4）。 */
+  /* 灌顶：一次性把这次的 p 抬到"基本保送"（需求/11 §7.4.4）。 */
   const enlight = num(path.enlighten);
 
   const p = Math.min(
@@ -359,17 +372,62 @@ function judgeBreak(state, params, ctx) {
   );
   const roll = rng();
   if (roll < p) {
-    path.enlighten = 0;                       /* 灌顶用掉就没了 */
-    commitTier(state, dao, tier, rules);
+    path.enlighten = 0;
+    setLv(tier);
     return { ok: true, why: 'roll', q, p, roll, enlight };
   }
 
-  path.enlighten = 0;                          /* 灌顶失败也算用掉 */
+  path.enlighten = 0;
   path.fail = Math.min(
     num(S.failCap != null ? S.failCap : 0.1),
     num(path.fail) + 0.01 + rng() * 0.02
   );
   return { ok: false, why: 'roll', q, p, roll };
+}
+
+/**
+ * ② **突破境界**（r36）。参数 {dao, tier}。
+ *
+ * 这是**玩家手动点的那个动作**：条件齐了才进品。
+ * `LV` 必须已经到 `tier`（层级是门票），否则 `need_level`。
+ *
+ * 与 `raiseLevel` 的分工：
+ *   raiseLevel  → "这道门的关窍通了没有"（可能由事件推动，不占名额）
+ *   breakthrough → "这一步迈不迈"（玩家决定，**一年一次**）
+ */
+function breakthrough(state, params, ctx) {
+  const dao = String(params.dao || '');
+  const tier = num(params.tier);
+  const rules = ctx.rules;
+  const path = state.path[dao];
+
+  if (!path) return { ok: false, why: 'no_such_dao' };
+  if (num(path.level) >= tier) return { ok: false, why: 'already' };
+
+  /* r36：**层级是门票**——`lv` 到了才能进品（`level` 可能还停在上一品）。 */
+  const lvNow = num(path.lv != null ? path.lv : path.level);
+  if (lvNow < tier) return { ok: false, why: 'need_level', lv: lvNow };
+
+  /* 心性 < 90 的修心：突破必然失败（需求/11 §6.1） */
+  if (dao === 'heart') {
+    const H = rules.HEART || {};
+    const need = num(H.heartBreakNeed != null ? H.heartBreakNeed : 90);
+    const heartV = num(mods.get(state, 'attr.heart.eff'));
+    if (heartV < need) {
+      return { ok: false, why: 'heart_low', need, heart: heartV };
+    }
+  }
+
+  const isEntry = num(path.level) === 0 && tier === 1;
+  if (!isEntry && state.turn && state.turn.breakthroughUsed) {
+    return { ok: false, why: 'one_per_year' };
+  }
+
+  state.turn = state.turn || {};
+  if (!isEntry) state.turn.breakthroughUsed = true;
+
+  commitTier(state, dao, tier, rules);
+  return { ok: true, why: 'break', tier };
 }
 
 /* ── 心性：定时衰减 / 心魔 / 心关失败（需求/01 §3，r35） ────── */
@@ -484,7 +542,7 @@ function heartClashFail(state, rules, rng) {
 module.exports = {
   RANK, DAOS, GONGFA, attrOf, gongfaOf, barMax, baseRate, monthGain, spiritCoef,
   appearRate, successBase, studyBonus, pillBonus, luckAdj,
-  bottleneckOf, commitTier, spill, breakWall, judgeBreak, lifespanOf,
+  bottleneckOf, commitTier, spill, breakWall, raiseLevel, breakthrough, lifespanOf,
   monthsToFull, canTrain,
   heartDecay, demonSurvive, canHaveDemon, rollDemon, heartClashFail
 };

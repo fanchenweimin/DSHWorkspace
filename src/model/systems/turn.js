@@ -74,6 +74,12 @@ function rollYear(state) {
   state.handled = [];
   state.turn = state.turn || {};
   state.turn.breakthroughUsed = false;
+
+  /* r39：品内小境界"一年一次"的记账，跨年清零（入门关本来就不记） */
+  for (const dao of ['body', 'qi', 'spirit', 'heart']) {
+    const p = state.path && state.path[dao];
+    if (p) p.triedYear = {};
+  }
   state.turn.mainId = null;      /* 新的一年重抽主卡（设计/20 §9） */
   state.turn.mainDone = false;   /* 新的一年才又有"一件大事" */
   state.turn.heartBlocked = false;  /* 心魔活下来的"当年不可再发起心关"解除 */
@@ -127,10 +133,21 @@ function rollYear(state) {
 /**
  * 把这一年剩下的月过完（设计/20 §9：挡住的年底就结束）。
  * 不弹窗、不确认——点一下就是"这一年就这么过去了"。
+ *
+ * r38 修：如果**月份已经用完**（`monthsUsed >= 12`）但年份还没翻
+ * （比如调用方直接把 `monthsUsed` 设成 12，或者某条路径耗完月却没走 `commit`），
+ * 这里要兜底翻年——否则玩家会卡在"这一年已经过完了"里出不来。
  */
 function pass(state, note) {
   const left = budget(state);
-  if (left <= 0) return { ok: false, reason: '这一年已经过完了。' };
+  if (left <= 0) {
+    /* 月份已经满了：兜底翻年，别让人卡死 */
+    if (!state.dead) {
+      rollYear(state);
+      return { ok: true, months: 0, waited: true, rolled: true };
+    }
+    return { ok: false, reason: '这一年已经过完了。' };
+  }
   state.monthsUsed = MONTHS_PER_YEAR;
   state.log.push(note || `剩下的 ${left} 个月，你没有再做什么。`);
   rollYear(state);
@@ -250,6 +267,7 @@ function train(state, payload) {
 function breakAct(state, payload) {
   const dao = String(payload.dao || '');
   const tier = num(payload.tier);
+  const rules = config.get('rules');
   const card = handSys.breakCards(state).find((b) => b.dao === dao && b.tier === tier);
   if (!card) return { ok: false, reason: '这一关还没到。' };
   if (!card.gateOk) return { ok: false, reason: card.gateHint || '还差些火候。' };
@@ -273,25 +291,46 @@ function breakAct(state, payload) {
     });
   }
 
-  /* 修为得先练满（归档：「练满才有资格破下一品」）。
+  /* 修为得先练满（「练满才有资格破下一品」）。
      入门关（第 1 品）没有修为条，不受这条限制。 */
   if (!card.ready) {
     const left = Math.max(0, num(card.barMax) - num(card.bar));
     return { ok: false, reason: `修为还没练满，还差 ${Math.round(left)}。先修满再说。` };
   }
 
-  /* 事件瓶颈（品 5/6、养灵、修心、法相…）：不是掷骰，是把那一件事办掉（r30）。
-     没有那件事的剧情，就过不去——硬闯没用。 */
+  /* ── r36：**层级已到位 → 这一步是"突破境界"** ──────────────
+     LV 是门票，进不进由玩家决定；条件齐了也能一直不点（合法玩法）。 */
+  if (card.levelReady) {
+    const r = realm.breakthrough(state, { dao, tier }, { rules, rng: Math.random });
+    if (!r.ok) {
+      const why = {
+        need_level: '这道门的关窍还没通。',
+        heart_low: `心性不够（${Math.round(r.heart)} / 需要 ${r.need}），这一关必然失败。`,
+        one_per_year: '一年只能破一次境界。',
+        already: '已经在这一品了。'
+      }[r.why] || '这一关过不去。';
+      return { ok: false, reason: why };
+    }
+    state.log.push(`你破了「${card.title}」。从今天起，你站在这一品上了。`);
+    return { ok: true, months: 0, broke: true, dao, tier };
+  }
+
+  /* 事件瓶颈（品 5/6、养灵、修心、法相…）：不是掷骰，是把那一件事办掉。
+     办成 = **更新层级**；然后玩家还得回来点「突破」——**不会自动进品**。 */
   if (card.kind !== 'prob') {
     const ev = handSys.gateOf(state, dao, tier);
     if (!ev) return { ok: false, reason: '这一关还没有等来那件事。' };
     const c = (ev.choices && ev.choices[0]) || { id: null, label: '过', do: [] };
 
+    /* 事件办成后补一次"更新层级"——事件本身不一定写了 raise。 */
+    const list = (c.do || []).slice();
+    list.push({ call: { macro: 'macro.break.attempt', args: { dao, tier, byEvent: true } } });
+
     return commit(state, {
       id: ev.id,
       months: num(ev.months) || 3,
       text: `「${ev.title}」—— 你选了「${c.label}」。`,
-      list: c.do || [],
+      list,
       event: ev,
       choice: c
     });
@@ -304,6 +343,69 @@ function breakAct(state, payload) {
     list: [{ call: { macro: 'macro.break.attempt', args: { dao, tier } } }],
     event: null
   });
+}
+
+/* ── 委托：每门百艺一条实战线（r39，需求/20 §7.4） ─────── */
+
+/**
+ * 接一单委托。
+ *
+ * payload: { mode: 'commission', art: 'alchemy', kind: 'odd'|'main' }
+ *
+ * 流程（需求/20 §7.4.2）：
+ *   ① 手艺够不够（reqLv）
+ *   ② 选杂活 / 正活
+ *   ③ 出城的单：掷"路上事件"——**强制的**，遇上了必须处理
+ *   ④ 结账
+ */
+function commissionAct(state, payload) {
+  const com = require('./commission');
+  const artId = String(payload.art || '');
+  const pick = com.available(state).find((c) => c.art === artId);
+  if (!pick) return { ok: false, reason: '没有这门手艺的委托。' };
+  if (!pick.unlocked) return { ok: false, reason: pick.lockedWhy || '这门活你接不了。' };
+
+  const isMain = payload.mode2 === 'main' || payload.kind === 'main';
+  const pay = isMain ? pick.main.pay : pick.odd.pay;
+  const risk = isMain ? pick.main.risk : 0;
+
+  /* 出城 + 正活 → 掷路上事件 */
+  let encounter = null;
+  if (pick.outing && isMain && risk > 0 && Math.random() < risk) {
+    encounter = pick.art;
+  }
+
+  const list = [];
+  list.push({ money: { copper: pay } });
+  list.push({ add: ['reputation.eff', isMain ? 3 : 1] });
+
+  if (encounter) {
+    /* 遇上了：钱先不给，改成一次死斗（对手按玩家品的 1.1 倍） */
+    list.length = 0;
+    list.push({
+      judge: {
+        kind: 'battle',
+        scale: 1.1,
+        kindName: '劫道的',
+        match: 'death'
+      }
+    });
+  }
+
+  const months = num(pick.months) || 2;
+  const text = encounter
+    ? `你接了「${pick.name}」，出城走到半路——有人拦在前面。`
+    : (isMain ? `你把「${pick.name}」接了，做完了。` : `你去给「${pick.name}」打了下手。`);
+
+  const r = commit(state, {
+    id: null,
+    months,
+    text,
+    list,
+    event: null
+  });
+
+  return { ...r, commission: { art: pick.art, name: pick.name, pay, encounter: !!encounter } };
 }
 
 /* ── 百艺：一次做一季（3 月） ────────────────────────── */
@@ -656,6 +758,8 @@ function act(state, payload) {
     if (a.id === 'act.market') return marketVisit(state);
     /* 闲居：把这一年剩下的月份过完（用户口径：闲居就是过完当前年） */
     if (a.restMonths) return pass(state, `剩下的月份，你哪儿也没去。`);
+    /* r39：接委托走专门的分支（选哪门艺、杂活还是正活、要不要出城） */
+    if (a.id === 'act.commission') return commissionAct(state, payload);
     return commit(state, {
       id: null,
       months: a.months != null ? a.months : 1,

@@ -28,15 +28,26 @@ function fresh(name) {
   s.fate = '';
   s.talents = [];
   s.mods = (s.mods || []).filter((m) => !/^(fate|talent)\./.test(String(m.source || '')));
+  /* r39：开局随机天赋会把某门百艺设成"已学"，测试要清干净 */
+  for (const id of Object.keys(s.arts || {})) {
+    s.arts[id] = { lvl: 0, exp: 0, talent: 'none', learned: false };
+  }
+  s.flags = s.flags || {};
+  delete s.flags.art;
   return s;
 }
 
 function opening() {
   const s = fresh();
   require('../src/model/systems/opening').apply(s, { rng: () => 0.99 });
-  require('../src/model/systems/turn').act(s, {
-    kind: 'event', id: 'evt.edu.graduate.meng', choice: 'sit'
-  });
+  /* r39：7 岁开局第一件事是强制事件；测试只关心"府学及以后"，直接写状态 */
+  s.clock.age = 12;
+  s.education.stage = 'fu';
+  s.education.graduated = false;
+  s.flags.edu = { meng: { done: true } };
+  s.turn = s.turn || {};
+  s.turn.mainDone = true;
+  s.turn.mainId = null;
   return s;
 }
 
@@ -180,7 +191,8 @@ test('手牌：开局给出事件，且条件不成立的被挡掉', () => {
   const state = require('../src/model/state/demo').initial();
   const table = hand.table(state);
   assert.strictEqual(table.events.length, 1, '一手只有一张主卡');
-  assert.strictEqual(table.events[0].id, 'evt.edu.graduate.meng', '开局该是蒙学卒试');
+  /* r39：7 岁开局第一个强制事件是「进蒙学 · 开体魄」 */
+  assert.strictEqual(table.events[0].id, 'evt.edu.enter.meng', '开局该是进蒙学');
   assert.strictEqual(table.locked, true, '强制事件该封住常驻');
   assert.strictEqual(table.actions.length, 0);
 });
@@ -256,7 +268,7 @@ test('突破：门槛只看瓶颈，不看修为条（r27）', () => {
 
   /* 修为条几乎空着，也不能因为"条没满"被拦 */
   s.path.body.bar = 1;
-  const r = realm.judgeBreak(s, { dao: 'body', tier: 1 }, { rules, rng: () => 0.01 });
+  const r = realm.raiseLevel(s, { dao: 'body', tier: 1 }, { rules, rng: () => 0.01 });
   assert.strictEqual(r.ok, true, `修满已不是前提，实际 ${r.why || ''}`);
 });
 
@@ -533,33 +545,32 @@ test('战斗：闪避成功这一下全免（r32）', () => {
   }
 });
 
-test('突破：入门不占当年的名额（r32）', () => {
+test('r39 突破次数：入门不限次，品内一年一次', () => {
   const realm = require('../src/model/rules/realm');
   const rules = require('../src/model/repository/config').get('rules');
   const s = opening();
 
-  /* 先破一次品内（体魄 1 → 脏腑 2），用掉当年的名额 */
+  /* 品内（脏腑 2）：**让第一次失败**，同年第二次该被年份拦住 */
   s.path.body.level = 1;
-  s.path.body.wall = { 2: true };
+  s.path.body.lv = 1;
+  s.path.body.wall = { 2: true };              /* 墙在 */
   s.path.body.attempts = 1;                    /* 跳过"首次必败" */
-  const first = realm.judgeBreak(s, { dao: 'body', tier: 2 }, { rules, rng: () => 0.001 });
-  assert.strictEqual(first.ok, true, first.why);
-  assert.strictEqual(s.turn.breakthroughUsed, true);
+  const first = realm.raiseLevel(s, { dao: 'body', tier: 2 }, { rules, rng: () => 0.999 });
+  assert.strictEqual(first.ok, false, '墙在且掷不过，该失败');
+  assert.strictEqual(s.path.body.lv, 1, '层级没动');
 
-  /* 同一年再破一次品内：不许 */
-  s.path.body.level = 2;
-  s.path.body.wall = { 3: true };
-  s.path.body.attempts = 2;
-  const second = realm.judgeBreak(s, { dao: 'body', tier: 3 }, { rules, rng: () => 0.99 });
+  const second = realm.raiseLevel(s, { dao: 'body', tier: 2 }, { rules, rng: () => 0.999 });
   assert.strictEqual(second.ok, false);
-  assert.strictEqual(second.why, 'one_per_year');
+  assert.strictEqual(second.why, 'one_per_year', '品内同年只准冲一次');
 
-  /* 但"入门"（炼气·感气）不算名额：今年还能进 */
+  /* 入门关（炼气·感气）：同年可以一直试 */
   s.path.qi.level = 0;
-  s.path.qi.wall = { 1: false };
-  const entry = realm.judgeBreak(s, { dao: 'qi', tier: 1 }, { rules, rng: () => 0.5 });
-  assert.strictEqual(entry.ok, true, entry.why);
-  assert.strictEqual(s.path.qi.level, 1, '感气该进得去');
+  s.path.qi.lv = 0;
+  s.path.qi.wall = { 1: true };
+  for (let i = 0; i < 3; i += 1) {
+    const r = realm.raiseLevel(s, { dao: 'qi', tier: 1 }, { rules, rng: () => 0.99 });
+    assert.notStrictEqual(r.why, 'one_per_year', '入门关不该被年份拦住');
+  }
 });
 
 test('阶品：影响等级 = 阶 + 品，差一级只剩一成（r33）', () => {
@@ -716,23 +727,39 @@ test('战斗：拳头能破盾（物理穿透 55%），不会一颗子弹都打�
   assert.ok(r.seg.shield <= r.seg.hp + r.seg.shield, '盾不该把整拳吃掉');
 });
 
-test('法术：高境界用低阶术法能以力驭法，不再是废纸（r34）', () => {
+test('r39 物品代差：术法阶品是它自己的，不随人涨', () => {
+  const grade = require('../src/model/rules/grade');
   const battle = require('../src/model/rules/battle');
+
+  /* 罗汉拳 = 1 阶黄下（jie 1, pin 1） */
+  assert.deepStrictEqual(grade.itemFit(1, 1, 1, 1), { usable: true, mul: 1, why: 'ok' });
+  assert.deepStrictEqual(grade.itemFit(1, 2, 1, 1), { usable: true, mul: 0.1, why: 'diluted' });
+  assert.strictEqual(grade.itemFit(1, 3, 1, 1).usable, false, '调息用罗汉拳：无效');
+  assert.strictEqual(grade.itemFit(1, 3, 1, 1).why, 'out_of_range');
+  assert.strictEqual(grade.itemFit(2, 1, 1, 1).why, 'cross_tier', '跨大阶一律无效');
+
+  /* 新手用高阶货：满效果（这是"有人给你"的那条路） */
+  assert.strictEqual(grade.itemFit(1, 1, 2, 3).mul, 1);
+
+  /* 物品写法：人 / 物 两套 */
+  assert.strictEqual(grade.short(2, 3), '2 阶 · 黄上');
+  assert.strictEqual(grade.itemLabel(2, 3), '2 阶黄上级');
+
+  /* 战斗里：炼气 3 品拿黄中术法（同阶低一品）→ 只剩一成，不再"以力驭法"撑起来 */
   const s = opening();
   s.path.body.level = 2;
-  s.path.qi.level = 3;                      /* 炼气·驭凡 */
-  s.spells = { 'spell.huodan': { lvl: 1, exp: 0 } };   /* 火弹术 黄中 小成 = 2 阶 1 品 */
+  s.path.body.lv = 2;
+  s.path.qi.level = 3;
+  s.path.qi.lv = 3;
+  s.spells = { 'spell.huodan': { lvl: 1, exp: 0 } };
 
   const me = battle.stats(s, 'player');
-  assert.strictEqual(me.tier, 3);
   const foe = battle.makeEnemy(me, { scale: 1, kindName: '同辈' });
+  const move = { name: '火弹术', kind: 'attack', power: 20, mult: 0.85, rank: 2, jie: 2, pin: 2, lvl: 1 };
 
-  const move = { name: '火弹术', kind: 'attack', power: 20, mult: 0.85, rank: 2, jie: 2, pin: 1, lvl: 1 };
-  s.spells['spell.huodan'].lvl = 1;
   const r = battle.strike(me, foe, move, () => 0.5);
-  assert.ok(r.gRatio > 0.1, `该以力驭法撑起来，实际 ${r.gRatio}`);
-  assert.strictEqual(r.bend, true, '要标成以力驭法');
-  assert.ok(r.seg.hp > 0);
+  assert.strictEqual(r.fitWhy, 'diluted', '同阶低一品：打折');
+  assert.ok(r.gRatio <= 0.1 + 1e-9, '最多一成，实际 ' + r.gRatio);
 });
 
 test('法术来源：学堂教、坊市买、城主府换、奇遇得（r35）', () => {
@@ -875,8 +902,10 @@ test('开局：没墙就直接站在体魄，没有"未入门"这一档（r28）
   const s = fresh();
   const r = opening.apply(s, { rng: () => 0.99 });
   assert.strictEqual(r.entered, true);
-  assert.strictEqual(s.path.body.level, 1, '十岁该已经站在体魄上');
-  assert.ok(s.path.body.bar > 0 && s.path.body.bar < rules.PROF.body[0], '半条内力，不是零');
+  assert.strictEqual(s.path.body.level, 1, '七岁筋骨已开，该站在体魄上');
+  assert.strictEqual(s.path.body.lv, 1, '层级也到 1');
+  /* r39：7 岁开局不白送修为 */
+  assert.strictEqual(s.path.body.bar, 0, '开局修为条是 0');
   assert.strictEqual(s.lifespan, 85, '凡人寿元按 LIFESPAN 的上限');
 });
 
@@ -1037,25 +1066,26 @@ test('战事：日历到点必来；城破了才轮下一座（r29）', () => {
   const calendar = require('../src/model/systems/calendar');
   const s = opening();
 
-  /* 直接拨到某一年年初：跨年那一步本来就会做 sync + 清 mainDone */
-  const jumpTo = (year) => {
-    s.clock.year = year;
+  /* r39：日历按**角色年龄**触发，拨的是 age */
+  const jumpTo = (age) => {
+    s.clock.age = age;
+    s.clock.year = 309 + (age - 7);
     s.monthsUsed = 0;
     s.turn.mainDone = false;
     s.turn.mainId = null;
     calendar.sync(s);
   };
 
-  jumpTo(312);
-  assert.strictEqual(s.war.phase, 'warning', '第 312 年该进预警档');
+  jumpTo(30);
+  assert.strictEqual(s.war.phase, 'warning', '30 岁该进预警档');
   const warn = hand.table(s).main;
   assert.strictEqual(warn.id, 'evt.war.warning.north', '到点的那一条必须上桌');
 
   turn.act(s, { kind: 'event', id: warn.id, choice: warn.choices[0].id });
   assert.strictEqual(hand.table(s).main, null, '一年只出一件主要事件（r30）');
 
-  jumpTo(313);
-  assert.strictEqual(s.war.phase, 'city', '第 313 年该进城战档');
+  jumpTo(31);
+  assert.strictEqual(s.war.phase, 'city', '31 岁该进城战档');
   const war = hand.table(s).main;
   assert.strictEqual(war.id, 'evt.war.city.beiguan');
   assert.strictEqual(war.forced, true, '城战是封住整年的');
@@ -1066,9 +1096,9 @@ test('战事：日历到点必来；城破了才轮下一座（r29）', () => {
   assert.strictEqual(s.flags.city_lost.beiguan, true, '弃城要留标记');
 
   /* 同一年里不再抽新卡；把"今年的大事"放开来，才看得到下一座城 */
-  s.turn.mainDone = false;
-  s.turn.mainId = null;
-  assert.strictEqual(hand.table(s).main.id, 'evt.war.city.wangbei', '北关破了才轮到王北');
+  /* r39：日历一年一城，第二座在 32 岁 */
+  jumpTo(32);
+  assert.strictEqual(hand.table(s).main.id, 'evt.war.city.wangbei', '北关破了，32 岁轮到王北');
 });
 
 test('跨年战事：今年月不够就把剩下的记到明年开春（r32）', () => {
@@ -1076,7 +1106,8 @@ test('跨年战事：今年月不够就把剩下的记到明年开春（r32）',
   const turn = require('../src/model/systems/turn');
   const s = opening();
 
-  s.clock.year = 313;
+  s.clock.age = 31;
+  s.clock.year = 333;
   s.war.phase = 'city';
   s.monthsUsed = 10;                       /* 只剩 2 月，城战要 5 月 */
   s.turn.mainDone = false;
@@ -1089,7 +1120,7 @@ test('跨年战事：今年月不够就把剩下的记到明年开春（r32）',
   const r = turn.act(s, { kind: 'event', id: t.main.id, choice: 'flee' });
   assert.strictEqual(r.ok, true, r.reason || '');
   assert.strictEqual(r.carry, 3, '今年 2 月 + 明年 3 月 = 5 月');
-  assert.strictEqual(s.clock.year, 314, '过完这一年');
+  assert.strictEqual(s.clock.year, 334, '过完这一年');
   assert.strictEqual(s.monthsUsed, 3, '明年开春先还这三个月的账');
 });
 
@@ -1234,11 +1265,19 @@ test('破境：判定成功才进品，且清条（I3 / I4 / I25）', () => {
   const s = fresh();
   s.path.body.bar = 200;
 
-  /* 资质 66 → 体魄无墙，当年即破；判定走 commitTier，是层级唯一的写入点 */
+  /* r39：判定只更新 **层级 lv**，境界 level 不动、修为条不清 */
   const r = effects.run(s, [{ call: { macro: 'macro.break.attempt', args: { dao: 'body', tier: 1 } } }], { rules, rng: () => 0.99 });
-  assert.strictEqual(s.path.body.level, 1, '该进体魄');
-  assert.strictEqual(s.path.body.bar, 0, '破境成功要清条');
+  assert.strictEqual(s.path.body.lv, 1, '层级该通到 1');
+  assert.strictEqual(s.path.body.level, 0, '境界还没进（层级≠境界）');
+  assert.strictEqual(s.path.body.bar, 200, '只通层级，不清条');
   assert.strictEqual(r.errors.length, 0);
+
+  /* 玩家再点一次「突破」，这才进品、才清条 */
+  const realm = require('../src/model/rules/realm');
+  const b = realm.breakthrough(s, { dao: 'body', tier: 1 }, { rules });
+  assert.strictEqual(b.ok, true, b.why);
+  assert.strictEqual(s.path.body.level, 1, '境界进到体魄');
+  assert.strictEqual(s.path.body.bar, 0, '进品才清条');
 });
 
 test('I2 / I25：修为条不许乘，层级不许直接写', () => {
@@ -1263,6 +1302,7 @@ test('事件瓶颈：判定层硬闯没用，突破是"把那件事办掉"（r30
   /* 锻体·朝元圆满 + 战功够：该轮到「武名动四方」了 */
   const s = opening();
   s.path.body.level = 4;
+  s.path.body.lv = 4;                     /* r39：层级也要到 4，否则 level_gap */
   s.path.body.bar = rules.PROF.body[3];
   s.merit.war = 120;
 
@@ -1270,15 +1310,16 @@ test('事件瓶颈：判定层硬闯没用，突破是"把那件事办掉"（r30
   assert.strictEqual(card.kind, 'event_once', '品 5 是事件瓶颈');
 
   /* 判定层：没有事件就不给过（硬闯无效） */
-  const judge = realm.judgeBreak(s, { dao: 'body', tier: 5 }, { rules });
+  const judge = realm.raiseLevel(s, { dao: 'body', tier: 5 }, { rules });
   assert.strictEqual(judge.ok, false);
   assert.strictEqual(judge.why, 'need_event');
 
   /* 突破按钮：把那一件事办掉，直接进品，不再掷骰 */
+  /* r39：事件办完只通层级，境界要另点 */
   const go = turn.act(s, { kind: 'break', dao: 'body', tier: 5, mode: 'try' });
   assert.strictEqual(go.ok, true, go.reason || '');
-  assert.strictEqual(s.path.body.level, 5, '事件办完直接进金身');
-  assert.strictEqual(s.path.body.bar, 0, '进品清条');
+  assert.strictEqual(s.path.body.lv, 5, '事件办完，层级通到金身');
+  assert.strictEqual(s.path.body.level, 4, '境界还在朝元（层级≠境界）');
   assert.ok(s.log.some((l) => l.includes('武名动四方')), '纪事里要看得到那一关的名字');
 });
 
@@ -1300,7 +1341,9 @@ test('回合：蒙学卒试真的把学籍推到府学', () => {
   const s = fresh();
   assert.strictEqual(s.education.stage, 'meng');
 
-  turn.act(s, { kind: 'event', id: 'evt.edu.graduate.meng', choice: 'sit' });
+  /* r39：蒙学毕业在 10 岁，且只有「收拾书箱」这一个选项 */
+  s.clock.age = 10;
+  turn.act(s, { kind: 'event', id: 'evt.edu.graduate.meng', choice: 'leave' });
   assert.strictEqual(s.education.stage, 'fu');
   assert.strictEqual(s.flags.edu.meng.done, true);
 });
@@ -1342,9 +1385,13 @@ test('修心：破境不清道心（累计制）', () => {
   /* r35：心性 < 90 时修心突破必然失败，所以这条测试必须先把心性抬到 90 */
   s.attr.heart.base = 95;
 
-  const force = realm.judgeBreak(s, { dao: 'heart', tier: 1, force: true }, { rules, rng: () => 0.5 });
-  assert.strictEqual(force.ok, true, '事件办成了就该进品');
-  assert.strictEqual(s.path.heart.level, 1);
+  /* r39：先通层级，再点突破 */
+  const force = realm.raiseLevel(s, { dao: 'heart', tier: 1, byEvent: true }, { rules, rng: () => 0.5 });
+  assert.strictEqual(force.ok, true, '事件办成了就该通层级');
+  assert.strictEqual(s.path.heart.lv, 1, '层级到 1');
+  const brk = realm.breakthrough(s, { dao: 'heart', tier: 1 }, { rules });
+  assert.strictEqual(brk.ok, true, brk.why);
+  assert.strictEqual(s.path.heart.level, 1, '境界进到不惑');
   assert.strictEqual(s.path.heart.bar, 100, '道心不清零，接着往上攒');
 });
 
@@ -1356,14 +1403,14 @@ test('修心：心性 < 90 突破必然失败（r35）', () => {
   s.path.heart.bar = 100;
 
   /* 事件瓶颈的 force 也救不了：心性不够就是进不去 */
-  const r = realm.judgeBreak(s, { dao: 'heart', tier: 1, force: true }, { rules, rng: () => 0.01 });
+  const r = realm.raiseLevel(s, { dao: 'heart', tier: 1, byEvent: true }, { rules, rng: () => 0.01 });
   assert.strictEqual(r.ok, false, '心性 89 必须失败');
   assert.strictEqual(r.why, 'heart_low');
   assert.strictEqual(s.path.heart.level, 0, '层级不动');
 
   /* 正好 90 就放行 */
   s.attr.heart.base = 90;
-  const r2 = realm.judgeBreak(s, { dao: 'heart', tier: 1, force: true }, { rules, rng: () => 0.01 });
+  const r2 = realm.raiseLevel(s, { dao: 'heart', tier: 1, byEvent: true }, { rules, rng: () => 0.01 });
   assert.strictEqual(r2.ok, true, '心性 90 应当放行');
 });
 
@@ -1402,6 +1449,213 @@ test('裁剪：玩家拿不到权重与来源', () => {
   assert.ok(!('do' in forPlayer.choices[0]), '选项效果不该给玩家');
   const forAdmin = cropEvent(ev, 'sysadmin');
   assert.strictEqual(forAdmin.weight, 3, 'sysadmin 应该看到全部');
+});
+
+
+test('r39 时间线：7/10/11/14/15/16/19 岁各有一个强制事件', () => {
+  const demo = require('../src/model/state/demo');
+  const config = require('../src/model/repository/config');
+
+  const ev = (id) => config.get('events').find((x) => x.id === id);
+  const ageOf = (id) => {
+    const e = ev(id);
+    const w = (e.when || []).find((x) => x.eq && x.eq[0] === 'clock.age');
+    return w ? w.eq[1] : null;
+  };
+
+  assert.strictEqual(demo.initial('测').clock.age, 7, '开局 7 岁');
+
+  const chain = [
+    ['evt.edu.enter.meng', 7, 3],
+    ['evt.edu.graduate.meng', 10, 1],
+    ['evt.edu.enter.ganqi', 11, 6],
+    ['evt.art.choose', 14, 6],
+    ['evt.edu.exam.great', 15, 6],
+    ['evt.edu.enter.tai', 16, 1],
+    ['evt.edu.graduate.tai', 19, 1]
+  ];
+  for (const [id, age, months] of chain) {
+    assert.strictEqual(ageOf(id), age, id + ' 该 ' + age + ' 岁');
+    assert.strictEqual(ev(id).months, months, id + ' 耗时 ' + months + ' 月');
+    assert.strictEqual(!!ev(id).forced, true, id + ' 该是强制');
+  }
+
+  for (const id of ['evt.edu.graduate.meng', 'evt.edu.exam.great']) {
+    assert.strictEqual((ev(id).choices || []).length, 1, id + ' 只该剩一个选项');
+  }
+  assert.strictEqual((ev('evt.edu.enter.tai').choices || []).length, 2, '太学判定有两个分支');
+  assert.ok((ev('evt.art.choose').choices || []).length >= 9, '百艺可选多门');
+});
+
+test('r39 突破次数：入门关同年可多试，品内一年一次', () => {
+  const demo = require('../src/model/state/demo');
+  const realm = require('../src/model/rules/realm');
+  const rules = require('../src/model/repository/config').get('rules');
+
+  /* 入门关（体魄）：连试三次都该被允许 */
+  const e = demo.initial('测', { rng: () => 0.5 });
+  e.turn = {};
+  e.path.body.wall = { 1: true };
+  for (let i = 0; i < 3; i += 1) {
+    const r = realm.raiseLevel(e, { dao: 'body', tier: 1 }, { rules, rng: () => 0.99 });
+    assert.notStrictEqual(r.why, 'one_per_year', '入门关不该被年份拦住');
+  }
+
+  /* 品内（脏腑）：第一次之后，同年再试要被拒 */
+  const s = demo.initial('测', { rng: () => 0.5 });
+  s.turn = {};
+  s.path.body.level = 1;
+  s.path.body.lv = 1;
+  s.path.body.wall = { 2: true };
+  s.path.body.attempts = 1;
+  const first = realm.raiseLevel(s, { dao: 'body', tier: 2 }, { rules, rng: () => 0.99 });
+  assert.notStrictEqual(first.why, 'one_per_year', '第一次该放行');
+  const second = realm.raiseLevel(s, { dao: 'body', tier: 2 }, { rules, rng: () => 0.99 });
+  assert.strictEqual(second.why, 'one_per_year', '品内同年第二次该被拒');
+});
+
+test('r39 法术分栏：修炼列表只给已学，学习列表只给真能学', () => {
+  const demo = require('../src/model/state/demo');
+  const hand = require('../src/model/systems/hand');
+
+  const s = demo.initial('测', { rng: () => 0.5 });
+  s.turn = s.turn || {};
+  s.turn.mainDone = true;
+
+  const practice = hand.spellPractice(s);
+  const learn = hand.spellLearn(s);
+
+  /* 已学的只该有罗汉拳（开局必教） */
+  assert.ok(practice.every((x) => x.known), '修炼列表里只能有已学的');
+  assert.ok(practice.some((x) => x.id === 'spell.luohan'), '罗汉拳该在修炼列表');
+
+  /* 能学的：境界够；法相才能学的（五雷正法）不该出现 */
+  for (const x of learn) {
+    assert.ok(!x.known, '学习列表里不该有已学的');
+    assert.ok(!x.locked, '被境界拦住的术法不该出现在学习列表：' + x.id);
+  }
+  assert.ok(!learn.some((x) => x.id === 'spell.wulei'), '炼气不够，五雷正法不该出现');
+});
+
+
+test('r39 心性事件：扣心的必须有正收益 + 只来一次', () => {
+  const config = require('../src/model/repository/config');
+  const events = config.get('events');
+
+  const negDelta = (c) => {
+    const out = [];
+    const walk = (n) => {
+      if (Array.isArray(n)) { n.forEach(walk); return; }
+      if (!n || typeof n !== 'object') return;
+      for (const k of Object.keys(n)) {
+        if (k === 'add' && Array.isArray(n[k]) && n[k][0] === 'attr.heart.eff' && Number(n[k][1]) < 0) {
+          out.push(Number(n[k][1]));
+        }
+        walk(n[k]);
+      }
+    };
+    walk(c.do || []);
+    return out;
+  };
+
+  for (const e of events) {
+    const bad = (e.choices || []).filter((c) => negDelta(c).length);
+    if (!bad.length) continue;
+
+    for (const c of bad) {
+      /* ② 必须有正收益（钱 / 属性 / 声望 / 道心 / 术法 / 战斗） */
+      const t = JSON.stringify(c.do || []);
+      const gain = /money|attr\.(insight|aptitude)|reputation|path\.heart\.bar|learn|judge/.test(t);
+      assert.ok(gain, e.id + '/' + c.id + ' 扣了心性却没给正收益');
+    }
+
+    /* ④ 一次性守卫：**强制事件**必须"来过就别再来"；
+          普通灾祸不强制（它靠 weight 控频率，本来就该偶尔重复） */
+    if (e.forced) {
+      const t = JSON.stringify(e.when || []);
+      assert.ok(/none/.test(t), e.id + ' 是强制事件却扣心性，没有 none 守卫（会年年重来）');
+    }
+  }
+});
+
+test('r39 委托：与百艺挂钩，手艺不够就锁着', () => {
+  const demo = require('../src/model/state/demo');
+  const com = require('../src/model/systems/commission');
+
+  const s = demo.initial('测', { rng: () => 0.5 });
+  assert.strictEqual(com.unlocked(s).length, 0, '一门手艺都没学，接不了委托');
+
+  s.arts.alchemy.learned = true;
+  s.arts.alchemy.lvl = 1;
+  const list = com.unlocked(s);
+  assert.ok(list.length >= 1, '学了丹道，至少有丹道委托');
+  assert.strictEqual(list[0].art, 'alchemy');
+
+  /* 每门百艺都该有一条委托 */
+  const arts = require('../src/seed/arts.json').map((a) => a.id);
+  const covered = com.available(s).map((c) => c.art);
+  for (const id of arts) {
+    assert.ok(covered.indexOf(id) >= 0, '百艺 ' + id + ' 没有对应委托');
+  }
+
+  /* 出城的委托要标 outing */
+  assert.ok(com.available(s).some((c) => c.outing), '至少有一条出城委托');
+});
+
+test('r39 物品：只显示级别，不写"品"', () => {
+  const grade = require('../src/model/rules/grade');
+  assert.strictEqual(grade.itemLabel(2, 3), '2 阶黄上级');
+  assert.strictEqual(grade.itemLabel(1, 1), '1 阶黄下级');
+  assert.strictEqual(grade.itemLabel(2, 4), '2 阶玄级');
+});
+
+
+test('r39 求学：每品一次，换品重新计', () => {
+  const demo = require('../src/model/state/demo');
+  const hand = require('../src/model/systems/hand');
+  const rules = require('../src/model/repository/config').get('rules');
+
+  const s = demo.initial('测', { rng: () => 0.5 });
+  s.education.stage = 'fu';
+  s.education.graduated = false;
+  s.clock.age = 12;
+  s.path.body.level = 1;
+  s.path.body.lv = 1;
+  s.path.body.bar = rules.PROF.body[0];
+
+  const card2 = () => hand.breakCards(s).find((b) => b.dao === 'body');
+  assert.ok(card2() && card2().study, '品 2 一开始可求学');
+
+  /* 求过一次：这一品不能再求 */
+  s.flags.study = { body: { 2: true } };
+  assert.ok(!card2().study, '品 2 求过就不能再求');
+
+  /* 升到品 3：重新给一次 */
+  s.path.body.level = 2;
+  s.path.body.lv = 2;
+  s.path.body.bar = rules.PROF.body[1];
+  assert.ok(card2().study, '换到品 3 该重新可求学');
+
+  /* 封顶与"每次的量"一致（r39 修了 0.06/0.12 的误导） */
+  assert.strictEqual(rules.SUCCESS.teachCap['1'], rules.SUCCESS.teachPerSession,
+    'teachCap 该等于 teachPerSession（每品只求一次）');
+});
+
+test('r39 接口：payload 必须带 events 数组（老前端按数组读）', () => {
+  const demo = require('../src/model/state/demo');
+  const opening = require('../src/model/systems/opening');
+  const hand = require('../src/model/systems/hand');
+
+  const s = demo.initial('测', { rng: () => 0.5 });
+  opening.apply(s, { rng: () => 0.5 });
+  const table = hand.table(s);
+
+  /* 开局一定有主卡（7 岁进蒙学） */
+  assert.ok(table.main, '开局该有主卡');
+  assert.strictEqual(table.main.id, 'evt.edu.enter.meng');
+  /* table.events 与 main 一致 */
+  assert.strictEqual(table.events.length, 1, 'table.events 该只有一张');
+  assert.strictEqual(table.events[0].id, table.main.id);
 });
 
 /* ── 串起来跑 ───────────────────────────────────────── */

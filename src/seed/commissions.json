@@ -1,0 +1,137 @@
+{
+  "_note": "r39：委托与每一门百艺挂钩（需求/20 §7.4）。reqLv = 要几档手艺；outing = 是否出城（会掷路上事件）。",
+  "tbl.commissions": [
+    {
+      "no": 1,
+      "art": "alchemy",
+      "name": "城主府要一批伤药",
+      "reqLv": 0,
+      "months": 2,
+      "pay": 180,
+      "outing": false,
+      "risk": 0,
+      "desc": "炼一批军中用的伤药。炼坏了要赔料。"
+    },
+    {
+      "no": 2,
+      "art": "forge",
+      "name": "军械坊修一批兵器",
+      "reqLv": 0,
+      "months": 2,
+      "pay": 200,
+      "outing": false,
+      "risk": 0,
+      "desc": "断口要重新淬，活不重，但量大。"
+    },
+    {
+      "no": 3,
+      "art": "talisman",
+      "name": "给商队备符",
+      "reqLv": 0,
+      "months": 2,
+      "pay": 160,
+      "outing": false,
+      "risk": 0,
+      "desc": "商队走远路，符要够用。画歪了他们会退。"
+    },
+    {
+      "no": 4,
+      "art": "array",
+      "name": "给富户布宅阵",
+      "reqLv": 1,
+      "months": 3,
+      "pay": 600,
+      "outing": true,
+      "risk": 0.1,
+      "desc": "上门布阵。宅子里的人不好伺候。"
+    },
+    {
+      "no": 5,
+      "art": "medicine",
+      "name": "出诊",
+      "reqLv": 0,
+      "months": 2,
+      "pay": 150,
+      "outing": true,
+      "risk": 0.1,
+      "desc": "城里城外的病人。有传染的，有闹的。"
+    },
+    {
+      "no": 6,
+      "art": "planting",
+      "name": "给药圃看苗",
+      "reqLv": 0,
+      "months": 2,
+      "pay": 120,
+      "outing": true,
+      "risk": 0.25,
+      "desc": "城郊的田庄。要防野物，也要防人。"
+    },
+    {
+      "no": 7,
+      "art": "beast",
+      "name": "捕一头兽",
+      "reqLv": 0,
+      "months": 3,
+      "pay": 520,
+      "outing": true,
+      "risk": 0.4,
+      "desc": "野外。要活的，所以不能直接弄死它。"
+    },
+    {
+      "no": 8,
+      "art": "puppet",
+      "name": "给守城械做维护",
+      "reqLv": 1,
+      "months": 2,
+      "pay": 340,
+      "outing": false,
+      "risk": 0,
+      "desc": "坊里的活。机关比人听话。"
+    },
+    {
+      "no": 9,
+      "art": "feast",
+      "name": "给宴席掌勺",
+      "reqLv": 0,
+      "months": 1,
+      "pay": 140,
+      "outing": false,
+      "risk": 0,
+      "desc": "主家要面子，菜不能出错。"
+    },
+    {
+      "no": 10,
+      "art": "geomancy",
+      "name": "替人寻矿脉",
+      "reqLv": 1,
+      "months": 3,
+      "pay": 700,
+      "outing": true,
+      "risk": 0.4,
+      "desc": "荒山里走。塌方比强盗更常见。"
+    },
+    {
+      "no": 11,
+      "art": "appraise",
+      "name": "替商行掌眼",
+      "reqLv": 0,
+      "months": 2,
+      "pay": 220,
+      "outing": false,
+      "risk": 0,
+      "desc": "看走眼要赔。这一行靠眼力吃饭。"
+    },
+    {
+      "no": 12,
+      "art": "brew",
+      "name": "送一批酒到邻城",
+      "reqLv": 0,
+      "months": 3,
+      "pay": 480,
+      "outing": true,
+      "risk": 0.4,
+      "desc": "车要走三天。路上什么都有。"
+    }
+  ]
+}

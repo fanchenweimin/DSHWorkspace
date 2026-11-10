@@ -1,22 +1,23 @@
 'use strict';
 
 /**
- * 开局：七岁入蒙学，到十岁这三年。
+ * 开局：**七岁，刚入蒙学**（r38）。
  *
- * r28 口径（用户口径 + `归档/境界系统总纲.md` §「修为总量的定义」）：
- *   **入第一品不是"攒满进度条"，而是一次瓶颈判定。**
- *     · 没墙 → 直接站在体魄（level 1）；
- *     · 有墙 → 停在门口（level 0），当年只剩这一关。
- *   所以 level 0 **没有修为条**，界面上也就不该出现"未入门 + 进度条"那一格。
+ * 旧口径（r28–r37）是"十岁开局，蒙学已经坐了三年"，所以开局白送 45% 内力。
+ * r38 改成从 7 岁开始，**那三年还没过**，所以：
+ *   · 锻体**永远是 0 品起步**（筋骨没练开是常态）；
+ *   · **不白送任何修为**——第一年的"打熬筋骨"才是玩家练的第一份内力。
  *
- *   修为条从第 1 品才开始有：站在体魄练满 140，才有资格破脏腑（`PROF[0]`）。
+ * 体魄这一关（`appearRate('body', 1)`）仍然在开局判一次：
+ *   · 没墙 → 天赋好，直接就站在体魄上（level 1，lv 1，bar 0）
+ *   · 有墙 → 停在门口（level 0），要先冲过去
  *
  * 这里只改开局那一瞬，不参与回合结算。
  */
 
 const realm = require('../rules/realm');
 
-const START_AGE = 10;
+const START_AGE = 7;      /* r38：七岁入蒙学 */
 
 /**
  * @param {object} state  demo.initial() 的产物
@@ -32,6 +33,7 @@ function apply(state, opts) {
   p.wall = p.wall || {};
   p.study = p.study || {};
   p.level = 0;
+  p.lv = 0;
   p.bar = 0;
 
   const q = realm.appearRate(state, 'body', 1, rules);
@@ -39,20 +41,19 @@ function apply(state, opts) {
   if (q > 0 && rng() < q) {
     p.wall[1] = true;
     state.lifespan = realm.lifespanOf(state, rules);
-    state.log.push('你今年十岁。筋骨还没练开——体魄这一关，得你自己过。');
+    state.log.push('你今年七岁，第一天进蒙学。先生让你站直了看——你的筋骨还没练开。');
     return { entered: false, q, bar: 0 };
   }
 
+  /* 没墙：天生筋骨就开（r36：境界与层级一起写；r38：不给白送的修为） */
   p.level = 1;
+  p.lv = 1;
   p.wall[1] = false;
-
-  /* 三年蒙学不是白坐的：先给不到半条内力，剩下的自己练 */
-  const cap = ((rules.PROF || {}).body || [])[0] || 0;
-  p.bar = Math.round(cap * 0.45);
+  p.bar = 0;
 
   state.lifespan = realm.lifespanOf(state, rules);
-  state.log.push(`你今年十岁，已经站在体魄上（${Math.round(p.bar)} / ${cap}）。`);
-  return { entered: true, q, bar: p.bar };
+  state.log.push('你今年七岁，第一天进蒙学。先生说你筋骨已经开了——体魄这一关，你跳过去了。');
+  return { entered: true, q, bar: 0 };
 }
 
 module.exports = { apply, START_AGE };

@@ -180,7 +180,13 @@ function breakCards(state) {
     const p = state.path[dao];
     if (!p) continue;
 
-    const level = num(p.level);
+    const level = num(p.level);                        /* 境界（站在第几品） */
+    const lv = num(p.lv != null ? p.lv : p.level);     /* 层级（门通到第几层） */
+
+    /* r36：下一张卡永远是"**下一个境界**"（`level + 1`）。
+       它有两种状态：
+         · lv < level+1 → 层级还没通 → 卡是「冲关」
+         · lv ≥ level+1 → 层级通了 → 卡是「突破境界」（玩家点不点随他） */
     const tier = level + 1;
     const prof = rules.PROF[dao] || [];
     if (tier > prof.length) continue;                 /* 这一道已经到顶了 */
@@ -188,9 +194,8 @@ function breakCards(state) {
     const cap = realm.barMax(state, dao, rules);
     const barFull = cap == null ? true : num(p.bar) >= cap - 0.001;
 
-    /* 一年只能破一次境界：今年已经破过了，就不再摆别的关（入门关不算，照摆） */
     const entryCard = level === 0 && tier === 1;
-    if (!entryCard && state.turn && state.turn.breakthroughUsed) continue;
+    const levelReady = lv >= tier;
 
     /* 事件瓶颈的月数由那件事自己定（大心关三个月、武名动四方三个月…） */
     const kind = realm.bottleneckOf(dao, tier);
@@ -210,7 +215,9 @@ function breakCards(state) {
       key: `break:${dao}:${tier}`,
       dao,
       tier,
-      /* prob = 概率瓶颈（掷骰冲关）；其余 = 事件瓶颈（把那一件事办掉，r30） */
+      level,                                        /* 境界：站在第几品 */
+      lv,                                           /* 层级：门通到第几层 */
+      /* prob = 概率瓶颈（掷骰冲关）；其余 = 事件瓶颈（把那一件事办掉） */
       kind,
       entry: level === 0 && dao !== 'heart',        /* 入门关：没有修为条 */
       title: (tiers[dao] || [])[tier - 1] || `第 ${tier} 品`,
@@ -218,6 +225,8 @@ function breakCards(state) {
       /* 闭关多久：按属性反比（r33）——资质好的人破同样的关快些 */
       months: time.breakMonths(state, dao, tier),
       ready: barFull,
+      /* r36：lv 到位 → 只剩"点不点突破"；没到位 → 这张卡是"冲关" */
+      levelReady,
       bar: round1(p.bar),
       barMax: cap == null ? null : round1(cap),
       gateOk,
@@ -296,12 +305,48 @@ function artRow(state) {
 
 /* ── 法术一行 ─────────────────────────────────────────── */
 
+/**
+ * 法术列表（r39 重做）。
+ *
+ * **分成两份，别混**（需求/15 §1.2、`设计/40` §3.2.1）：
+ *   practice — **我已经学了的**，这一格是"怎么练"（没买的术法不该出现在这里）
+ *   learn    — **我今天真能学的**：境界够 且 有一条能走的来路（有钱 / 在学 / 有军功）
+ *
+ * 境界不够的（比如要法相才能学的）**一律不出现**——他没到那儿，那门对他等于不存在。
+ */
 function spellRow(state) {
-  return spells.publicList(state).map((s) => ({
+  const practice = spells.publicList(state, { only: 'known' }).map((s) => ({
     ...s,
-    /* 已学：练到下一档要几个月；没学：学会要几个月 */
-    months: s.known ? (spells.monthsToNext(state, s.id) || 0) : time.learnMonths(state, 'spell')
+    months: spells.monthsToNext(state, s.id) || 0
   }));
+
+  const learn = spells.publicList(state, { only: 'actionable' })
+    .filter((s) => !s.known)
+    .map((s) => ({
+      ...s,
+      months: time.learnMonths(state, 'spell')
+    }));
+
+  /* 兼容老调用方：合并成一个数组（练的在前） */
+  return practice.concat(learn);
+}
+
+/** 只给"练"的那一份（界面用这个分栏） */
+function spellPractice(state) {
+  return spells.publicList(state, { only: 'known' }).map((s) => ({
+    ...s,
+    months: spells.monthsToNext(state, s.id) || 0
+  }));
+}
+
+/** 只给"能学"的那一份 */
+function spellLearn(state) {
+  return spells.publicList(state, { only: 'actionable' })
+    .filter((s) => !s.known)
+    .map((s) => ({
+      ...s,
+      months: time.learnMonths(state, 'spell')
+    }));
 }
 
 /* ── 兜底：还有月份，却没有一件做得成的事 ───────────── */
@@ -334,7 +379,8 @@ function nothingToDo(state, main, breaks, train, art, actions) {
 function table(state) {
   if (state.dead) {
     return {
-      main: null, events: [], breaks: [], train: [], arts: [], spells: [], actions: [],
+      main: null, events: [], breaks: [], train: [], arts: [], spells: [],
+      spellPractice: [], spellLearn: [], actions: [],
       locked: false, canWait: false, monthsLeft: 0, artAge: artAge()
     };
   }
@@ -350,6 +396,8 @@ function table(state) {
       /* 左栏要显示"我学了什么、练到哪了"——封住的只是"能不能做"，不是"能不能看" */
       arts: artRow(state),
       spells: spellRow(state),
+      spellPractice: spellPractice(state),
+      spellLearn: spellLearn(state),
       locked: true, canWait: draw.nothingToDo(state, main), monthsLeft: MONTHS_PER_YEAR - num(state.monthsUsed),
       artAge: artAge()
     };
@@ -358,8 +406,11 @@ function table(state) {
   const breaks = breakCards(state).filter((b) => (b.entry ? b.gateOk : true));
   const train = trainRow(state);
   const art = artRow(state);
-  const spell = spellRow(state);
   const actions = resident(state);
+
+  /* r39：法术分两份——"练"（已学）与"学"（今天真能学） */
+  const spellPracticeList = spellPractice(state);
+  const spellLearnList = spellLearn(state);
 
   return {
     main,
@@ -367,7 +418,11 @@ function table(state) {
     breaks,
     train,
     arts: art,
-    spells: spell,
+    /* 老字段：合并版，给不区分练/学的调用方 */
+    spells: spellPracticeList.concat(spellLearnList),
+    /* 新字段：界面按这两个分栏画 */
+    spellPractice: spellPracticeList,
+    spellLearn: spellLearnList,
     actions,
     locked: false,
     canWait: nothingToDo(state, main, breaks, train, art, actions),
@@ -378,5 +433,6 @@ function table(state) {
 
 module.exports = {
   hand, resident, table, all, expand, MONTHS_PER_YEAR,
-  breakCards, trainRow, artRow, spellRow, gateOf, artAge, inSchool, tutorCost, DAO_CN
+  breakCards, trainRow, artRow, spellRow, spellPractice, spellLearn,
+  gateOf, artAge, inSchool, tutorCost, DAO_CN
 };

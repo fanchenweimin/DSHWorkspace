@@ -38,6 +38,17 @@ function getPath(path, ctx) {
     return s.split('.').slice(1).reduce((o, k) => (o == null ? undefined : o[k]), ctx.state.flags || {});
   }
   if (!s.includes('.') && !ROOTS.has(s)) return s; // 字面量（'city'、'meng'）
+
+  /* r37 修：`.eff` 结尾的路径必须走 `mods.get()`。
+     状态里存的是 `{ base: 85 }` 这样的对象，`.eff` 是**现算**的（修饰器 + 上限）。
+     直接 reduce 会拿到对象，`cmp()` 判成 NaN，于是 `gte ['attr.aptitude.eff', 80]`
+     永远为假——这会让所有读 `.eff` 的条件静默失效。 */
+  if (s.endsWith('.eff')) {
+    const mods = require('./mods');
+    const v = mods.get(ctx.state, s);
+    if (v !== undefined) return v;
+  }
+
   return s.split('.').reduce((o, k) => (o == null ? undefined : o[k]), ctx.state);
 }
 

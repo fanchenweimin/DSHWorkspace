@@ -89,8 +89,9 @@ function cropState(state, viewer) {
     out.path = p;
   }
 
-  /* ⑥ 内部计数 */
-  delete out.monthsUsed;
+  /* ⑥ monthsUsed 要留：界面靠它画"这一年还剩几个月"的刻度。
+     它不是隐藏属性，是游戏节奏本身。 */
+  out.monthsUsed = state.monthsUsed;
 
   return out;
 }

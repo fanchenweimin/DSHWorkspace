@@ -366,24 +366,28 @@ function strike(att0, dfd, move0, rng) {
   const sup = suppressMul(att, dfd);
 
   /**
-   * 品阶够不够得着（用户口径 r33）：术法有品阶，对手有阶品；
-   * 黄上小成（2 阶 2 品）打 2 阶 3 品的人，威力只剩一成。
-   * 拳脚没有品阶，不受这条约束。
+   * 两层判定，**顺序不能反**（r39，需求/11 §2.9.0.2）：
+   *
+   *   ① itemFit —— **这门术法 / 这件东西，你还用得上吗**（代差）
+   *        跨大阶 → 完全无效；高一个小品 → 一成；否则满效果
+   *   ② reach   —— **使出来之后，压不压制得住对手**（差距）
+   *        人的 L=阶+品，差一级 ×0.1
+   *
+   * 拳脚（rank 0）两套都不套：它没有品阶，只吃大境界压制。
+   *
+   * **r39：取消"以力驭法"**（用户裁决）。旧规则说"境界高了能用自身阶品撑起低阶术法，
+   * 打 0.75 折"，但那与"物品有代差"直接冲突——罗汉拳到了脏腑就只能发挥一成，
+   * 到调息就彻底没用。**术法的阶品是它自己的，不随人涨。**
    */
   let gRatio = 1;
-  let bend = false;
+  let fitWhy = '';
   if (num(move.rank) > 0) {
-    const moveL = grade.level(move.jie, move.pin);
-    const selfL = grade.level(att.rank, att.tier);
-    if (selfL > moveL) {
-      /*
-       * r34 以力驭法：修为够高的人拿一门低阶术法，也能把它撑到自己的阶品上。
-       * 打 0.75 折——不如练高阶术法划算，但不至于"境界高了，旧术法就变废纸"。
-       */
-      gRatio = grade.reach(att.rank, att.tier, dfd.rank, dfd.tier) * 0.75;
-      bend = true;
+    const fit = grade.itemFit(att.rank, att.tier, move.jie, move.pin);
+    fitWhy = fit.why;
+    if (!fit.usable) {
+      gRatio = 0;                       /* 跨阶 / 超两品：彻底没用 */
     } else {
-      gRatio = grade.reach(move.jie, move.pin, dfd.rank, dfd.tier);
+      gRatio = grade.reach(move.jie, move.pin, dfd.rank, dfd.tier) * fit.mul;
     }
   }
 
@@ -422,7 +426,7 @@ function strike(att0, dfd, move0, rng) {
     dfd.will -= dmg;
   }
 
-  return { dodged: false, guard: false, seg, sup, gRatio, bend, means, move: shown, rolled: means !== att0.means };
+  return { dodged: false, guard: false, seg, sup, gRatio, fitWhy, means, move: shown, rolled: means !== att0.means };
 }
 
 function alive(s) {
@@ -574,10 +578,12 @@ function resolve(state, params, ctx) {
       text = `${whoName}运起「${r.move.name}」，身前撑起一层护盾。`;
     } else {
       const gname = r.move.grade ? `（${r.move.grade}）` : '';
-      /* 品阶不够：这一下几乎打不进去，得让玩家看见为什么 */
-      const weak = num(r.gRatio) < 0.5
-        ? '，品阶差着一截，只擦破一点皮'
-        : (r.bend ? '，以力驭法，威力打了折' : '');
+      /* r39：分清"没用"与"打折"——玩家要知道这门术法是不是该换代了 */
+      let weak = '';
+      if (r.fitWhy === 'cross_tier') weak = '，这东西对上了大阶，完全使不出来';
+      else if (r.fitWhy === 'out_of_range') weak = '，阶品差得太远，一点都打不进去';
+      else if (r.fitWhy === 'diluted') weak = '，阶品差着一品，威力只剩一成';
+      else if (num(r.gRatio) < 0.5) weak = '，品阶差着一截，只擦破一点皮';
       text = `${whoName}${VERB[r.means]}「${r.move.name}」${gname}，${otherName}${dmgText(r.seg)}${weak}。`;
     }
 

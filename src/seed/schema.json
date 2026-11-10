@@ -2,6 +2,30 @@
   "_note": "配置页的'人话说明书'：字段中文名、哪些字段不许人改（机器生成的坐标 / 轮廓 / 语义表）、列宽。form.js 只读这一份，不再把中文名写死在代码里。路径用点分，* 匹配任意一段。",
   "version": "r27",
   "fields": {
+    "1": {
+      "label": "第一品",
+      "width": 90
+    },
+    "2": {
+      "label": "第二品",
+      "width": 90
+    },
+    "3": {
+      "label": "第三品",
+      "width": 90
+    },
+    "4": {
+      "label": "第四品",
+      "width": 90
+    },
+    "5": {
+      "label": "第五品",
+      "width": 90
+    },
+    "6": {
+      "label": "第六品",
+      "width": 90
+    },
     "no": {
       "label": "主键",
       "width": 56,
@@ -673,30 +697,6 @@
       "label": "悟性",
       "width": 76
     },
-    "1": {
-      "label": "第一品",
-      "width": 90
-    },
-    "2": {
-      "label": "第二品",
-      "width": 90
-    },
-    "3": {
-      "label": "第三品",
-      "width": 90
-    },
-    "4": {
-      "label": "第四品",
-      "width": 90
-    },
-    "5": {
-      "label": "第五品",
-      "width": 90
-    },
-    "6": {
-      "label": "第六品",
-      "width": 90
-    },
     "restMonths": {
       "label": "过完当年（闲居）",
       "width": 110
@@ -888,6 +888,22 @@
     "surrenderAt": {
       "label": "认输线（血量比例）",
       "width": 140
+    },
+    "reqLv": {
+      "label": "要几档手艺",
+      "readonly": false
+    },
+    "pay": {
+      "label": "基准报酬（铜）",
+      "readonly": false
+    },
+    "outing": {
+      "label": "是否出城",
+      "readonly": false
+    },
+    "risk": {
+      "label": "路上遇险概率",
+      "readonly": false
     }
   },
   "files": {
@@ -1005,6 +1021,13 @@
       "readonlyPaths": [
         "*.params"
       ]
+    },
+    "commissions": {
+      "label": "委托与百艺",
+      "group": "事件",
+      "readonlyPaths": [
+        "_note"
+      ]
     }
   },
   "hints": {
@@ -1012,6 +1035,7 @@
     "world": "大陆轮廓、国界坐标是算出来的，改了就画歪；要改地图请改 map.js 再重新生成。",
     "ops": "算子表是语义，不是数值。加算子要动代码，改这里没用。",
     "invariants": "不变量是硬约束清单，只读。",
-    "rules": "只改数值，别改结构。破境公式在 src/model/rules/ 里，这里改的是它读的常量。"
+    "rules": "只改数值，别改结构。破境公式在 src/model/rules/ 里，这里改的是它读的常量。",
+    "commissions": "每门百艺一条委托线：要几档手艺、要不要出城、路上有多大风险。"
   }
 }

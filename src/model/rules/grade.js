@@ -67,6 +67,47 @@ function short(jie, pin) {
 }
 
 /**
+ * **物品**的写法：「2 阶黄上级」（r39，需求/11 §2.9.0）。
+ *
+ * 人和物用两套写法：
+ *   人 → `2 阶 3 品`（`short`）
+ *   物 → `2 阶黄上级`（这个函数）
+ *
+ * 因为物品没有"站在第几品"，它只有"给哪个境界用的"。
+ * 数值上两者是同一把尺子（黄下1…天6），只是叫法不同。
+ */
+function itemLabel(jie, pin) {
+  const j = Math.max(1, Math.round(num(jie, 1)));
+  return `${j} 阶${pinName(pin)}级`;
+}
+
+/**
+ * 这件物品对这个人还有没有用（r39，需求/11 §2.9.0.1）。
+ *
+ *   userJie > itemJie          → 完全无效（**跨大阶一律无效，没有例外**）
+ *   userJie < itemJie          → 满效果（新手用高阶货）
+ *   同阶：userPin <= itemPin   → 满效果
+ *   同阶：userPin == itemPin+1 → 打折（默认 0.1）
+ *   同阶：userPin >= itemPin+2 → 无效
+ *
+ * @returns {{usable:boolean, mul:number, why:string}}
+ */
+function itemFit(userJie, userPin, itemJie, itemPin, discount) {
+  const d = discount == null ? 0.1 : num(discount, 0.1);
+  const uj = Math.max(1, Math.round(num(userJie, 1)));
+  const ij = Math.max(1, Math.round(num(itemJie, 1)));
+  const up = clampPin(userPin);
+  const ip = clampPin(itemPin);
+
+  if (uj > ij) return { usable: false, mul: 0, why: 'cross_tier' };
+  if (uj < ij) return { usable: true, mul: 1, why: 'ok' };
+
+  if (up <= ip) return { usable: true, mul: 1, why: 'ok' };
+  if (up === ip + 1) return { usable: true, mul: d, why: 'diluted' };
+  return { usable: false, mul: 0, why: 'out_of_range' };
+}
+
+/**
  * 前进 / 后退若干品，满 6 品进一阶，掉到 0 品退一阶。
  * 用来算"练了几档"和"做出来的东西低一品"。
  */
@@ -110,5 +151,5 @@ function canReach(srcJie, srcPin, dstJie, dstPin) {
 
 module.exports = {
   PIN_NAME, JIE_NAME,
-  pinName, jieName, label, short, add, level, reach, canReach, clampPin
+  pinName, jieName, label, short, itemLabel, add, level, reach, canReach, itemFit, clampPin
 };

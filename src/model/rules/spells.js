@@ -292,13 +292,21 @@ function reqOk(state, spell) {
   return true;
 }
 
-/** 给玩家看的一行 */
-function publicList(state) {
+/**
+ * 给玩家看的一行。
+ *
+ * r39：**加 `only` 过滤**——界面只该画"我已经有的 / 我今天真能学的"。
+ *   only: 'known'    只给已学的（修炼列表用它：没买的东西不该出现在"怎么练"里）
+ *   only: 'actionable' 已学 + 真能学（境界够 且 有一条能走的来路）
+ *   省略           全给（配置页 / 调试用）
+ */
+function publicList(state, opts) {
   ensure(state);
   const DAO_CN = { body: '锻体', qi: '炼气', spirit: '养灵', heart: '修心' };
   const rules = config.get('rules') || {};
   const tiers = rules.TIERS || {};
   const C = rules.CURRENCY || { copper: 100, silver: 100 };
+  const only = (opts && opts.only) || null;
 
   return list().map((s) => {
     const known = know(state, s.id);
@@ -354,6 +362,10 @@ function publicList(state) {
       locked: !!lockHint,
       lockHint
     };
+  }).filter((row) => {
+    if (only === 'known') return row.known;
+    if (only === 'actionable') return row.known || (row.sourceOk && !row.locked);
+    return true;
   });
 }
 
