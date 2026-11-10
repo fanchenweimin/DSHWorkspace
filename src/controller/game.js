@@ -282,4 +282,37 @@ function has(req, res) {
   });
 }
 
-module.exports = { current, act, reset, create, has, saveNow, forget, publicState, identityOf, bagOf };
+/**
+ * GET /api/diag —— 排查用（r39）。
+ *
+ * 「开局没有事件」这类问题，九成是 `dayao_gid` 这个 cookie 指向了一个**没有存档**的 gid，
+ * 于是 `/api/hand` 返回 `{empty:true}`，页面就一片空白。
+ * 这里把"当前 gid / 有没有档 / 档里是什么"一次说清楚。
+ */
+function diag(req, res) {
+  const gid = session.gameId(req, res);
+  const state = running.peek(gid);
+  const out = {
+    gid,
+    hasSave: !!state,
+    viewer: session.viewerOf(req),
+    now: new Date().toISOString()
+  };
+  if (state) {
+    out.state = {
+      age: state.clock && state.clock.age,
+      year: state.clock && state.clock.year,
+      stage: state.education && state.education.stage,
+      monthsUsed: state.monthsUsed,
+      mainId: state.turn && state.turn.mainId,
+      mainDone: state.turn && !!(state.turn && state.turn.mainDone),
+      dead: !!state.dead
+    };
+    const table = handSys.table(state);
+    out.main = table.main ? { id: table.main.id, title: table.main.title } : null;
+    out.events = (table.events || []).map((e) => e.id);
+  }
+  return sendJSON(res, 200, out);
+}
+
+module.exports = { current, act, reset, create, has, saveNow, forget, diag, publicState, identityOf, bagOf };

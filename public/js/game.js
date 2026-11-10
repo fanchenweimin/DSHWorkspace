@@ -787,7 +787,20 @@
       const res = await fetch('/api/hand');
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       DATA = await res.json();
-      if (DATA.empty) { location.href = '/'; return; }
+      if (DATA.empty) {
+        /* r39：不静默跳走——先告诉用户发生了什么，2 秒后再回首页。
+           （"开局没事件"最常见的成因就是这台浏览器的 gid 没有存档。）
+           `?stay=1` 时停下不动，方便排查。 */
+        const stay = /[?&]stay=1/.test(location.search);
+        $('mainCards').innerHTML =
+          '<p class="empty">这台浏览器还没有活着的这一世（或存档已被清掉）。'
+          + '<br />回首页点「开始新游戏」即可。<br />'
+          + '<a href="/">回首页</a>'
+          + (stay ? '' : '<br /><small>2 秒后自动返回…</small>')
+          + '</p>';
+        if (!stay) setTimeout(() => { location.href = '/'; }, 2000);
+        return;
+      }
       S = DATA.state;
       render();
       wire();

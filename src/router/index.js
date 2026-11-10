@@ -21,7 +21,9 @@ const ROUTES = [
   ['POST', '/api/save', game.saveNow],
   ['POST', '/api/forget', game.forget],
   ['GET', '/api/config', content.configIndex],
-  ['GET', '/api/schema', content.schemaDoc]
+  ['GET', '/api/schema', content.schemaDoc],
+  /* r39：排查用——告诉你"这台浏览器是哪一局、那一局在不在库里" */
+  ['GET', '/api/diag', game.diag]
 ];
 
 function matchConfig(method, pathname) {
