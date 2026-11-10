@@ -430,6 +430,37 @@ function breakthrough(state, params, ctx) {
   return { ok: true, why: 'break', tier };
 }
 
+/**
+ * 概率瓶颈的玩家突破动作（r40）：一次点击完成「瓶颈判定 + 真实进品」。
+ *
+ * raiseLevel 与 breakthrough 仍是两个独立的状态函数，但业务动作不能再把
+ * 它们拆成两次点击。否则玩家会先通 lv、再点一次进 level，看起来就像同一关
+ * 被突破了两遍，也绕开了「一年一次真实突破」的操作语义。
+ *
+ * 事件瓶颈不走这里：事件只通 lv，真实突破仍由玩家随后手动触发。
+ */
+function probabilityBreakthrough(state, params, ctx) {
+  const dao = String(params.dao || '');
+  const tier = num(params.tier);
+  const path = state.path[dao];
+  if (!path) return { ok: false, why: 'no_such_dao' };
+  if (bottleneckOf(dao, tier) !== 'prob') return { ok: false, why: 'not_probability_bottleneck' };
+
+  /* 品内在改 lv 之前先查年度名额，避免名额已用时还白白通一层瓶颈。
+     入门关豁免；event 瓶颈的 lv 更新不在这里，也不受这条限制。 */
+  const isEntry = num(path.level) === 0 && tier === 1;
+  if (!isEntry && state.turn && state.turn.breakthroughUsed) {
+    return { ok: false, why: 'one_per_year' };
+  }
+
+  const raised = raiseLevel(state, { dao, tier }, ctx);
+  if (!raised.ok) return raised;
+
+  const broke = breakthrough(state, { dao, tier }, ctx);
+  if (!broke.ok) return { ...broke, raised: true, raise: raised };
+  return { ...broke, ...raised, ok: true, why: 'break', raised: true, broke: true };
+}
+
 /* ── 心性：定时衰减 / 心魔 / 心关失败（需求/01 §3，r35） ────── */
 
 /**
@@ -542,7 +573,7 @@ function heartClashFail(state, rules, rng) {
 module.exports = {
   RANK, DAOS, GONGFA, attrOf, gongfaOf, barMax, baseRate, monthGain, spiritCoef,
   appearRate, successBase, studyBonus, pillBonus, luckAdj,
-  bottleneckOf, commitTier, spill, breakWall, raiseLevel, breakthrough, lifespanOf,
+  bottleneckOf, commitTier, spill, breakWall, raiseLevel, breakthrough, probabilityBreakthrough, lifespanOf,
   monthsToFull, canTrain,
   heartDecay, demonSurvive, canHaveDemon, rollDemon, heartClashFail
 };

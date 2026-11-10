@@ -409,7 +409,11 @@ const OPS = {
 
     if (kind === 'raise') return realm.raiseLevel(ctx.state, { ...params, byEvent: true }, ctx);
     if (kind === 'break') {
-      /* 概率瓶颈走这条；带上 byEvent 时，raiseLevel 会按事件通道处理 */
+      /* r40：概率瓶颈的玩家动作 = 瓶颈判定 + 真实进品，一次完成。
+         byEvent=true 是事件瓶颈通道，只通 lv；真实突破由玩家随后手动点击。 */
+      if (!byEvent && realm.bottleneckOf(params.dao, Number(params.tier)) === 'prob') {
+        return realm.probabilityBreakthrough(ctx.state, params, ctx);
+      }
       return realm.raiseLevel(ctx.state, { ...params, byEvent }, ctx);
     }
     if (kind === 'attr') return judgeAttr(params, ctx);

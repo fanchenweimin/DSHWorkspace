@@ -1258,27 +1258,68 @@ test('修饰器：永久不掉，按年的到期', () => {
   assert.strictEqual(mods.get(s, 'attr.aptitude.eff'), 69, '洗髓是永久的');
 });
 
-test('破境：判定成功才进品，且清条（I3 / I4 / I25）', () => {
+test('破境：概率瓶颈一次点击判定并进品，且清条（I3 / I4 / I25 · r40）', () => {
   const demo = require('../src/model/state/demo');
   const effects = require('../src/model/systems/effects');
   const rules = require('../src/model/repository/config').get('rules');
   const s = fresh();
+  s.turn = s.turn || {};
+  s.turn.mainDone = true;                   /* 别让开局强制事件拦住动作 */
   s.path.body.bar = 200;
 
-  /* r39：判定只更新 **层级 lv**，境界 level 不动、修为条不清 */
+  /* r40：概率瓶颈的玩家动作 = 瓶颈判定 + 真实进品，一次完成。
+     不再有"先通 lv、再点一次进品"的两段式点击。 */
   const r = effects.run(s, [{ call: { macro: 'macro.break.attempt', args: { dao: 'body', tier: 1 } } }], { rules, rng: () => 0.99 });
   assert.strictEqual(s.path.body.lv, 1, '层级该通到 1');
-  assert.strictEqual(s.path.body.level, 0, '境界还没进（层级≠境界）');
-  assert.strictEqual(s.path.body.bar, 200, '只通层级，不清条');
+  assert.strictEqual(s.path.body.level, 1, '同一次点击就进品（r40）');
+  assert.strictEqual(s.path.body.bar, 0, '进品清条');
   assert.strictEqual(r.errors.length, 0);
 
-  /* 玩家再点一次「突破」，这才进品、才清条 */
-  const realm = require('../src/model/rules/realm');
-  const b = realm.breakthrough(s, { dao: 'body', tier: 1 }, { rules });
-  assert.strictEqual(b.ok, true, b.why);
-  assert.strictEqual(s.path.body.level, 1, '境界进到体魄');
-  assert.strictEqual(s.path.body.bar, 0, '进品才清条');
+  /* 入门关不占年度名额——第 2 品同年仍可尝试 */
+  assert.ok(!(s.turn && s.turn.breakthroughUsed), '入门关不占名额');
+  const turn = require('../src/model/systems/turn');
+
+  /* 品内突破（脏腑）占年度名额：先真的破一次第 2 品 */
+  s.path.body.lv = 1;
+  s.path.body.attempts = 2;                 /* 跳过"首次必败" */
+  s.path.body.wall = { 2: true };           /* 墙已掷出、在 */
+  s.path.body.bar = rules.PROF.body[0];     /* 站在体魄，条拉满 */
+  const ok2 = effects.run(s, [{ call: { macro: 'macro.break.attempt', args: { dao: 'body', tier: 2 } } }], { rules, rng: () => 0.001 });
+  assert.strictEqual(ok2.errors.length, 0, ok2.errors.join('; '));
+  assert.strictEqual(s.path.body.level, 2, '第二段点击把品内破到脏腑');
+  assert.strictEqual(s.turn.breakthroughUsed, true, '品内突破要占用年度名额');
+
+  /* 同一年内再冲下一品（品内，非入门）：名额已用，直接拒绝 */
+  s.path.body.bar = rules.PROF.body[1];
+  const again = turn.act(s, { kind: 'break', dao: 'body', tier: 3, mode: 'try' });
+  assert.strictEqual(again.ok, false);
+  assert.ok(String(again.reason || '').includes('一年只能破一次'), '该说清是名额问题：' + again.reason);
 });
+
+test('破境：事件瓶颈先通层级，进品要另点（r40）', () => {
+  const realm = require('../src/model/rules/realm');
+  const rules = require('../src/model/repository/config').get('rules');
+  const s = fresh();
+  s.path.body.level = 4;
+  s.path.body.lv = 4;
+  s.path.body.bar = rules.PROF.body[3];
+
+  /* 事件通道（byEvent）：只通 lv，不进品 */
+  const raised = effects_run(s, [{ call: { macro: 'macro.break.attempt', args: { dao: 'body', tier: 5, byEvent: true } } }], rules);
+  assert.strictEqual(raised.errors.length, 0, raised.errors.join('; '));
+  assert.strictEqual(s.path.body.lv, 5, '事件办完，层级通到金身');
+  assert.strictEqual(s.path.body.level, 4, '境界还在朝元（层级≠境界）');
+
+  /* 玩家手动进品 */
+  const b = realm.breakthrough(s, { dao: 'body', tier: 5 }, { rules });
+  assert.strictEqual(b.ok, true, b.why);
+  assert.strictEqual(s.path.body.level, 5, '点了突破才进金身');
+});
+
+function effects_run(s, list, rules) {
+  const effects = require('../src/model/systems/effects');
+  return effects.run(s, list, { rules, rng: () => 0.99 });
+}
 
 test('I2 / I25：修为条不许乘，层级不许直接写', () => {
   const demo = require('../src/model/state/demo');
@@ -1449,6 +1490,43 @@ test('裁剪：玩家拿不到权重与来源', () => {
   assert.ok(!('do' in forPlayer.choices[0]), '选项效果不该给玩家');
   const forAdmin = cropEvent(ev, 'sysadmin');
   assert.strictEqual(forAdmin.weight, 3, 'sysadmin 应该看到全部');
+});
+
+test('r40 修为条：裁剪后玩家仍拿得到 bar / barMax（进度条不许变 NaN）', () => {
+  const { cropState } = require('../src/controller/serialize');
+  const s = fresh();
+  s.path.body.bar = 120;
+  s.path.body.barMax = 200;
+
+  const out = cropState(s, 'guest');
+  assert.strictEqual(out.path.body.bar, 120, 'bar 要发给浏览器（左栏进度条的分子）');
+  assert.strictEqual(out.path.body.barMax, 200, 'barMax 要发给浏览器（进度条的分母）');
+  assert.ok(!('attr' in out), '隐藏属性仍然要藏');
+  assert.ok(!('lifespan' in out), '寿元仍然要藏');
+  assert.ok(!('luck' in out), '气运仍然要藏');
+});
+
+test('r40 炼气：没完成府学炼气学习，感气这道门不开', () => {
+  const turn = require('../src/model/systems/turn');
+  const hand = require('../src/model/systems/hand');
+
+  const s = fresh();
+  s.turn = s.turn || {};
+
+  /* 门槛没过：卡上的按钮是灰的，硬点也进不去 */
+  let card = hand.breakCards(s).find((b) => b.dao === 'qi' && b.tier === 1);
+  assert.strictEqual(card.gateOk, false, '没上过府学炼气课，门槛该是关的');
+  assert.ok(String(card.gateHint || '').includes('府学'), '提示该说清楚去哪学');
+
+  const blocked = turn.act(s, { kind: 'break', dao: 'qi', tier: 1, mode: 'try' });
+  assert.strictEqual(blocked.ok, false, '没学过炼气知识，不许冲感气');
+  assert.strictEqual(s.path.qi.level, 0, '境界不该动');
+
+  /* 11 岁强制事件办完（flag.edu.ganqi.entered）→ 门槛打开 */
+  s.flags.edu = s.flags.edu || {};
+  s.flags.edu.ganqi = { entered: true };
+  card = hand.breakCards(s).find((b) => b.dao === 'qi' && b.tier === 1);
+  assert.strictEqual(card.gateOk, true, '府学炼气课上完，门槛该开');
 });
 
 

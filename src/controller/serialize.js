@@ -75,19 +75,16 @@ function cropState(state, viewer) {
   delete out.fate;
   delete out.talents;
 
-  /* ⑤ 四道的修为条数值：只给"满没满"与下一个品名 */
-  if (out.path && typeof out.path === 'object') {
-    const p = {};
-    for (const [dao, row] of Object.entries(out.path)) {
-      if (!row || typeof row !== 'object') { p[dao] = row; continue; }
-      const r = { ...row };
-      delete r.bar;
-      delete r.barMax;
-      /* ready 是布尔，留着——它是"修为满了没有"，不是数值 */
-      p[dao] = r;
-    }
-    out.path = p;
-  }
+  /* ⑤ 四道的修为条：**要留着**（r39.3 修）。
+   *
+   * 原以为"修为数值"也该藏，但它是**主界面的核心反馈**——左栏那条进度条
+   * 就是玩家判断"我现在练到哪、还要多久"的唯一依据。藏掉它，界面会显示
+   * `NaN / —`、条也不画（`设计/40` §3.2.1 的"没涉及就隐藏"被用错了地方：
+   * 玩家**已经站在这一品**，它当然"涉及"）。
+   *
+   * 藏的是"隐藏属性 / 寿命 / 气运 / 命格"那些**规则层输入**，
+   * 不是"我练了多少"这种**玩法反馈**。
+   */
 
   /* ⑥ monthsUsed 要留：界面靠它画"这一年还剩几个月"的刻度。
      它不是隐藏属性，是游戏节奏本身。 */

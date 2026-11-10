@@ -298,15 +298,29 @@ function breakAct(state, payload) {
     return { ok: false, reason: `修为还没练满，还差 ${Math.round(left)}。先修满再说。` };
   }
 
-  /* ── r36：**层级已到位 → 这一步是"突破境界"** ──────────────
-     LV 是门票，进不进由玩家决定；条件齐了也能一直不点（合法玩法）。 */
+  /* 品内真实突破全局一年一次。但只有"会造成进品"的点击才看名额：
+     · 概率瓶颈：一次点击 = 判定 + 进品，名额没够直接拒（省月份）；
+     · 层级已到位（事件瓶颈办完事）：点的是"突破境界"，看名额；
+     · 事件瓶颈还没办事：点的是"把那件事办掉"，只通层级不进品——
+       名额用光也该能办，进品等明年（"条件满足了也可以不突破"是合法状态）。
+     入门关不受名额限制。 */
+  const isEntry = num((state.path[dao] || {}).level) === 0 && tier === 1;
+  const willBreak = card.levelReady || card.kind === 'prob';
+  if (willBreak && !isEntry && state.turn && state.turn.breakthroughUsed) {
+    return { ok: false, reason: '一年只能破一次境界。今年已经破过了。' };
+  }
+
+  /* ── 层级已到位 → 这一步是"真实境界突破" ──────────────
+     r40：事件瓶颈先由事件通 lv，再在这里由玩家手动进品。
+     概率瓶颈正常不会停在这个状态：它的判定与进品已在同一次点击里完成；
+     保留此分支用于事件瓶颈，以及旧存档中已经通了 lv 的概率瓶颈。 */
   if (card.levelReady) {
     const r = realm.breakthrough(state, { dao, tier }, { rules, rng: Math.random });
     if (!r.ok) {
       const why = {
         need_level: '这道门的关窍还没通。',
         heart_low: `心性不够（${Math.round(r.heart)} / 需要 ${r.need}），这一关必然失败。`,
-        one_per_year: '一年只能破一次境界。',
+        one_per_year: '一年只能破一次境界。今年已经破过了。',
         already: '已经在这一品了。'
       }[r.why] || '这一关过不去。';
       return { ok: false, reason: why };
@@ -336,13 +350,22 @@ function breakAct(state, payload) {
     });
   }
 
-  return commit(state, {
+  /* r40：概率瓶颈只点这一次。macro.break.attempt 内部先判定，
+     成功后立即真实进品并占用年度名额；不会再长出第二次「突破」点击。 */
+  const beforeLevel = num((state.path[dao] || {}).level);
+  const r = commit(state, {
     id: null,
     months: card.months || 1,
     text: `你闭关冲「${card.title}」。`,
     list: [{ call: { macro: 'macro.break.attempt', args: { dao, tier } } }],
     event: null
   });
+
+  if (num((state.path[dao] || {}).level) >= tier && beforeLevel < tier) {
+    state.log.push(`你破了「${card.title}」。从今天起，你站在这一品上了。`);
+    r.broke = true;
+  }
+  return r;
 }
 
 /* ── 委托：每门百艺一条实战线（r39，需求/20 §7.4） ─────── */

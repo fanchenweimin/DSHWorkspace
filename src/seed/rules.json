@@ -384,13 +384,10 @@
       "1": {
         "when": [
           {
-            "gte": [
-              "path.body.level",
-              2
-            ]
+            "flag": "flag.edu.ganqi.entered"
           }
         ],
-        "hint": "气感要在筋骨练开之后才有。先把脏腑坐实。"
+        "hint": "炼气知识要到府学才教。先完成十一岁的府学炼气学习。"
       },
       "4": {
         "when": [
