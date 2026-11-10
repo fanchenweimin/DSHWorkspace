@@ -74,6 +74,8 @@ function rollYear(state) {
   state.handled = [];
   state.turn = state.turn || {};
   state.turn.breakthroughUsed = false;
+  /* r40.1：**每道各自一年一次**，跨年清空记账 */
+  state.turn.brokeThisYear = {};
 
   /* r39：品内小境界"一年一次"的记账，跨年清零（入门关本来就不记） */
   for (const dao of ['body', 'qi', 'spirit', 'heart']) {
@@ -306,8 +308,9 @@ function breakAct(state, payload) {
      入门关不受名额限制。 */
   const isEntry = num((state.path[dao] || {}).level) === 0 && tier === 1;
   const willBreak = card.levelReady || card.kind === 'prob';
-  if (willBreak && !isEntry && state.turn && state.turn.breakthroughUsed) {
-    return { ok: false, reason: '一年只能破一次境界。今年已经破过了。' };
+  /* r40.1：**每道一年一次**——锻体破过不影响炼气，但同一道今年只能破一次 */
+  if (willBreak && !isEntry && realm.brokeThisYear(state, dao)) {
+    return { ok: false, reason: '这一年这一道已经破过了。' };
   }
 
   /* ── 层级已到位 → 这一步是"真实境界突破" ──────────────

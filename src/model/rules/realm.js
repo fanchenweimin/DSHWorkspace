@@ -386,6 +386,35 @@ function raiseLevel(state, params, ctx) {
 }
 
 /**
+ * 「这一年这一道破过了没有」（r40.1）。
+ *
+ * **每道各自一年一次**（用户口径：「每个瓶颈都是独立的」）：
+ * 锻体今年破过一次，不影响炼气今年再破一次。
+ * 所以记账不能用一个全局布尔，得按道分开：`turn.brokeThisYear[dao]`。
+ *
+ * 兼容旧存档：老档里是 `turn.breakthroughUsed = true`（全局），
+ * 读到时视为"四道都破过了"，宁可多卡一年，不要凭空多给一次。
+ */
+function brokeThisYear(state, dao) {
+  const t = (state && state.turn) || {};
+  if (t.brokeThisYear && typeof t.brokeThisYear === 'object') {
+    return !!t.brokeThisYear[dao];
+  }
+  return !!t.breakthroughUsed;
+}
+
+/** 记下"这一年这一道破过了" */
+function markBrokeThisYear(state, dao) {
+  state.turn = state.turn || {};
+  if (!state.turn.brokeThisYear || typeof state.turn.brokeThisYear !== 'object') {
+    state.turn.brokeThisYear = {};
+  }
+  state.turn.brokeThisYear[dao] = true;
+  /* 老字段同步一份，方便旧代码/存档兼容判断 */
+  state.turn.breakthroughUsed = true;
+}
+
+/**
  * ② **突破境界**（r36）。参数 {dao, tier}。
  *
  * 这是**玩家手动点的那个动作**：条件齐了才进品。
@@ -419,12 +448,13 @@ function breakthrough(state, params, ctx) {
   }
 
   const isEntry = num(path.level) === 0 && tier === 1;
-  if (!isEntry && state.turn && state.turn.breakthroughUsed) {
+  /* r40.1：**每道一年一次**（不是全局一次） */
+  if (!isEntry && brokeThisYear(state, dao)) {
     return { ok: false, why: 'one_per_year' };
   }
 
   state.turn = state.turn || {};
-  if (!isEntry) state.turn.breakthroughUsed = true;
+  if (!isEntry) markBrokeThisYear(state, dao);
 
   commitTier(state, dao, tier, rules);
   return { ok: true, why: 'break', tier };
@@ -447,9 +477,10 @@ function probabilityBreakthrough(state, params, ctx) {
   if (bottleneckOf(dao, tier) !== 'prob') return { ok: false, why: 'not_probability_bottleneck' };
 
   /* 品内在改 lv 之前先查年度名额，避免名额已用时还白白通一层瓶颈。
-     入门关豁免；event 瓶颈的 lv 更新不在这里，也不受这条限制。 */
+     入门关豁免；event 瓶颈的 lv 更新不在这里，也不受这条限制。
+     r40.1：名额是**按道**算的。 */
   const isEntry = num(path.level) === 0 && tier === 1;
-  if (!isEntry && state.turn && state.turn.breakthroughUsed) {
+  if (!isEntry && brokeThisYear(state, dao)) {
     return { ok: false, why: 'one_per_year' };
   }
 
@@ -574,6 +605,6 @@ module.exports = {
   RANK, DAOS, GONGFA, attrOf, gongfaOf, barMax, baseRate, monthGain, spiritCoef,
   appearRate, successBase, studyBonus, pillBonus, luckAdj,
   bottleneckOf, commitTier, spill, breakWall, raiseLevel, breakthrough, probabilityBreakthrough, lifespanOf,
-  monthsToFull, canTrain,
+  monthsToFull, canTrain, brokeThisYear, markBrokeThisYear,
   heartDecay, demonSurvive, canHaveDemon, rollDemon, heartClashFail
 };

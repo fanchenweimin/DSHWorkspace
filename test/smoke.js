@@ -1293,7 +1293,7 @@ test('破境：概率瓶颈一次点击判定并进品，且清条（I3 / I4 / I
   s.path.body.bar = rules.PROF.body[1];
   const again = turn.act(s, { kind: 'break', dao: 'body', tier: 3, mode: 'try' });
   assert.strictEqual(again.ok, false);
-  assert.ok(String(again.reason || '').includes('一年只能破一次'), '该说清是名额问题：' + again.reason);
+  assert.ok(/已经破过了/.test(String(again.reason || '')), '该说清是名额问题：' + again.reason);
 });
 
 test('破境：事件瓶颈先通层级，进品要另点（r40）', () => {
@@ -1757,6 +1757,63 @@ test('r39.2 前端 render()：14 岁前后、无主卡时也不抛', () => {
   assert.doesNotThrow(() => runRender(payloadFor(14)), '14 岁渲染不该抛');
   /* 20 岁（学籍 none，无主卡） */
   assert.doesNotThrow(() => runRender(payloadFor(20)), '20 岁渲染不该抛');
+});
+
+
+test('r40.1 突破名额：每道一年一次，各道分开算', () => {
+  const demo = require('../src/model/state/demo');
+  const turn = require('../src/model/systems/turn');
+  const realm = require('../src/model/rules/realm');
+  const rules = require('../src/model/repository/config').get('rules');
+
+  const mk = () => {
+    const s = demo.initial('测', { rng: () => 0.99 });
+    s.turn = {};
+    s.path.body.level = 1;
+    s.path.body.lv = 1;
+    s.path.body.bar = rules.PROF.body[0];
+    s.path.qi.level = 1;
+    s.path.qi.lv = 1;
+    s.path.qi.bar = rules.PROF.qi[0];
+    return s;
+  };
+
+  /* ① 锻体破一次（概率瓶颈：判定 + 进品一步完成） */
+  const s = mk();
+  const b1 = realm.probabilityBreakthrough(s, { dao: 'body', tier: 2 }, { rules, rng: () => 0.001 });
+  assert.strictEqual(b1.ok, true, b1.why || '');
+  assert.strictEqual(s.path.body.level, 2, '该一步进品');
+  assert.deepStrictEqual(s.turn.brokeThisYear, { body: true }, '记账该按道');
+
+  /* ② 同一个道同年再破：拒绝 */
+  s.path.body.lv = 2;
+  s.path.body.bar = rules.PROF.body[1];
+  const b2 = realm.probabilityBreakthrough(s, { dao: 'body', tier: 3 }, { rules, rng: () => 0.001 });
+  assert.strictEqual(b2.ok, false, '同一道一年只能破一次');
+  assert.strictEqual(b2.why, 'one_per_year', b2.why);
+
+  /* ③ **另一道**同年能破（每道独立） */
+  const q1 = realm.probabilityBreakthrough(s, { dao: 'qi', tier: 2 }, { rules, rng: () => 0.001 });
+  assert.strictEqual(q1.ok, true, '炼气该能破：' + (q1.why || ''));
+  assert.strictEqual(s.path.qi.level, 2);
+  assert.deepStrictEqual(s.turn.brokeThisYear, { body: true, qi: true });
+
+  /* ④ 跨年后记账清零（走 turn.rollYear 的真路径） */
+  const s2 = mk();
+  realm.probabilityBreakthrough(s2, { dao: 'body', tier: 2 }, { rules, rng: () => 0.001 });
+  assert.deepStrictEqual(s2.turn.brokeThisYear, { body: true });
+  turn.act(s2, { kind: 'wait' });
+  assert.deepStrictEqual(s2.turn.brokeThisYear, {}, '跨年该清空');
+
+  /* ⑤ 入门关不占名额 */
+  const e = demo.initial('测2', { rng: () => 0.99 });
+  e.turn = {};
+  e.path.qi.level = 0;
+  e.path.qi.lv = 0;
+  e.path.qi.wall = { 1: false };
+  const entry = realm.probabilityBreakthrough(e, { dao: 'qi', tier: 1 }, { rules, rng: () => 0.99 });
+  assert.strictEqual(entry.ok, true, '入门关该放行：' + (entry.why || ''));
+  assert.ok(!e.turn.brokeThisYear || !e.turn.brokeThisYear.qi, '入门关不记账');
 });
 
 /* ── 串起来跑 ───────────────────────────────────────── */
