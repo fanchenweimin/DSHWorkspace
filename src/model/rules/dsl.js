@@ -111,6 +111,24 @@ function evalWhen(c, ctx) {
     }
     case 'has': { const d = cmp(getPath(arg[0], ctx), arg[1]); return d != null && d >= 0; }
     case 'count': return (arg.of || []).filter((x) => evalWhen(x, ctx)).length >= (arg.gte != null ? arg.gte : 1);
+    /* r41：**距寿元还剩几年**。`{"lifeLeft": [10, "<"]}` 表示"活不过 10 年了"。
+       为什么要有它：寿元会随破境延长（体魄 85、调息 105、金身 350…），
+       写死 `age >= 60` 的预警在"延寿之后"就变成了假警报。 */
+    case 'lifeLeft': {
+      const [n, how] = Array.isArray(arg) ? arg : [arg, '<='];
+      const toNum = (v) => {
+        const x = Number(v);
+        return Number.isFinite(x) ? x : 0;
+      };
+      const lifespan = toNum(ctx.state.lifespan);
+      const age = toNum(ctx.state.clock && ctx.state.clock.age);
+      const left = lifespan - age;
+      const d = cmp(left, n);
+      if (d == null) return false;
+      if (how === '<') return d < 0;
+      if (how === '>') return d > 0;
+      return d <= 0;                       /* 默认：只剩这么点或更少 */
+    }
     case 'chance': return true;
     case 'judge': return true;
     default:

@@ -1537,8 +1537,10 @@ test('r39 时间线：7/10/11/14/15/16/19 岁各有一个强制事件', () => {
   const ev = (id) => config.get('events').find((x) => x.id === id);
   const ageOf = (id) => {
     const e = ev(id);
-    const w = (e.when || []).find((x) => x.eq && x.eq[0] === 'clock.age');
-    return w ? w.eq[1] : null;
+    /* r41：有的节点用 eq（恰好那一年），有的用 gte（错过可补）。
+       两种都认，取"最小年龄"。 */
+    const w = (e.when || []).find((x) => (x.eq || x.gte) && (x.eq || x.gte)[0] === 'clock.age');
+    return w ? (w.eq ? w.eq[1] : w.gte[1]) : null;
   };
 
   assert.strictEqual(demo.initial('测').clock.age, 7, '开局 7 岁');
@@ -1887,6 +1889,92 @@ function num(v) {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
 }
+
+
+test('r41 寿元预警：按剩余寿命，不按固定 60 岁', () => {
+  const demo = require('../src/model/state/demo');
+  const hand = require('../src/model/systems/hand');
+  const opening = require('../src/model/systems/opening');
+
+  const at = (age, lifespan, level) => {
+    const s = demo.initial('测', { rng: () => 0.5 });
+    opening.apply(s, { rng: () => 0.5 });
+    if (level) { s.path.body.level = level; s.path.body.lv = level; }
+    s.lifespan = lifespan;
+    s.clock.age = age;
+    s.turn = { mainDone: false, mainId: null };
+    const t = hand.table(s);
+    return t.main && t.main.id === 'evt.age.warning';
+  };
+
+  /* 凡人 60 岁（寿元 85）：还有 25 年，不该预警 */
+  assert.strictEqual(at(60, 85), false, '60 岁不该报寿元将尽');
+  /* 剩 7 年：该报 */
+  assert.strictEqual(at(78, 85), true, '剩 7 年该报');
+  /* 修士寿元 105，60 岁正当年 */
+  assert.strictEqual(at(60, 105, 3), false, '调息 60 岁不该报');
+  /* 修士 100 岁（剩 5 年）：该报 */
+  assert.strictEqual(at(100, 105, 3), true, '剩 5 年该报');
+});
+
+test('r41 委托：学了丹道就能接，零活/正活两种做法', () => {
+  const demo = require('../src/model/state/demo');
+  const turn = require('../src/model/systems/turn');
+  const com = require('../src/model/systems/commission');
+
+  const mk = () => {
+    const s = demo.initial('测', { rng: () => 0.5 });
+    s.clock.age = 15;
+    s.education.stage = 'fu';
+    s.education.graduated = false;
+    s.flags = { edu: { meng: { done: true }, ganqi: { entered: true } }, study: {} };
+    s.turn = { mainDone: true };
+    s.arts.alchemy = { lvl: 1, exp: 0, talent: 'none', learned: true };
+    return s;
+  };
+
+  /* 模型层：学了就有、没学就锁 */
+  const s = mk();
+  const al = com.available(s).find((c) => c.art === 'alchemy');
+  assert.strictEqual(al.unlocked, true, '学了丹道该能接丹道委托');
+
+  const none = demo.initial('测2', { rng: () => 0.5 });
+  const al2 = com.available(none).find((c) => c.art === 'alchemy');
+  assert.strictEqual(al2.unlocked, false, '没学过该锁着');
+  assert.ok(/没学/.test(al2.lockedWhy), al2.lockedWhy);
+
+  /* 业务层：两种做法报酬不同 */
+  const z = turn.act(mk(), { kind: 'action', id: 'act.commission', art: 'alchemy', mode2: 'odd' });
+  assert.strictEqual(z.ok, true, z.reason || '');
+  const m = turn.act(mk(), { kind: 'action', id: 'act.commission', art: 'alchemy', mode2: 'main' });
+  assert.strictEqual(m.ok, true, m.reason || '');
+  assert.ok(m.commission.pay > z.commission.pay, '正活该比零活给得多');
+});
+
+test('r41 选百艺：天赋最高的排第一，并写明上限', () => {
+  const demo = require('../src/model/state/demo');
+  const hand = require('../src/model/systems/hand');
+  const config = require('../src/model/repository/config');
+
+  const raw = JSON.parse(JSON.stringify(
+    config.get('events').find((e) => e.id === 'evt.art.choose')
+  ));
+
+  const s = demo.initial('测', { rng: () => 0.5 });
+  s.arts.alchemy.talent = 'peak';        /* 丹道绝品 */
+  const ev = hand.decorate(s, raw);
+
+  assert.strictEqual(ev.choices[0].id, 'alchemy', '有天赋的那门该排第一');
+  assert.ok(/推荐/.test(ev.choices[0].hint), '第一名该标推荐：' + ev.choices[0].hint);
+  assert.ok(/宗师/.test(ev.choices[0].hint), '该写明最高档：' + ev.choices[0].hint);
+
+  /* 没天赋的那门要写明"最高 1 档" */
+  const forge = ev.choices.find((c) => c.id === 'forge');
+  assert.ok(/最高 1 档/.test(forge.hint), '没天赋该写最高 1 档：' + forge.hint);
+
+  /* 选项一个都不能少 */
+  assert.strictEqual(ev.choices.length, raw.choices.length, '不能漏选项');
+});
 
 /* ── 串起来跑 ───────────────────────────────────────── */
 (async () => {

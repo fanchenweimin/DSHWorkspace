@@ -224,7 +224,8 @@ async function act(req, res) {
     dao: body.dao,
     tier: body.tier,
     mode: body.mode,
-    art: body.art          /* r39：委托要用它选是哪门百艺 */
+    art: body.art,          /* r39：委托要用它选是哪门百艺 */
+    mode2: body.mode2       /* r41：同一门委托的"零活 / 正活"两种做法 */
   });
 
   if (result.ok) running.save(gid, state);

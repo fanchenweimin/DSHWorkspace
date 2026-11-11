@@ -31,6 +31,12 @@
   };
   const WAR = { peace: '平时', warning: '预警', city: '城战', nation: '国战' };
   const ZONE = { city: '长明城', wild: '荒郊', battle: '阵前' };
+  /* r41：百艺的中文名（委托卡片上要写"丹道"，不能写 alchemy） */
+  const ART_CN = {
+    alchemy: '丹道', forge: '器道', talisman: '符道', array: '阵道',
+    medicine: '医道', planting: '灵植', beast: '御兽', puppet: '傀儡',
+    feast: '灵膳', geomancy: '堪舆', appraise: '鉴宝', brew: '灵酿'
+  };
   const DIGIT = ['〇', '一', '二', '三', '四', '五', '六', '七', '八', '九'];
 
   const cnYear = (n) => String(n).split('').map((d) => DIGIT[Number(d)] || d).join('');
@@ -456,7 +462,7 @@
 
     for (const c of rows) {
       /* 14 岁前没百艺 → 整块不出现（需求/15 §1.2） */
-      if (S.age < 14) break;
+      if (Number(S.clock.age) < 14) break;
 
       const over = c.months > S.monthsLeft;
       const base = busy || S.monthsLeft <= 0;
@@ -472,15 +478,27 @@
       }
 
       const risk = c.outing ? ' · 出城' : '';
-      list.push(`<button class="chip" data-kind="commission" data-id="${esc(c.art)}"
-        data-card="com:${esc(c.art)}" ${base || over ? 'disabled' : ''}
+      const artName = ART_CN[c.art] || c.art;
+
+      /* r41：**两种做法都摆出来**（需求/20 §7.4.2）：
+           零活：0.4 倍报酬、没风险
+           正活：全额报酬、出城的要掷路上事件 */
+      list.push(`<button class="chip" data-kind="commission" data-id="${esc(c.art)}" data-mode="odd"
+        data-card="com:${esc(c.art)}:odd" ${base || over ? 'disabled' : ''}
         title="${esc(c.desc)}">
-        <span class="chip-name">${esc(c.name)}<em>${esc(c.art)} · 第 ${c.lv} 档</em></span>
+        <span class="chip-name">${esc(c.name)}<em>${esc(artName)} · 打下手</em></span>
+        <span class="chip-meta">零活 ${c.odd.pay} 铜 · 不担风险 · ${monthsText(c.months)}${over ? ' · 月不够' : ''}</span>
+      </button>`);
+
+      list.push(`<button class="chip" data-kind="commission" data-id="${esc(c.art)}" data-mode="main"
+        data-card="com:${esc(c.art)}:main" ${base || over ? 'disabled' : ''}
+        title="${esc(c.desc)}">
+        <span class="chip-name">${esc(c.name)}<em>${esc(artName)} · 第 ${c.lv} 档</em></span>
         <span class="chip-meta">正活 ${c.main.pay} 铜${risk} · ${monthsText(c.months)}${over ? ' · 月不够' : ''}</span>
       </button>`);
     }
 
-    const show = !S.dead && !DATA.locked && S.age >= 14 && list.length > 0;
+    const show = !S.dead && !DATA.locked && Number(S.clock.age) >= 14 && list.length > 0;
     $('bandCom').hidden = !show;
     host.innerHTML = show ? list.join('') : '';
   }
@@ -770,7 +788,7 @@
     else if (kind === 'sell') act({ kind: 'sell', id }, key);
     else if (kind === 'wait') act({ kind: 'wait' }, key);
     else if (kind === 'action') act({ kind: 'action', id }, key);
-    else if (kind === 'commission') act({ kind: 'action', id: 'act.commission', art: id }, key);
+    else if (kind === 'commission') act({ kind: 'action', id: 'act.commission', art: id, mode2: el.dataset.mode }, key);
   }
 
   function wire() {

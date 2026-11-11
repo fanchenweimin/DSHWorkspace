@@ -124,7 +124,42 @@ function hand(state, opts) {
   }
 
   /* ② 否则照常从池子里掷一张（事件瓶颈不占主事件，走「突破」按钮） */
-  return draw.mainOf(state, all(), ctxOf(state), opts);
+  const picked = draw.mainOf(state, all(), ctxOf(state), opts);
+  return picked ? decorate(state, picked) : picked;
+}
+
+/**
+ * 给"选百艺"那张卡做动态加工（r41）。
+ *
+ * 需求：**推荐一门上限最高的**，不然玩家随便选一门没天赋的，
+ * 练到 1 档就封顶，白白浪费一次强制事件。
+ *
+ * 做法：按 `arts.talentRank` 把选项从高到低排，并在 hint 里写清
+ * 「这门你能到第几档」。有天赋那门排第一，并标一个「推荐」。
+ */
+function decorate(state, ev) {
+  if (!ev || ev.id !== 'evt.art.choose') return ev;
+  const arts = require('../rules/arts');
+  const CAP_CN = { 1: '1 档', 2: '2 档', 3: '3 档', 4: '4 档（宗师）' };
+
+  const out = ev.choices.map((c) => {
+    const id = String(c.id);
+    if (!arts.byId(id)) return { ...c, order: 99 };
+    const rank = arts.talentRank(state, id);            /* 0 无 / 1 下 / 2 上 / 3 绝 */
+    const cap = arts.capOf(state, id);                  /* 数字 1..4 */
+    const talentCn = arts.TALENT_CN[arts.talentOf(state, id)] || '无';
+    return {
+      ...c,
+      order: 9 - rank,                                  /* 天赋越高越靠前 */
+      hint: `${c.hint || ''}（你的天赋：${talentCn}，最高 ${CAP_CN[cap] || cap + ' 档'}）`
+    };
+  }).sort((a, b) => (a.order - b.order));
+
+  /* 第一名如果真有天赋，标一下"推荐" */
+  if (out.length && arts.talentRank(state, out[0].id) > 0) {
+    out[0] = { ...out[0], hint: `【推荐】${out[0].hint}` };
+  }
+  return { ...ev, choices: out };
 }
 
 /**
@@ -433,6 +468,6 @@ function table(state) {
 
 module.exports = {
   hand, resident, table, all, expand, MONTHS_PER_YEAR,
-  breakCards, trainRow, artRow, spellRow, spellPractice, spellLearn,
+  breakCards, trainRow, artRow, spellRow, spellPractice, spellLearn, decorate,
   gateOf, artAge, inSchool, tutorCost, DAO_CN
 };
