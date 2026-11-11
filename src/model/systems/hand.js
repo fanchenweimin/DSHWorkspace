@@ -105,6 +105,44 @@ function ctxOf(state) {
 }
 
 /**
+ * 事件瓶颈该不该"自己上桌"（r42）。
+ *
+ * 用户口径：**事件瓶颈是一个事件，玩家要能看到它、能做选择**，
+ * 而不是被一个按钮替他把选项选了。
+ *
+ * 触发条件（全部满足才上桌）：
+ *   ① 这一品是事件瓶颈
+ *   ② 修为已练满（`barFull`）——「3 品修为进度满」
+ *   ③ `lv < tier`——这一关还没通
+ *   ④ 该品还没破
+ *
+ * 上桌之后：玩家在事件里做选择 → `macro.break.attempt(byEvent)` 把 `lv` +1。
+ * 等 `lv >= tier`，修炼区才出现「突破」按钮，点它才真正进品。
+ */
+function gateDue(state) {
+  for (const dao of ['body', 'qi', 'spirit', 'heart']) {
+    const p = state.path && state.path[dao];
+    if (!p) continue;
+    const level = num(p.level);
+    const lv = num(p.lv != null ? p.lv : p.level);
+    const tier = level + 1;
+    const kind = realm.bottleneckOf(dao, tier);
+    if (kind === 'prob') continue;                 /* 概率瓶颈不吃事件 */
+    if (lv >= tier) continue;                      /* 这一关已经通了，等玩家点突破 */
+    const cap = realm.barMax(state, dao, config.get('rules'));
+    const barFull = cap == null ? true : num(p.bar) >= cap - 0.001;
+    if (!barFull) continue;                        /* 修为没满，事件不触发 */
+    const ev = gateOf(state, dao, tier);
+    if (!ev) continue;
+    /* 门槛（BREAK_GATE）也要过，否则事件会先于门槛出现 */
+    const gate = (((config.get('rules') || {}).BREAK_GATE || {})[dao] || {})[String(tier)] || {};
+    if (!evalWhen(gate.when || [], ctxOf(state))) continue;
+    return ev;
+  }
+  return null;
+}
+
+/**
  * 今年能上桌的那一张（设计/20 §7：一手一张）。
  * r30：**一年只出一件主要事件**——处理掉以后，这一年就不再抽新的了
  * （`turn.mainDone` 由 `turn.commit` 置位，跨年清）。
@@ -122,6 +160,12 @@ function hand(state, opts) {
     ev.fromCalendar = true;
     return ev;
   }
+
+  /* ①.5 r42：**事件瓶颈到点了 → 事件自己上桌**。
+        它比随机事件优先：修为满了、这一关还没通，那件事就该找上来。
+        但不是 forced——玩家可以今年先不办（办不办是他的事）。 */
+  const due = gateDue(state);
+  if (due) return decorate(state, due);
 
   /* ② 否则照常从池子里掷一张（事件瓶颈不占主事件，走「突破」按钮） */
   const picked = draw.mainOf(state, all(), ctxOf(state), opts);
@@ -438,7 +482,18 @@ function table(state) {
     };
   }
 
-  const breaks = breakCards(state).filter((b) => (b.entry ? b.gateOk : true));
+  /* r41/r42：**修为没满就不摆突破卡**（需求/11 §1.1）。
+     r42 补充：**事件瓶颈还要 `lv` 到位才摆**——
+       · 概率瓶颈：修为满 → 摆"冲关"卡
+       · 事件瓶颈：修为满 → 事件自己上桌（`gateDue`），修炼区**不摆按钮**；
+                   等事件把 `lv` 推上去，`levelReady` 为真，这时才摆"突破"卡
+     入门关例外：它没有修为条，只看门槛。 */
+  const breaks = breakCards(state).filter((b) => {
+    if (b.entry) return b.gateOk;
+    if (!b.ready || !b.gateOk) return false;
+    if (b.kind !== 'prob') return b.levelReady;    /* 事件瓶颈：通了才给按钮 */
+    return true;
+  });
   const train = trainRow(state);
   const art = artRow(state);
   const actions = resident(state);
@@ -468,6 +523,6 @@ function table(state) {
 
 module.exports = {
   hand, resident, table, all, expand, MONTHS_PER_YEAR,
-  breakCards, trainRow, artRow, spellRow, spellPractice, spellLearn, decorate,
+  breakCards, trainRow, artRow, spellRow, spellPractice, spellLearn, decorate, gateDue,
   gateOf, artAge, inSchool, tutorCost, DAO_CN
 };

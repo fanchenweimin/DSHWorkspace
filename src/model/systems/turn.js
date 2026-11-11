@@ -344,25 +344,18 @@ function breakAct(state, payload) {
     return { ok: true, months: 0, broke: true, dao, tier };
   }
 
-  /* 事件瓶颈（品 5/6、养灵、修心、法相…）：不是掷骰，是把那一件事办掉。
-     办成 = **更新层级**；然后玩家还得回来点「突破」——**不会自动进品**。 */
+  /* 事件瓶颈（品 5/6、养灵、修心、法相…）：**不是掷骰，也不是按钮代办**。
+     r42：它由事件自己上桌（`hand.gateDue`），玩家在事件里做选择，
+     事件把 `lv` +1；等 `lv >= tier`，这张卡的 `levelReady` 变 true，
+     那时才走上面"真实突破"那一支。
+
+     所以到这一支时只有一种情况：**事件还没来**（修为没满 / 门槛没到）。
+     不再替玩家选 `choices[0]`——那是替玩家做了决定。 */
   if (card.kind !== 'prob') {
-    const ev = handSys.gateOf(state, dao, tier);
-    if (!ev) return { ok: false, reason: '这一关还没有等来那件事。' };
-    const c = (ev.choices && ev.choices[0]) || { id: null, label: '过', do: [] };
-
-    /* 事件办成后补一次"更新层级"——事件本身不一定写了 raise。 */
-    const list = (c.do || []).slice();
-    list.push({ call: { macro: 'macro.break.attempt', args: { dao, tier, byEvent: true } } });
-
-    return commit(state, {
-      id: ev.id,
-      months: num(ev.months) || 3,
-      text: `「${ev.title}」—— 你选了「${c.label}」。`,
-      list,
-      event: ev,
-      choice: c
-    });
+    return {
+      ok: false,
+      reason: `这一关要等一件事：${card.title}。修为练满、条件到了，它会自己找上来。`
+    };
   }
 
   /* r40：概率瓶颈只点这一次。macro.break.attempt 内部先判定，

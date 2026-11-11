@@ -1334,34 +1334,71 @@ test('I2 / I25：修为条不许乘，层级不许直接写', () => {
   assert.strictEqual(s.path.spirit.level, 0, '养灵仍是 Lv0');
 });
 
-test('事件瓶颈：判定层硬闯没用，突破是"把那件事办掉"（r30）', () => {
+test('r42 事件瓶颈：事件自己上桌 → 办完 lv+1 → 才出突破按钮', () => {
   const hand = require('../src/model/systems/hand');
   const turn = require('../src/model/systems/turn');
   const realm = require('../src/model/rules/realm');
   const rules = require('../src/model/repository/config').get('rules');
 
-  /* 锻体·朝元圆满 + 战功够：该轮到「武名动四方」了 */
-  const s = opening();
-  s.path.body.level = 4;
-  s.path.body.lv = 4;                     /* r39：层级也要到 4，否则 level_gap */
-  s.path.body.bar = rules.PROF.body[3];
-  s.merit.war = 120;
+  const mk = (barFull) => {
+    const s = opening();
+    s.turn = { mainDone: false };
+    s.path.body.level = 4;
+    s.path.body.lv = 4;
+    s.path.body.bar = barFull ? (rules.PROF.body[3] || 4000) : 0;
+    s.merit.war = 120;
+    return s;
+  };
 
-  const card = hand.breakCards(s).find((b) => b.dao === 'body');
-  assert.strictEqual(card.kind, 'event_once', '品 5 是事件瓶颈');
+  /* ① 修为没满：事件不上桌、也没有突破按钮 */
+  {
+    const s = mk(false);
+    const t = hand.table(s);
+    assert.ok(!t.main || t.main.id !== 'evt.gate.body.5', '修为没满不该出这一关的事件');
+    const card = (t.breaks || []).find((b) => b.dao === 'body');
+    assert.ok(!card, '修为没满不该有突破按钮');
+  }
 
-  /* 判定层：没有事件就不给过（硬闯无效） */
-  const judge = realm.raiseLevel(s, { dao: 'body', tier: 5 }, { rules });
-  assert.strictEqual(judge.ok, false);
-  assert.strictEqual(judge.why, 'need_event');
+  /* ② 修为满了：**事件自己上桌**，且仍然没有突破按钮（lv 还没到） */
+  {
+    const s = mk(true);
+    const t = hand.table(s);
+    assert.ok(t.main, '修为满了，那一关的事件该自己上桌');
+    assert.strictEqual(t.main.id, 'evt.gate.body.5', '该是「武名动四方」');
+    assert.ok((t.main.choices || []).length >= 1, '要能看到选项，不是被按钮代办');
 
-  /* 突破按钮：把那一件事办掉，直接进品，不再掷骰 */
-  /* r39：事件办完只通层级，境界要另点 */
-  const go = turn.act(s, { kind: 'break', dao: 'body', tier: 5, mode: 'try' });
-  assert.strictEqual(go.ok, true, go.reason || '');
-  assert.strictEqual(s.path.body.lv, 5, '事件办完，层级通到金身');
-  assert.strictEqual(s.path.body.level, 4, '境界还在朝元（层级≠境界）');
-  assert.ok(s.log.some((l) => l.includes('武名动四方')), '纪事里要看得到那一关的名字');
+    const card = (t.breaks || []).find((b) => b.dao === 'body');
+    assert.ok(!card, 'lv 还没到，不该有突破按钮');
+
+    /* 判定层硬闯仍然无效 */
+    const judge = realm.raiseLevel(s, { dao: 'body', tier: 5 }, { rules });
+    assert.strictEqual(judge.ok, false);
+    assert.strictEqual(judge.why, 'need_event');
+  }
+
+  /* ③ 办掉事件：lv 推到 5，境界还停在 4 */
+  {
+    const s = mk(true);
+    const t = hand.table(s);
+    const c = t.main.choices[0];
+    const r = turn.act(s, { kind: 'event', id: t.main.id, choice: c.id });
+    assert.strictEqual(r.ok, true, r.reason || '');
+    assert.strictEqual(s.path.body.lv, 5, '事件办完，层级通到金身');
+    assert.strictEqual(s.path.body.level, 4, '境界还在朝元（层级≠境界）');
+    assert.ok(s.log.some((l) => l.includes('武名动四方')), '纪事里要看得到那一关的名字');
+
+    /* ④ 现在才出现突破按钮 */
+    const t2 = hand.table(s);
+    const card2 = (t2.breaks || []).find((b) => b.dao === 'body');
+    assert.ok(card2, 'lv >= tier 该出现突破按钮');
+    assert.strictEqual(card2.levelReady, true);
+
+    /* ⑤ 点它 → 真正进品 */
+    const r2 = turn.act(s, { kind: 'break', dao: 'body', tier: 5 });
+    assert.strictEqual(r2.ok, true, r2.reason || '');
+    assert.strictEqual(r2.broke, true, '这一步才是进品');
+    assert.strictEqual(s.path.body.level, 5, '境界到金身');
+  }
 });
 
 test('回合：钱不够整条不发生，月份一点都不扣', () => {
@@ -1974,6 +2011,66 @@ test('r41 选百艺：天赋最高的排第一，并写明上限', () => {
 
   /* 选项一个都不能少 */
   assert.strictEqual(ev.choices.length, raw.choices.length, '不能漏选项');
+});
+
+
+test('r42 炼气 4/5/6 品：事件瓶颈的事件真的会上桌，办完才出突破', () => {
+  const demo = require('../src/model/state/demo');
+  const hand = require('../src/model/systems/hand');
+  const turn = require('../src/model/systems/turn');
+  const rules = require('../src/model/repository/config').get('rules');
+
+  const mk = (from, barFull) => {
+    const s = demo.initial('测', { rng: () => 0.5 });
+    s.clock.age = 40;
+    s.education.stage = 'tai';
+    s.education.graduated = true;
+    s.flags = { edu: { meng: { done: true }, ganqi: { entered: true }, graduated: true }, study: {} };
+    s.turn = { mainDone: false };
+    s.path.body.level = 4;
+    s.path.body.lv = 4;
+    s.path.qi.level = from;
+    s.path.qi.lv = from;
+    s.path.qi.bar = barFull ? (rules.PROF.qi[Math.min(5, from)] || 4000) : 0;
+    s.path.qi.wall = {};
+    return s;
+  };
+
+  for (const from of [3, 4, 5]) {
+    const tier = from + 1;
+    const gateId = 'evt.gate.qi.' + tier;
+
+    /* 修为没满：事件不上桌 */
+    const a = mk(from, false);
+    const ta = hand.table(a);
+    assert.ok(!ta.main || ta.main.id !== gateId, `${from} 品修为没满，不该出 ${gateId}`);
+
+    /* 修为满：事件上桌，但没有突破按钮 */
+    const s = mk(from, true);
+    const t = hand.table(s);
+    assert.ok(t.main, `${from} 品修为满了，${gateId} 该上桌`);
+    assert.strictEqual(t.main.id, gateId, '该是 ' + gateId);
+    const card0 = (t.breaks || []).find((b) => b.dao === 'qi' && b.tier === tier);
+    assert.ok(!card0, `${from}→${tier}：lv 没到位不该有突破按钮`);
+
+    /* 办事件 → lv+1，level 不变 */
+    const c = t.main.choices[0];
+    const r = turn.act(s, { kind: 'event', id: t.main.id, choice: c.id });
+    assert.strictEqual(r.ok, true, r.reason || '');
+    assert.strictEqual(s.path.qi.lv, tier, `${gateId} 办完该把 lv 推到 ${tier}（实际 ${s.path.qi.lv}）`);
+    assert.strictEqual(s.path.qi.level, from, '境界还不该动');
+
+    /* 现在出突破按钮，点它进品 */
+    const t2 = hand.table(s);
+    const card = (t2.breaks || []).find((b) => b.dao === 'qi' && b.tier === tier);
+    assert.ok(card, `${from}→${tier}：lv 到位该出现突破按钮`);
+    assert.strictEqual(card.levelReady, true);
+
+    const r2 = turn.act(s, { kind: 'break', dao: 'qi', tier });
+    assert.strictEqual(r2.ok, true, r2.reason || '');
+    assert.strictEqual(r2.broke, true);
+    assert.strictEqual(s.path.qi.level, tier, `炼气该到 ${tier} 品`);
+  }
 });
 
 /* ── 串起来跑 ───────────────────────────────────────── */

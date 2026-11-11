@@ -1716,7 +1716,7 @@
               "kind": "break",
               "dao": "body",
               "tier": 5,
-              "force": true
+              "byEvent": true
             }
           },
           {
@@ -1750,7 +1750,7 @@
               "kind": "break",
               "dao": "body",
               "tier": 6,
-              "force": true
+              "byEvent": true
             }
           },
           {
@@ -1784,7 +1784,7 @@
               "kind": "break",
               "dao": "qi",
               "tier": 4,
-              "force": true
+              "byEvent": true
             }
           },
           {
@@ -1818,7 +1818,7 @@
               "kind": "break",
               "dao": "qi",
               "tier": 5,
-              "force": true
+              "byEvent": true
             }
           },
           {
@@ -1852,7 +1852,7 @@
               "kind": "break",
               "dao": "qi",
               "tier": 6,
-              "force": true
+              "byEvent": true
             }
           },
           {
@@ -1886,7 +1886,7 @@
               "kind": "break",
               "dao": "spirit",
               "tier": 1,
-              "force": true
+              "byEvent": true
             }
           },
           {
@@ -1920,7 +1920,7 @@
               "kind": "break",
               "dao": "spirit",
               "tier": 2,
-              "force": true
+              "byEvent": true
             }
           },
           {
@@ -1954,7 +1954,7 @@
               "kind": "break",
               "dao": "spirit",
               "tier": 3,
-              "force": true
+              "byEvent": true
             }
           },
           {
@@ -1988,7 +1988,7 @@
               "kind": "break",
               "dao": "spirit",
               "tier": 4,
-              "force": true
+              "byEvent": true
             }
           },
           {
@@ -2022,7 +2022,7 @@
               "kind": "break",
               "dao": "spirit",
               "tier": 5,
-              "force": true
+              "byEvent": true
             }
           },
           {
@@ -2056,7 +2056,7 @@
               "kind": "break",
               "dao": "spirit",
               "tier": 6,
-              "force": true
+              "byEvent": true
             }
           },
           {
@@ -2090,7 +2090,7 @@
               "kind": "break",
               "dao": "heart",
               "tier": 1,
-              "force": true
+              "byEvent": true
             }
           },
           {
@@ -2124,7 +2124,7 @@
               "kind": "break",
               "dao": "heart",
               "tier": 2,
-              "force": true
+              "byEvent": true
             }
           },
           {
@@ -2158,7 +2158,7 @@
               "kind": "break",
               "dao": "heart",
               "tier": 3,
-              "force": true
+              "byEvent": true
             }
           },
           {
@@ -2192,7 +2192,7 @@
               "kind": "break",
               "dao": "heart",
               "tier": 4,
-              "force": true
+              "byEvent": true
             }
           },
           {
