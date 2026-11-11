@@ -1694,41 +1694,6 @@
     "source": "需求/13 §8 · 同行相轻（百艺不是闷头练就行）"
   },
   {
-    "no": 30,
-    "id": "evt.gate.body.5",
-    "title": "武名动四方",
-    "nature": "瓶颈",
-    "priority": 2,
-    "weight": 2,
-    "months": 3,
-    "gate": {
-      "dao": "body",
-      "tier": 5
-    },
-    "desc": "朝元圆满。山门前要一场让人记住的仗，你的名字才能传出这座城。",
-    "choices": [
-      {
-        "id": "go",
-        "label": "出战，让人记住",
-        "do": [
-          {
-            "judge": {
-              "kind": "break",
-              "dao": "body",
-              "tier": 5,
-              "byEvent": true
-            }
-          },
-          {
-            "log": "那一战打完，山门前有人叫了你的名字。"
-          }
-        ]
-      }
-    ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
-    "forced": true
-  },
-  {
     "no": 31,
     "id": "evt.gate.body.6",
     "title": "力破",
@@ -1791,41 +1756,6 @@
           },
           {
             "log": "你在识海里立起一座相。它睁眼的时候，你也睁眼。"
-          }
-        ]
-      }
-    ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
-    "forced": true
-  },
-  {
-    "no": 33,
-    "id": "evt.gate.qi.5",
-    "title": "万法归一",
-    "nature": "瓶颈",
-    "priority": 2,
-    "weight": 2,
-    "months": 3,
-    "gate": {
-      "dao": "qi",
-      "tier": 5
-    },
-    "desc": "法相圆满。把散出去的都收回来。",
-    "choices": [
-      {
-        "id": "go",
-        "label": "收",
-        "do": [
-          {
-            "judge": {
-              "kind": "break",
-              "dao": "qi",
-              "tier": 5,
-              "byEvent": true
-            }
-          },
-          {
-            "log": "万千法门收成一缕，落在你手上。"
           }
         ]
       }
@@ -2001,41 +1931,6 @@
           },
           {
             "log": "灵出去很远，回来时带着天地的一点凉。"
-          }
-        ]
-      }
-    ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
-    "forced": true
-  },
-  {
-    "no": 39,
-    "id": "evt.gate.spirit.5",
-    "title": "众生念",
-    "nature": "瓶颈",
-    "priority": 2,
-    "weight": 2,
-    "months": 3,
-    "gate": {
-      "dao": "spirit",
-      "tier": 5
-    },
-    "desc": "治下的人念着你的名字。",
-    "choices": [
-      {
-        "id": "go",
-        "label": "受这一念",
-        "do": [
-          {
-            "judge": {
-              "kind": "break",
-              "dao": "spirit",
-              "tier": 5,
-              "byEvent": true
-            }
-          },
-          {
-            "log": "千万人的念头涌进来，你没有散。"
           }
         ]
       }
@@ -3204,5 +3099,39 @@
       }
     ],
     "source": "r39 · 14 岁学百艺（r41：14–15 两岁窗口 + 高权重，不独占）"
+  },
+  {
+    "no": 55,
+    "id": "evt.gate.recognized",
+    "title": "有人记住了你",
+    "desc": "你在城头站着的时候，下面是黑压压的人。他们抬头看你，不知道你叫什么。后来有人喊了一声，接着是第二个、第三个。",
+    "nature": "瓶颈",
+    "priority": 2,
+    "weight": 2,
+    "forced": true,
+    "months": 3,
+    "gate": {
+      "scope": "recognition",
+      "tier": 5
+    },
+    "when": [],
+    "choices": [
+      {
+        "id": "stand",
+        "label": "站出去，让他们看清",
+        "hint": "这一关过了，世界就认了你；之后再冲第 5 品，另外两道也放行。",
+        "do": [
+          {
+            "recognize": {
+              "dao": "$arg.dao"
+            }
+          },
+          {
+            "log": "那天之后，你走到哪里，都有人先认出你，再看你的境界。"
+          }
+        ]
+      }
+    ],
+    "source": "r44 · 品 5 世界认可（三道共用，需求/11 §1.2.2）"
   }
 ]

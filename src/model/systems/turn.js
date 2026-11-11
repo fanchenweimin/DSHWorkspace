@@ -112,6 +112,22 @@ function rollYear(state) {
     state.log.push(`日子又磨去一点。心性 −${decay}（现 ${Math.round(num(mods.get(state, 'attr.heart.eff')))}）。`);
   }
 
+  /* ── ③.5 世界认可 · 唤醒（r44，需求/11 §1.2.2） ──────────────
+     这是"事件 1"，**必出、不占主事件位**：
+       · 4 品修为满 + 门槛过 → 看有没有「世界认可」
+           · 有  → 直接 lv = 5（跳过事件 2）
+           · 没有 → 唤醒事件 2（让「有人记住了你」能进池）
+     它必须放在心魔之后、战事之前：心魔可能中断这一年，唤醒不该白做。 */
+  const recog = require('./recognition');
+  const wake = recog.settleWakeUp(state, rules);
+  for (const w of wake) {
+    if (w.action === 'granted') {
+      state.log.push(`你冲第 5 品那天，才发现不必再证明什么——${w.daoName}的门槛，世界早就替你跨过了。`);
+    } else {
+      state.log.push(`你${w.daoName}已修到第四品圆满。可这城里，似乎还没人认得你。`);
+    }
+  }
+
   /* ── ④ 心魔（需求/01 §3.5：心性 0–39 每年掷一次） ──────────── */
   const demon = realm.rollDemon(state, rules, Math.random);
   if (demon) {

@@ -346,6 +346,31 @@ const OPS = {
   },
 
   /**
+   * **世界认可**（r44，`需求/11` §1.2.2）。
+   *
+   * 三道（锻体 / 炼气 / 养灵）共用同一张门票：拿到之后，
+   * 另外两道冲第 5 品时事件 1 会直接放行。
+   *
+   * 参数：{ dao: 'body' } —— 哪个道办成的（拿认可 + 通那一层的 lv）
+   * 不传 dao 时，只拿认可、不通层级（给"别人给你认可"这种场景留口子）。
+   */
+  recognize(arg, ctx) {
+    const recog = require('./recognition');
+    const dao = String(valueOf((arg && arg.dao) || '', ctx) || '');
+    recog.grant(ctx.state, dao);
+
+    if (dao && ctx.state.path && ctx.state.path[dao]) {
+      const p = ctx.state.path[dao];
+      const realm = require('../rules/realm');
+      p.lv = Math.max(num(p.lv), 5);
+      p.attempts = 0;
+      p.fail = 0;
+      realm.breakWall(ctx.state, dao, 5);
+    }
+    return { ok: true, why: 'recognized', dao };
+  },
+
+  /**
    * 学会一门术法（r35，需求/12 §0.1.2 奇遇来源）。
    *
    * 为什么不写 `set: ['spells.$arg.spell.lvl', 0]`：

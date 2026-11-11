@@ -128,6 +128,26 @@ function ctxOf(state) {
 function gatesDue(state) {
   const out = [];
   const rules = config.get('rules') || {};
+  const recog = require('./recognition');
+
+  /* r44：**世界认可**是三道共用的跨道瓶颈（`需求/11` §1.2.2）。
+     它没有 `gate.dao`，靠 `gate.scope: 'recognition'` 认。
+     进池条件：
+       · 被某个道唤醒过（`awoken` 里有东西）
+       · **还没拿到认可**（拿到了就不必再出这张卡）
+       · 那个道确实还卡在 `lv < 5`（被 `settleWakeUp` 直接放行的不该再进池） */
+  const worldEv = everyEvent().find((e) => e.gate && e.gate.scope === 'recognition');
+  if (worldEv && !recog.recognized(state)) {
+    const pending = recog.DAOS.filter((d) => {
+      if (!recog.awoken(state, d)) return false;
+      const p = state.path && state.path[d];
+      return p && num(p.lv) < 5;
+    });
+    if (pending.length) {
+      out.push({ ...worldEv, forced: true, args: { ...(worldEv.args || {}), dao: pending[0] } });
+    }
+  }
+
   for (const dao of ['body', 'qi', 'spirit', 'heart']) {
     const p = state.path && state.path[dao];
     if (!p) continue;
@@ -137,6 +157,8 @@ function gatesDue(state) {
     const kind = realm.bottleneckOf(dao, tier);
     if (kind === 'prob') continue;                 /* 概率瓶颈不吃事件 */
     if (lv >= tier) continue;                      /* 这一关已经通了，等玩家点突破 */
+    /* r44：第 5 品走"世界认可"那条链，不走这一支 */
+    if (recog.isWorldTier(dao, tier)) continue;
     const cap = realm.barMax(state, dao, rules);
     const barFull = cap == null ? true : num(p.bar) >= cap - 0.001;
     if (!barFull) continue;                        /* 修为没满，还不够资格 */

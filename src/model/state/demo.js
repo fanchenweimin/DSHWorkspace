@@ -226,6 +226,11 @@ function initial(name, opts) {
     flags,
     war: { phase: 'peace' },
     spiritMass: { own: 0, city: 0 },
+    /* r44：**世界认可**——品 5 的一道门票（`需求/11` §1.2.2）。
+       · recognized：拿到了没有（永久，除非灌顶作废）
+       · awoken：哪个道把它"唤醒"了（事件 2 只有被唤醒才能出现）
+       · fromVoidSoul：灌顶过的人永久失格 */
+    recognition: { recognized: false, awoken: {}, fromVoidSoul: false },
     turn: { breakthroughUsed: false },
     log: [
       '大曜历三〇九年，你七岁，第一天进蒙学。',

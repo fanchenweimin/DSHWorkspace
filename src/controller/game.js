@@ -99,6 +99,14 @@ function publicState(state) {
     stage: STAGE[state.education.stage] || '卒业',
     identity: identityOf(state),
     war: state.war.phase,
+    /* r44：世界认可（品 5 的门票）。它是**玩法状态**，不是隐藏属性——
+       玩家必须知道自己有没有，否则"为什么第 5 品一直不来"无从判断。 */
+    recognition: {
+      recognized: !!(state.recognition && state.recognition.recognized),
+      awoken: !!(state.recognition && state.recognition.awoken
+        && Object.keys(state.recognition.awoken).length),
+      voided: !!(state.recognition && state.recognition.fromVoidSoul)
+    },
     log: state.log.slice(-60),
     monthsUsed: state.monthsUsed,
     monthsLeft: turn.MONTHS_PER_YEAR - state.monthsUsed,
