@@ -1699,7 +1699,7 @@
     "title": "武名动四方",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "body",
@@ -1725,7 +1725,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 31,
@@ -1733,7 +1734,7 @@
     "title": "力破",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "body",
@@ -1759,7 +1760,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 32,
@@ -1767,7 +1769,7 @@
     "title": "立相",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "qi",
@@ -1793,7 +1795,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 33,
@@ -1801,7 +1804,7 @@
     "title": "万法归一",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "qi",
@@ -1827,7 +1830,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 34,
@@ -1835,7 +1839,7 @@
     "title": "散功",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "qi",
@@ -1861,7 +1865,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 35,
@@ -1869,7 +1874,7 @@
     "title": "见众生",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "spirit",
@@ -1895,7 +1900,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 36,
@@ -1903,7 +1909,7 @@
     "title": "见自己",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "spirit",
@@ -1929,7 +1935,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 37,
@@ -1937,7 +1944,7 @@
     "title": "见因果",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "spirit",
@@ -1963,7 +1970,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 38,
@@ -1971,7 +1979,7 @@
     "title": "见天地",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "spirit",
@@ -1997,7 +2005,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 39,
@@ -2005,7 +2014,7 @@
     "title": "众生念",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "spirit",
@@ -2031,7 +2040,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 40,
@@ -2039,7 +2049,7 @@
     "title": "返本",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "spirit",
@@ -2065,7 +2075,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 41,
@@ -2073,7 +2084,7 @@
     "title": "大心关 · 不惑",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "heart",
@@ -2099,7 +2110,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 42,
@@ -2107,7 +2119,7 @@
     "title": "大心关 · 天命",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "heart",
@@ -2133,7 +2145,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 43,
@@ -2141,7 +2154,7 @@
     "title": "大心关 · 耳顺",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "heart",
@@ -2167,7 +2180,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 44,
@@ -2175,7 +2189,7 @@
     "title": "大心关 · 从心而欲",
     "nature": "瓶颈",
     "priority": 2,
-    "weight": 0,
+    "weight": 2,
     "months": 3,
     "gate": {
       "dao": "heart",
@@ -2201,7 +2215,8 @@
         ]
       }
     ],
-    "source": "需求/11 · 事件瓶颈（只能由事件开）"
+    "source": "需求/11 · 事件瓶颈（只能由事件开） · r43：进池掷骰，不插队",
+    "forced": true
   },
   {
     "no": 45,

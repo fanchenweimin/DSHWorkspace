@@ -105,21 +105,29 @@ function ctxOf(state) {
 }
 
 /**
- * 事件瓶颈该不该"自己上桌"（r42）。
+ * 事件瓶颈现在能不能进池子（r42 / r43 改）。
  *
- * 用户口径：**事件瓶颈是一个事件，玩家要能看到它、能做选择**，
- * 而不是被一个按钮替他把选项选了。
+ * **它不是必出的**（用户口径 r43）：
+ *   「他应该是和其他事件一起进事件池子。只是瓶颈事件本身是个强制事件
+ *     （代表显示类型，不代表优先级）。」
  *
- * 触发条件（全部满足才上桌）：
+ * 所以这里只回答"够不够资格进池"，**不决定出不出**。
+ * 抽取由 `draw.mainOf` 按权重正常掷——和机缘、灾祸、战事完全平等竞争。
+ *
+ * 进池条件（全部满足）：
  *   ① 这一品是事件瓶颈
  *   ② 修为已练满（`barFull`）——「3 品修为进度满」
  *   ③ `lv < tier`——这一关还没通
- *   ④ 该品还没破
+ *   ④ `BREAK_GATE` 门槛也过了（心性 ≥ 90 / 战功 / 太学卒业…）
  *
- * 上桌之后：玩家在事件里做选择 → `macro.break.attempt(byEvent)` 把 `lv` +1。
+ * 抽中之后：玩家在事件里做选择 → `macro.break.attempt(byEvent)` 把 `lv` +1。
  * 等 `lv >= tier`，修炼区才出现「突破」按钮，点它才真正进品。
+ *
+ * @returns {Array} 够资格进池的 gate 事件（可能为空，也可能不止一个）
  */
-function gateDue(state) {
+function gatesDue(state) {
+  const out = [];
+  const rules = config.get('rules') || {};
   for (const dao of ['body', 'qi', 'spirit', 'heart']) {
     const p = state.path && state.path[dao];
     if (!p) continue;
@@ -129,17 +137,26 @@ function gateDue(state) {
     const kind = realm.bottleneckOf(dao, tier);
     if (kind === 'prob') continue;                 /* 概率瓶颈不吃事件 */
     if (lv >= tier) continue;                      /* 这一关已经通了，等玩家点突破 */
-    const cap = realm.barMax(state, dao, config.get('rules'));
+    const cap = realm.barMax(state, dao, rules);
     const barFull = cap == null ? true : num(p.bar) >= cap - 0.001;
-    if (!barFull) continue;                        /* 修为没满，事件不触发 */
+    if (!barFull) continue;                        /* 修为没满，还不够资格 */
     const ev = gateOf(state, dao, tier);
     if (!ev) continue;
     /* 门槛（BREAK_GATE）也要过，否则事件会先于门槛出现 */
-    const gate = (((config.get('rules') || {}).BREAK_GATE || {})[dao] || {})[String(tier)] || {};
+    const gate = ((rules.BREAK_GATE || {})[dao] || {})[String(tier)] || {};
     if (!evalWhen(gate.when || [], ctxOf(state))) continue;
-    return ev;
+
+    /* **抽中即强制**：它上桌后封住常驻（I15），但这只是"显示类型"，
+       不代表它能插队先出。 */
+    out.push({ ...ev, forced: true });
   }
-  return null;
+  return out;
+}
+
+/** 兼容旧调用：只问"有没有"，取第一个（内部用） */
+function gateDue(state) {
+  const list = gatesDue(state);
+  return list.length ? list[0] : null;
 }
 
 /**
@@ -161,14 +178,12 @@ function hand(state, opts) {
     return ev;
   }
 
-  /* ①.5 r42：**事件瓶颈到点了 → 事件自己上桌**。
-        它比随机事件优先：修为满了、这一关还没通，那件事就该找上来。
-        但不是 forced——玩家可以今年先不办（办不办是他的事）。 */
-  const due = gateDue(state);
-  if (due) return decorate(state, due);
-
-  /* ② 否则照常从池子里掷一张（事件瓶颈不占主事件，走「突破」按钮） */
-  const picked = draw.mainOf(state, all(), ctxOf(state), opts);
+  /* ② r43：**事件瓶颈和普通事件一起进池子掷**。
+     它不进池就没机会被抽到；但它**也不插队**——只是池子里多了一张
+     "重量 = 瓶颈权重"的牌，和机缘、灾祸、战事平等竞争。
+     抽中之后它是 `forced: true`（封住常驻），那是**显示类型**，不是优先级。 */
+  const pool = all().concat(gatesDue(state));
+  const picked = draw.mainOf(state, pool, ctxOf(state), opts);
   return picked ? decorate(state, picked) : picked;
 }
 
@@ -523,6 +538,6 @@ function table(state) {
 
 module.exports = {
   hand, resident, table, all, expand, MONTHS_PER_YEAR,
-  breakCards, trainRow, artRow, spellRow, spellPractice, spellLearn, decorate, gateDue,
+  breakCards, trainRow, artRow, spellRow, spellPractice, spellLearn, decorate, gateDue, gatesDue,
   gateOf, artAge, inSchool, tutorCost, DAO_CN
 };

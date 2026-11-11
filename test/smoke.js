@@ -2014,19 +2014,24 @@ test('r41 选百艺：天赋最高的排第一，并写明上限', () => {
 });
 
 
-test('r42 炼气 4/5/6 品：事件瓶颈的事件真的会上桌，办完才出突破', () => {
+test('r43 炼气 4/5/6 品：瓶颈事件进池竞争，抽中才推进', () => {
   const demo = require('../src/model/state/demo');
   const hand = require('../src/model/systems/hand');
   const turn = require('../src/model/systems/turn');
-  const rules = require('../src/model/repository/config').get('rules');
+  const draw = require('../src/model/systems/draw');
+  const config = require('../src/model/repository/config');
+  const rules = config.get('rules');
+  const conditions = config.get('conditions');
 
   const mk = (from, barFull) => {
     const s = demo.initial('测', { rng: () => 0.5 });
     s.clock.age = 40;
+    s.clock.year = 340;
     s.education.stage = 'tai';
     s.education.graduated = true;
-    s.flags = { edu: { meng: { done: true }, ganqi: { entered: true }, graduated: true }, study: {} };
-    s.turn = { mainDone: false };
+    /* r43：太学学习事件没办完时会占住 priority 1，这里标记已办，免得干扰抽样 */
+    s.flags = { edu: { meng: { done: true }, ganqi: { entered: true }, graduated: true, tai: { studied: true } }, study: {} };
+    s.turn = {};
     s.path.body.level = 4;
     s.path.body.lv = 4;
     s.path.qi.level = from;
@@ -2040,38 +2045,68 @@ test('r42 炼气 4/5/6 品：事件瓶颈的事件真的会上桌，办完才出
     const tier = from + 1;
     const gateId = 'evt.gate.qi.' + tier;
 
-    /* 修为没满：事件不上桌 */
+    /* ① 修为没满：**不进池** */
     const a = mk(from, false);
-    const ta = hand.table(a);
-    assert.ok(!ta.main || ta.main.id !== gateId, `${from} 品修为没满，不该出 ${gateId}`);
+    assert.strictEqual(hand.gatesDue(a).length, 0, `${from} 品修为没满，不该进池`);
 
-    /* 修为满：事件上桌，但没有突破按钮 */
+    /* ② 修为满：进池，且抽中后是 forced（显示类型，不是优先级） */
     const s = mk(from, true);
-    const t = hand.table(s);
-    assert.ok(t.main, `${from} 品修为满了，${gateId} 该上桌`);
-    assert.strictEqual(t.main.id, gateId, '该是 ' + gateId);
-    const card0 = (t.breaks || []).find((b) => b.dao === 'qi' && b.tier === tier);
-    assert.ok(!card0, `${from}→${tier}：lv 没到位不该有突破按钮`);
+    const due = hand.gatesDue(s);
+    assert.strictEqual(due.length, 1, `${from} 品修为满，${gateId} 该进池`);
+    assert.strictEqual(due[0].id, gateId);
+    assert.strictEqual(due[0].forced, true, '抽中即强制（显示类型）');
+    /* **不插队**：priority 与普通事件同层，不是 0/1 */
+    assert.ok(Number(due[0].priority) >= 2, '不该比其他事件优先');
 
-    /* 办事件 → lv+1，level 不变 */
-    const c = t.main.choices[0];
-    const r = turn.act(s, { kind: 'event', id: t.main.id, choice: c.id });
+    /* ③ **不是必出**：掷很多次，既有抽中也有没抽中的 */
+    const ctx = { state: s, rules, conditions, args: {} };
+    const pool = hand.all().concat(due);
+    let hits = 0;
+    const N = 120;
+    for (let k = 0; k < N; k += 1) {
+      const probe = mk(from, true);
+      const pctx = { state: probe, rules, conditions, args: {} };
+      const ppool = hand.all().concat(hand.gatesDue(probe));
+      const p = draw.mainOf(probe, ppool, pctx, { rng: mulberry(k + 1) });
+      if (p && p.id === gateId) hits += 1;
+    }
+    assert.ok(hits > 0, `${gateId} 该有机会被抽中（0/${N}）`);
+    assert.ok(hits < N, `${gateId} 不该必出（${hits}/${N}）`);
+
+    /* ④ 抽中之后：办完 lv+1，才出突破按钮，点了才进品。
+       走 `table` 而不是直接拿 gatesDue 的对象——`turn.act` 是靠 table.events 找的。 */
+    const w = mk(from, true);
+    /* 把随机钉死，保证这一张真的抽到 gate（否则 table.main 是别的事件） */
+    w.turn.mainId = gateId;
+    const tbl = hand.table(w);
+    assert.ok(tbl.main, '该有主卡');
+    assert.strictEqual(tbl.main.id, gateId, '主卡该是瓶颈事件');
+    const c = tbl.main.choices[0];
+    const r = turn.act(w, { kind: 'event', id: tbl.main.id, choice: c.id });
     assert.strictEqual(r.ok, true, r.reason || '');
-    assert.strictEqual(s.path.qi.lv, tier, `${gateId} 办完该把 lv 推到 ${tier}（实际 ${s.path.qi.lv}）`);
-    assert.strictEqual(s.path.qi.level, from, '境界还不该动');
+    assert.strictEqual(w.path.qi.lv, tier, `${gateId} 办完该把 lv 推到 ${tier}`);
+    assert.strictEqual(w.path.qi.level, from, '境界还不该动');
 
-    /* 现在出突破按钮，点它进品 */
-    const t2 = hand.table(s);
+    const t2 = hand.table(w);
     const card = (t2.breaks || []).find((b) => b.dao === 'qi' && b.tier === tier);
     assert.ok(card, `${from}→${tier}：lv 到位该出现突破按钮`);
-    assert.strictEqual(card.levelReady, true);
 
-    const r2 = turn.act(s, { kind: 'break', dao: 'qi', tier });
+    const r2 = turn.act(w, { kind: 'break', dao: 'qi', tier });
     assert.strictEqual(r2.ok, true, r2.reason || '');
     assert.strictEqual(r2.broke, true);
-    assert.strictEqual(s.path.qi.level, tier, `炼气该到 ${tier} 品`);
+    assert.strictEqual(w.path.qi.level, tier, `炼气该到 ${tier} 品`);
   }
 });
+
+/** 可复现的随机序列（测试用） */
+function mulberry(a) {
+  return function rng() {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 /* ── 串起来跑 ───────────────────────────────────────── */
 (async () => {
